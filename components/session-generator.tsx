@@ -45,7 +45,7 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, ed
   useEffect(() => {
     if (editingSession) {
       setTema(editingSession.tema)
-      setCompetenciasSeleccionadas(editingSession.competenciasSeleccionadas)
+      setCompetenciasSeleccionadas(Array.isArray(editingSession.competenciasSeleccionadas) ? editingSession.competenciasSeleccionadas : [])
       setCiclo(editingSession.ciclo)
       setContexto(editingSession.contexto)
       setHorasClase(editingSession.horasClase)
@@ -63,66 +63,38 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, ed
 
   const generateSession = async () => {
     if (!tema || competenciasSeleccionadas.length === 0 || !ciclo || !contexto || !horasClase || !materialesDisponibles)
-      return
-
-    setIsGenerating(true)
-
-    await new Promise((resolve) => setTimeout(resolve, 3000))
-
-    const materialesDidacticosSugeridos = [
-      `Material concreto para ${tema} usando ${materialesDisponibles.toLowerCase()}`,
-      `Representaciones gráficas y visuales del tema ${tema}`,
-      `Juegos didácticos adaptados al contexto ${contexto.toLowerCase()}`,
-      `Fichas de trabajo personalizadas para ${tema}`,
-      `Material manipulativo creado con recursos disponibles`,
-    ]
-
-    const sessionData: SessionData = {
-      tema,
-      competenciasSeleccionadas,
-      ciclo,
-      contexto,
-      horasClase,
-      materialesDisponibles,
-      competenciaDescripcion: `${competenciasSeleccionadas[0]} - Nivel esperado para ciclo ${ciclo}: ${ciclo === "VI" ? "Los estudiantes desarrollan habilidades básicas y fundamentales" : "Los estudiantes consolidan y profundizan sus competencias matemáticas"}`,
-      secuenciaMetodologica: {
-        inicio: `**INICIO (${Math.ceil(horasClase * 0.2 * 45)} min):** Problematización y motivación con situación del contexto ${contexto.toLowerCase()} relacionada con ${tema}. Activación de saberes previos y presentación del propósito de aprendizaje usando ${materialesDisponibles.toLowerCase()}.`,
-        desarrollo: `**DESARROLLO (${Math.ceil(horasClase * 0.6 * 45)} min):** Aplicación de los procesos didácticos de matemática: familiarización con el problema, búsqueda y ejecución de estrategias, socialización de representaciones, reflexión y formalización del aprendizaje utilizando los materiales disponibles.`,
-        cierre: `**CIERRE (${Math.ceil(horasClase * 0.2 * 45)} min):** Síntesis de aprendizajes, metacognición y planteamiento de otros problemas relacionados con ${tema} en el contexto local.`,
-      },
-      procesosDidacticos: [
-        "Familiarización con el problema",
-        "Búsqueda y ejecución de estrategias",
-        "Socialización de representaciones",
-        "Reflexión y formalización",
-        "Planteamiento de otros problemas",
-      ],
-      actividadesContextualizadas: [
-        `Situación problemática del contexto ${contexto.toLowerCase()} que involucra ${tema}`,
-        `Trabajo colaborativo aplicando estrategias matemáticas en problemas locales`,
-        `Uso de materiales del entorno para representar conceptos de ${tema}`,
-        `Presentación de soluciones contextualizadas al entorno social elegido`,
-      ],
-      distribucionHoras:
-        horasClase === 1
-          ? `Sesión única de 45 minutos: Inicio (10 min), Desarrollo (30 min), Cierre (5 min)`
-          : `Distribución en ${horasClase} horas: ${Array.from(
-              { length: horasClase },
-              (_, i) =>
-                `Hora ${i + 1}: ${
-                  i === 0
-                    ? "Problematización y familiarización"
-                    : i === horasClase - 1
-                      ? "Reflexión y cierre"
-                      : "Desarrollo de estrategias"
-                }`,
-            ).join(", ")}`,
-      materialesDidacticosSugeridos,
-      createdAt: new Date(),
+      return;
+    setIsGenerating(true);
+    try {
+      // Construir el mensaje en el formato esperado por el backend
+      const message = `Tema: ${tema}\nCompetencia: ${competenciasSeleccionadas.join(", ")}\nGrado: ${ciclo}\nContexto: ${contexto}\nDuración: ${horasClase} horas\nMateriales: ${materialesDisponibles}`;
+      const formData = new FormData();
+      formData.append("Body", message);
+      formData.append("From", user.email || user.name || "frontend");
+      const response = await fetch("https://eduai-pjfa.onrender.com/webhook", {
+        method: "POST",
+        body: formData,
+      });
+      if (!response.ok) throw new Error("Error al generar la sesión");
+      let sessionData = await response.json();
+      // Si viene error y raw, intentar extraer el JSON real
+      if (sessionData && sessionData.error && sessionData.raw) {
+        // Extraer el bloque JSON ignorando los backticks y el encabezado "json"
+        const match = sessionData.raw.match(/```json\s*([\s\S]*?)\s*```/);
+        if (match && match[1]) {
+          try {
+            sessionData = JSON.parse(match[1]);
+          } catch (e) {
+            // Si falla, dejar el error original
+          }
+        }
+      }
+      onSessionGenerated(sessionData);
+    } catch (err) {
+      alert("Error al generar la sesión. Intenta de nuevo.");
+    } finally {
+      setIsGenerating(false);
     }
-
-    setIsGenerating(false)
-    onSessionGenerated(sessionData)
   }
 
   return (

@@ -22,6 +22,44 @@ import {
 } from "lucide-react"
 import type { SessionData } from "@/app/page"
 
+// Función para parsear el output plano de Gemini
+function parseGeminiText(text: string) {
+  if (!text) return null;
+  const lines = text.split(/\r?\n/).map(l => l.trim());
+  let title = "", tema = "", competencia = "", duracion = "", contexto = "";
+  let procesos: { titulo: string, items: string[] }[] = [];
+  let criterios: string[] = [];
+  let currentProceso: { titulo: string, items: string[] } | null = null;
+  let inCriterios = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (i === 0 && line.startsWith("📘")) {
+      title = line.replace("📘", "").trim();
+      continue;
+    }
+    if (line.startsWith("Tema:")) tema = line.replace("Tema:", "").trim();
+    else if (line.startsWith("Competencia:")) competencia = line.replace("Competencia:", "").trim();
+    else if (line.startsWith("Duración:")) duracion = line.replace("Duración:", "").trim();
+    else if (line.startsWith("Contexto:")) contexto = line.replace("Contexto:", "").trim();
+    else if (/^\d+\./.test(line)) {
+      // Proceso didáctico
+      if (currentProceso) procesos.push(currentProceso);
+      const titulo = line.replace(/^\d+\.\s*/, "").replace(":", "").trim();
+      currentProceso = { titulo, items: [] };
+    } else if (line.startsWith("- ") && currentProceso && !inCriterios) {
+      currentProceso.items.push(line.replace("- ", "").trim());
+    } else if (line.startsWith("✅")) {
+      if (currentProceso) procesos.push(currentProceso);
+      inCriterios = true;
+    } else if (inCriterios && line.startsWith("- ")) {
+      criterios.push(line.replace("- ", "").trim());
+    }
+  }
+  if (currentProceso && !procesos.includes(currentProceso)) procesos.push(currentProceso);
+  return { title, tema, competencia, duracion, contexto, procesos, criterios };
+}
+
 interface SessionResultsProps {
   session: SessionData
   onBack: () => void
@@ -179,7 +217,7 @@ export function SessionResults({ session, onBack, onViewDashboard, onEdit }: Ses
               <CardDescription>Estructura pedagógica Inicio - Desarrollo - Cierre</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {session.secuenciaMetodologica && (
+              {session.secuenciaMetodologica && session.secuenciaMetodologica.inicio && session.secuenciaMetodologica.desarrollo && session.secuenciaMetodologica.cierre ? (
                 <>
                   <div className="glass-effect rounded-xl p-4 border-l-4 border-primary">
                     <h4 className="font-bold text-primary mb-2">INICIO</h4>
@@ -211,6 +249,48 @@ export function SessionResults({ session, onBack, onViewDashboard, onEdit }: Ses
                     />
                   </div>
                 </>
+              ) : (
+                (() => {
+                  const parsed = parseGeminiText(session.competenciaDescripcion || "");
+                  if (!parsed) return <div className="text-muted-foreground">No hay información disponible.</div>;
+                  return (
+                    <div className="space-y-6">
+                      <div className="glass-effect rounded-xl p-4 border-l-4 border-primary">
+                        <h4 className="font-bold text-primary mb-2">{parsed.title || "Sesión Generada"}</h4>
+                        <div className="text-foreground leading-relaxed">
+                          {parsed.tema && <div><strong>Tema:</strong> {parsed.tema}</div>}
+                          {parsed.competencia && <div><strong>Competencia:</strong> {parsed.competencia}</div>}
+                          {parsed.duracion && <div><strong>Duración:</strong> {parsed.duracion}</div>}
+                          {parsed.contexto && <div><strong>Contexto:</strong> {parsed.contexto}</div>}
+                        </div>
+                      </div>
+                      {parsed.procesos.length > 0 && (
+                        <div className="space-y-4">
+                          {parsed.procesos.map((proc, idx) => (
+                            <div key={idx} className="glass-effect rounded-xl p-4 border-l-4 border-secondary">
+                              <h5 className="font-bold text-secondary mb-2">{proc.titulo}</h5>
+                              <ul className="list-disc pl-6 space-y-1">
+                                {proc.items.map((item, i) => (
+                                  <li key={i} className="text-foreground leading-relaxed">{item}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {parsed.criterios.length > 0 && (
+                        <div className="glass-effect rounded-xl p-4 border-l-4 border-accent">
+                          <h5 className="font-bold text-accent mb-2">Criterios de Evaluación</h5>
+                          <ul className="list-disc pl-6 space-y-1">
+                            {parsed.criterios.map((crit, i) => (
+                              <li key={i} className="text-foreground leading-relaxed">{crit}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()
               )}
             </CardContent>
           </Card>
@@ -280,7 +360,7 @@ export function SessionResults({ session, onBack, onViewDashboard, onEdit }: Ses
                   Actividades Contextualizadas
                 </span>
               </CardTitle>
-              <CardDescription>Adaptadas al contexto {session.contexto.toLowerCase()} seleccionado</CardDescription>
+              <CardDescription>Adaptadas al contexto {(session.contexto ? session.contexto.toLowerCase() : "N/A")} seleccionado</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
