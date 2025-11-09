@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { LoginScreen } from "@/components/login-screen"
 import { SessionGenerator } from "@/components/session-generator"
 import { SessionResults } from "@/components/session-results"
@@ -41,15 +42,44 @@ export type SessionData = {
 }
 
 export default function Home() {
-  const [currentView, setCurrentView] = useState<"login" | "generator" | "results" | "dashboard">("login")
+  const router = useRouter()
+  const [currentView, setCurrentView] = useState<"generator" | "results" | "dashboard">("generator")
   const [user, setUser] = useState<{ name: string; email: string } | null>(null)
   const [currentSession, setCurrentSession] = useState<SessionData | null>(null)
   const [sessions, setSessions] = useState<SessionData[]>([])
   const [editingSession, setEditingSession] = useState<SessionData | null>(null)
 
+  // Restaurar sesión al cargar y verificar autenticación
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user")
+    const accessToken = localStorage.getItem("access_token")
+    
+    if (storedUser && accessToken) {
+      try {
+        const userData = JSON.parse(storedUser)
+        setUser(userData)
+      } catch (e) {
+        console.error("Error restaurando sesión:", e)
+        router.push("/auth")
+      }
+    } else {
+      router.push("/auth")
+    }
+  }, [router])
+
   const handleLogin = (userData: { name: string; email: string }) => {
     setUser(userData)
     setCurrentView("generator")
+  }
+
+  const handleLogout = () => {
+    setUser(null)
+    localStorage.removeItem("user")
+    localStorage.removeItem("access_token")
+    setCurrentSession(null)
+    setSessions([])
+    setEditingSession(null)
+    router.push("/auth")
   }
 
   const handleSessionGenerated = (sessionData: SessionData) => {
@@ -77,8 +107,13 @@ export default function Home() {
     setCurrentView("generator")
   }
 
-  if (currentView === "login") {
-    return <LoginScreen onLogin={handleLogin} />
+  const handleOpenSavedSession = (sessionData: SessionData) => {
+    setCurrentSession(sessionData)
+    setCurrentView("results")
+  }
+
+  if (!user) {
+    return null // Loading, será redirigido por useEffect
   }
 
   if (currentView === "generator") {
@@ -87,6 +122,7 @@ export default function Home() {
         user={user!}
         onSessionGenerated={handleSessionGenerated}
         onViewDashboard={handleViewDashboard}
+        onLogout={handleLogout}
         editingSession={editingSession}
       />
     )
@@ -104,7 +140,7 @@ export default function Home() {
   }
 
   if (currentView === "dashboard") {
-    return <TeacherDashboard user={user!} sessions={sessions} onBack={handleBackFromDashboard} />
+    return <TeacherDashboard user={user!} sessions={sessions} onBack={handleBackFromDashboard} onOpenSession={handleOpenSavedSession} />
   }
 
   return null

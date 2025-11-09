@@ -1,5 +1,6 @@
 "use client"
 
+import { useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -19,46 +20,9 @@ import {
   MapPin,
   Package,
   Lightbulb,
+  Loader2,
 } from "lucide-react"
 import type { SessionData } from "@/app/page"
-
-// Función para parsear el output plano de Gemini
-function parseGeminiText(text: string) {
-  if (!text) return null;
-  const lines = text.split(/\r?\n/).map(l => l.trim());
-  let title = "", tema = "", competencia = "", duracion = "", contexto = "";
-  let procesos: { titulo: string, items: string[] }[] = [];
-  let criterios: string[] = [];
-  let currentProceso: { titulo: string, items: string[] } | null = null;
-  let inCriterios = false;
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (i === 0 && line.startsWith("📘")) {
-      title = line.replace("📘", "").trim();
-      continue;
-    }
-    if (line.startsWith("Tema:")) tema = line.replace("Tema:", "").trim();
-    else if (line.startsWith("Competencia:")) competencia = line.replace("Competencia:", "").trim();
-    else if (line.startsWith("Duración:")) duracion = line.replace("Duración:", "").trim();
-    else if (line.startsWith("Contexto:")) contexto = line.replace("Contexto:", "").trim();
-    else if (/^\d+\./.test(line)) {
-      // Proceso didáctico
-      if (currentProceso) procesos.push(currentProceso);
-      const titulo = line.replace(/^\d+\.\s*/, "").replace(":", "").trim();
-      currentProceso = { titulo, items: [] };
-    } else if (line.startsWith("- ") && currentProceso && !inCriterios) {
-      currentProceso.items.push(line.replace("- ", "").trim());
-    } else if (line.startsWith("✅")) {
-      if (currentProceso) procesos.push(currentProceso);
-      inCriterios = true;
-    } else if (inCriterios && line.startsWith("- ")) {
-      criterios.push(line.replace("- ", "").trim());
-    }
-  }
-  if (currentProceso && !procesos.includes(currentProceso)) procesos.push(currentProceso);
-  return { title, tema, competencia, duracion, contexto, procesos, criterios };
-}
 
 interface SessionResultsProps {
   session: SessionData
@@ -68,13 +32,131 @@ interface SessionResultsProps {
 }
 
 export function SessionResults({ session, onBack, onViewDashboard, onEdit }: SessionResultsProps) {
-  const handleExportPDF = () => {
-    // Simulamos exportación a PDF
-    alert("Exportando sesión a PDF...")
+  const [isSaving, setIsSaving] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || "http://127.0.0.1:8000"
+
+  // Parsear distribución horaria del backend
+  const parseDistribucionHoras = () => {
+    if (!session.distribucionHoras) return { inicio: 0, desarrollo: 0, cierre: 0 }
+    
+    const text = session.distribucionHoras.toLowerCase()
+    const inicioRegex = /inicio:?\s*(\d+)\s*minutos?/i
+    const desarrolloRegex = /desarrollo:?\s*(\d+)\s*minutos?/i
+    const cierreRegex = /cierre:?\s*(\d+)\s*minutos?/i
+    
+    const inicioMatch = inicioRegex.exec(text)
+    const desarrolloMatch = desarrolloRegex.exec(text)
+    const cierreMatch = cierreRegex.exec(text)
+    
+    return {
+      inicio: inicioMatch ? Number.parseInt(inicioMatch[1]) : 0,
+      desarrollo: desarrolloMatch ? Number.parseInt(desarrolloMatch[1]) : 0,
+      cierre: cierreMatch ? Number.parseInt(cierreMatch[1]) : 0,
+    }
   }
 
-  const handleSaveSession = () => {
-    alert("Sesión guardada en tu dashboard...")
+  const tiempos = parseDistribucionHoras()
+
+  const handleExportPDF = async () => {
+    setIsExporting(true)
+    try {
+      const pdfEndpoint = "https://pdf-render-hfzf.onrender.com/generate-pdf"
+      
+      // Preparar los datos en el formato esperado
+      const payload = {
+        data: {
+          tema: session.tema,
+          ciclo: session.ciclo,
+          contexto: session.contexto,
+          horasClase: session.horasClase,
+          competenciasSeleccionadas: session.competenciasSeleccionadas,
+          materialesDisponibles: session.materialesDisponibles,
+          competenciaDescripcion: session.competenciaDescripcion,
+          secuenciaMetodologica: session.secuenciaMetodologica,
+          procesosDidacticos: session.procesosDidacticos,
+          actividadesContextualizadas: session.actividadesContextualizadas,
+          distribucionHoras: session.distribucionHoras,
+          materialesDidacticosSugeridos: session.materialesDidacticosSugeridos,
+          criteriosEvaluacion: session.criteriosEvaluacion,
+        }
+      }
+
+      console.log('Enviando datos al generador de PDF:', payload)
+
+      const response = await fetch(pdfEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Error del servidor: ${response.status} ${response.statusText}`)
+      }
+
+      // Obtener el blob del PDF
+      const blob = await response.blob()
+      
+      // Crear un objeto URL para descargar
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `sesion-${session.tema?.substring(0, 20)}-${new Date().toISOString().split("T")[0]}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+      alert('¡PDF descargado exitosamente!')
+    } catch (err) {
+      console.error('Error exportando PDF:', err)
+      alert('Error al generar PDF. Intenta de nuevo.')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const handleSaveSession = async () => {
+    setIsSaving(true)
+    try {
+      const accessToken = localStorage.getItem("access_token")
+      const user = localStorage.getItem("user")
+
+      if (!accessToken || !user) {
+        alert("Debes estar autenticado para guardar sesiones")
+        return
+      }
+
+      const userData = JSON.parse(user)
+
+      const payload = {
+        user_id: userData.email,
+        session_data: session,
+      }
+
+      const res = await fetch(`${AUTH_URL}/save-session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!res.ok) {
+        throw new Error("Error al guardar la sesión")
+      }
+
+      alert("¡Sesión guardada exitosamente!")
+    } catch (err) {
+      console.error("Error guardando sesión:", err)
+      alert(`Error: ${err instanceof Error ? err.message : "Error desconocido"}`)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -122,229 +204,71 @@ export function SessionResults({ session, onBack, onViewDashboard, onEdit }: Ses
               <Edit3 className="h-4 w-4 mr-2" />
               Editar
             </Button>
-            <Button
-              variant="outline"
-              onClick={handleExportPDF}
-              className="glass-effect border-primary/30 hover:glow-primary bg-transparent"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              PDF
-            </Button>
           </div>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8 relative z-10">
-        <div className="max-w-4xl mx-auto space-y-6">
-          <Card className="glass-effect border-0 glow-primary/10">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-3xl text-balance bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    {session.tema}
-                  </CardTitle>
-                  <CardDescription className="text-lg font-medium flex items-center gap-4 mt-2">
-                    <span className="flex items-center gap-1">
-                      <GraduationCap className="h-4 w-4" />
-                      Ciclo {session.ciclo}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
-                      Contexto {session.contexto}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {session.horasClase} {session.horasClase === 1 ? "hora" : "horas"}
-                    </span>
-                  </CardDescription>
-                </div>
-                <Badge className="gradient-primary text-white glow-primary">
-                  <Brain className="h-3 w-3 mr-1" />
-                  IA + Currículo
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-semibold text-sm text-muted-foreground mb-2">COMPETENCIAS SELECCIONADAS:</h4>
-                  <div className="space-y-2">
-                    {session.competenciasSeleccionadas?.map((competencia, index) => (
-                      <Badge key={index} variant="secondary" className="glass-effect text-sm px-3 py-1">
-                        <Target className="h-3 w-3 mr-1" />
-                        {competencia}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                {session.materialesDisponibles && (
-                  <div>
-                    <h4 className="font-semibold text-sm text-muted-foreground mb-2">MATERIALES DISPONIBLES:</h4>
-                    <div className="glass-effect rounded-xl p-3 border-l-4 border-secondary">
-                      <p className="text-foreground text-sm leading-relaxed">{session.materialesDisponibles}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass-effect border-0 glow-accent/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Target className="h-6 w-6 text-accent" />
-                <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
-                  Competencia y Nivel Esperado
-                </span>
-              </CardTitle>
-              <CardDescription>Según currículo nacional para el ciclo seleccionado</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="glass-effect rounded-xl p-4 border-l-4 border-accent">
-                <p className="text-foreground leading-relaxed text-lg">{session.competenciaDescripcion}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass-effect border-0 glow-secondary/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Clock className="h-6 w-6 text-secondary" />
-                <span className="bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
-                  Secuencia Metodológica Completa
-                </span>
-              </CardTitle>
-              <CardDescription>Estructura pedagógica Inicio - Desarrollo - Cierre</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {session.secuenciaMetodologica && session.secuenciaMetodologica.inicio && session.secuenciaMetodologica.desarrollo && session.secuenciaMetodologica.cierre ? (
-                <>
-                  <div className="glass-effect rounded-xl p-4 border-l-4 border-primary">
-                    <h4 className="font-bold text-primary mb-2">INICIO</h4>
-                    <div
-                      className="text-foreground leading-relaxed"
-                      dangerouslySetInnerHTML={{
-                        __html: session.secuenciaMetodologica.inicio.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
-                      }}
-                    />
-                  </div>
-                  <div className="glass-effect rounded-xl p-4 border-l-4 border-secondary">
-                    <h4 className="font-bold text-secondary mb-2">DESARROLLO</h4>
-                    <div
-                      className="text-foreground leading-relaxed"
-                      dangerouslySetInnerHTML={{
-                        __html: session.secuenciaMetodologica.desarrollo
-                          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                          .replace(/\n/g, "<br>"),
-                      }}
-                    />
-                  </div>
-                  <div className="glass-effect rounded-xl p-4 border-l-4 border-accent">
-                    <h4 className="font-bold text-accent mb-2">CIERRE</h4>
-                    <div
-                      className="text-foreground leading-relaxed"
-                      dangerouslySetInnerHTML={{
-                        __html: session.secuenciaMetodologica.cierre.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
-                      }}
-                    />
-                  </div>
-                </>
-              ) : (
-                (() => {
-                  const parsed = parseGeminiText(session.competenciaDescripcion || "");
-                  if (!parsed) return <div className="text-muted-foreground">No hay información disponible.</div>;
-                  return (
-                    <div className="space-y-6">
-                      <div className="glass-effect rounded-xl p-4 border-l-4 border-primary">
-                        <h4 className="font-bold text-primary mb-2">{parsed.title || "Sesión Generada"}</h4>
-                        <div className="text-foreground leading-relaxed">
-                          {parsed.tema && <div><strong>Tema:</strong> {parsed.tema}</div>}
-                          {parsed.competencia && <div><strong>Competencia:</strong> {parsed.competencia}</div>}
-                          {parsed.duracion && <div><strong>Duración:</strong> {parsed.duracion}</div>}
-                          {parsed.contexto && <div><strong>Contexto:</strong> {parsed.contexto}</div>}
-                        </div>
-                      </div>
-                      {parsed.procesos.length > 0 && (
-                        <div className="space-y-4">
-                          {parsed.procesos.map((proc, idx) => (
-                            <div key={idx} className="glass-effect rounded-xl p-4 border-l-4 border-secondary">
-                              <h5 className="font-bold text-secondary mb-2">{proc.titulo}</h5>
-                              <ul className="list-disc pl-6 space-y-1">
-                                {proc.items.map((item, i) => (
-                                  <li key={i} className="text-foreground leading-relaxed">{item}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {parsed.criterios.length > 0 && (
-                        <div className="glass-effect rounded-xl p-4 border-l-4 border-accent">
-                          <h5 className="font-bold text-accent mb-2">Criterios de Evaluación</h5>
-                          <ul className="list-disc pl-6 space-y-1">
-                            {parsed.criterios.map((crit, i) => (
-                              <li key={i} className="text-foreground leading-relaxed">{crit}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="glass-effect border-0 glow-accent/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <BookOpen className="h-6 w-6 text-accent" />
-                <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
-                  Procesos Didácticos de Matemática
-                </span>
-              </CardTitle>
-              <CardDescription>Los 5 procesos específicos según MINEDU</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {session.procesosDidacticos?.map((proceso, index) => (
-                  <div
-                    key={index}
-                    className="glass-effect rounded-xl p-4 hover:glow-accent/20 transition-all duration-300"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="gradient-accent rounded-full p-2 glow-accent">
-                        <span className="text-white font-bold text-sm">{index + 1}</span>
-                      </div>
-                      <span className="font-medium">{proceso}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {session.materialesDidacticosSugeridos && session.materialesDidacticosSugeridos.length > 0 && (
+        <div className="max-w-6xl mx-auto space-y-6" ref={contentRef}>
+          
+          {/* Resumen Rápido - 4 columnas */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="glass-effect border-0 glow-primary/10">
+              <CardContent className="pt-6">
+                <div className="text-center space-y-2">
+                  <BookOpen className="h-8 w-8 text-primary mx-auto" />
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Tema</p>
+                  <p className="font-bold text-sm line-clamp-3 leading-tight">{session.tema}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="glass-effect border-0 glow-secondary/10">
+              <CardContent className="pt-6">
+                <div className="text-center space-y-2">
+                  <GraduationCap className="h-8 w-8 text-secondary mx-auto" />
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Ciclo</p>
+                  <p className="font-bold text-lg">{session.ciclo}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="glass-effect border-0 glow-accent/10">
+              <CardContent className="pt-6">
+                <div className="text-center space-y-2">
+                  <Clock className="h-8 w-8 text-accent mx-auto" />
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Duración</p>
+                  <p className="font-bold text-lg">{session.horasClase} hora{session.horasClase === 1 ? '' : 's'}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="glass-effect border-0 glow-primary/10">
+              <CardContent className="pt-6">
+                <div className="text-center space-y-2">
+                  <MapPin className="h-8 w-8 text-primary mx-auto" />
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Contexto</p>
+                  <p className="font-bold text-sm line-clamp-3 leading-tight">{session.contexto}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Competencias - Grid */}
+          {session.competenciasSeleccionadas && session.competenciasSeleccionadas.length > 0 && (
+            <Card className="glass-effect border-0 glow-secondary/10">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-2xl">
-                  <Lightbulb className="h-6 w-6 text-primary" />
-                  <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    Materiales Didácticos Sugeridos
-                  </span>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-secondary" />
+                  Competencias Seleccionadas
                 </CardTitle>
-                <CardDescription>Sugerencias personalizadas según el tema y materiales disponibles</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {session.materialesDidacticosSugeridos.map((material, index) => (
-                    <div key={index} className="glass-effect rounded-xl p-4 border-l-4 border-primary">
-                      <div className="flex items-start gap-3">
-                        <div className="gradient-primary rounded-full p-1 glow-primary mt-1">
-                          <Package className="h-3 w-3 text-white" />
-                        </div>
-                        <p className="text-foreground leading-relaxed">{material}</p>
-                      </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {session.competenciasSeleccionadas.map((comp, index) => (
+                    <div key={index} className="glass-effect rounded-lg p-3 border-l-4 border-secondary flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-secondary flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-foreground">{comp}</p>
                     </div>
                   ))}
                 </div>
@@ -352,75 +276,301 @@ export function SessionResults({ session, onBack, onViewDashboard, onEdit }: Ses
             </Card>
           )}
 
-          <Card className="glass-effect border-0 glow-secondary/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Users className="h-6 w-6 text-secondary" />
-                <span className="bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
-                  Actividades Contextualizadas
-                </span>
-              </CardTitle>
-              <CardDescription>Adaptadas al contexto {(session.contexto ? session.contexto.toLowerCase() : "N/A")} seleccionado</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {session.actividadesContextualizadas?.map((actividad, index) => (
-                  <div key={index} className="glass-effect rounded-xl p-4 border-l-4 border-secondary">
-                    <div className="flex items-start gap-3">
-                      <div className="gradient-secondary rounded-full p-1 glow-secondary mt-1">
-                        <Zap className="h-3 w-3 text-white" />
-                      </div>
-                      <p className="text-foreground leading-relaxed">{actividad}</p>
-                    </div>
+          {/* Descripción de Competencia */}
+          {session.competenciaDescripcion && (
+            <Card className="glass-effect border-0 glow-secondary/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-secondary" />
+                  Descripción de la Competencia
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="glass-effect rounded-lg p-4 border-l-4 border-secondary bg-gradient-to-r from-secondary/5 to-transparent">
+                  <p className="text-foreground leading-relaxed text-sm">{session.competenciaDescripcion}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Secuencia Metodológica - 3 columnas */}
+          {session.secuenciaMetodologica && (
+            <Card className="glass-effect border-0 glow-accent/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-accent" />
+                  Secuencia Metodológica
+                </CardTitle>
+                <CardDescription>Estructura pedagógica Inicio - Desarrollo - Cierre</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="glass-effect rounded-lg p-4 border-t-4 border-primary">
+                    <h4 className="font-bold text-primary mb-3 flex items-center gap-2">
+                      <span className="gradient-primary rounded-full w-6 h-6 flex items-center justify-center text-white text-xs">
+                        1
+                      </span>
+                      INICIO
+                    </h4>
+                    <div
+                      className="text-sm text-foreground leading-relaxed space-y-2"
+                      dangerouslySetInnerHTML={{
+                        __html: session.secuenciaMetodologica.inicio
+                          .replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-primary'>$1</strong>")
+                          .replaceAll("\n", "<br>"),
+                      }}
+                    />
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
 
-          <Card className="glass-effect border-0 glow-primary/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Clock className="h-6 w-6 text-primary" />
-                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                  Distribución en las Horas de Clase
-                </span>
-              </CardTitle>
-              <CardDescription>Cómo se reparte la secuencia en el tiempo elegido</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="glass-effect rounded-xl p-4 border-l-4 border-primary">
-                <p className="text-foreground leading-relaxed text-lg">{session.distribucionHoras}</p>
-              </div>
-            </CardContent>
-          </Card>
+                  <div className="glass-effect rounded-lg p-4 border-t-4 border-secondary">
+                    <h4 className="font-bold text-secondary mb-3 flex items-center gap-2">
+                      <span className="gradient-secondary rounded-full w-6 h-6 flex items-center justify-center text-white text-xs">
+                        2
+                      </span>
+                      DESARROLLO
+                    </h4>
+                    <div
+                      className="text-sm text-foreground leading-relaxed space-y-2"
+                      dangerouslySetInnerHTML={{
+                        __html: session.secuenciaMetodologica.desarrollo
+                          .replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-secondary'>$1</strong>")
+                          .replaceAll("\n", "<br>"),
+                      }}
+                    />
+                  </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-            <Button
-              onClick={handleSaveSession}
-              className="gradient-primary glow-primary hover:scale-105 transition-all duration-300 h-12"
-            >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Guardar Sesión
-            </Button>
-            <Button
-              onClick={handleExportPDF}
-              variant="outline"
-              className="glass-effect border-accent/30 hover:glow-accent h-12 bg-transparent"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Generar PDF
-            </Button>
-          </div>
+                  <div className="glass-effect rounded-lg p-4 border-t-4 border-accent">
+                    <h4 className="font-bold text-accent mb-3 flex items-center gap-2">
+                      <span className="gradient-accent rounded-full w-6 h-6 flex items-center justify-center text-white text-xs">
+                        3
+                      </span>
+                      CIERRE
+                    </h4>
+                    <div
+                      className="text-sm text-foreground leading-relaxed space-y-2"
+                      dangerouslySetInnerHTML={{
+                        __html: session.secuenciaMetodologica.cierre
+                          .replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-accent'>$1</strong>")
+                          .replaceAll("\n", "<br>"),
+                      }}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-          <div className="text-center pt-4">
+          {/* Distribución Horaria con visualización */}
+          {session.distribucionHoras && (
+            <Card className="glass-effect border-0 glow-secondary/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-secondary" />
+                  Distribución Horaria
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* Vertical bar chart with dynamic data */}
+                  <div className="flex items-end justify-center gap-4 h-64">
+                    {(() => {
+                      // Calcular el máximo para proporcionalidad
+                      const maxTiempo = Math.max(tiempos.inicio, tiempos.desarrollo, tiempos.cierre, 1)
+                      const containerHeight = 256 // h-64 = 256px
+                      
+                      return (
+                        <>
+                          {/* Inicio */}
+                          <div className="flex-1 flex flex-col items-center gap-3">
+                            <div 
+                              className="w-full bg-gradient-to-t from-primary to-primary/50 rounded-t-lg flex items-end justify-center pb-2 glow-primary/20" 
+                              style={{ height: `${Math.max((tiempos.inicio / maxTiempo) * containerHeight, 30)}px` }}
+                            >
+                              <span className="text-xs font-bold text-white">{tiempos.inicio}'</span>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-sm font-semibold text-primary">INICIO</p>
+                              <p className="text-xs text-muted-foreground">Motivación</p>
+                            </div>
+                          </div>
+
+                          {/* Desarrollo */}
+                          <div className="flex-1 flex flex-col items-center gap-3">
+                            <div 
+                              className="w-full bg-gradient-to-t from-secondary to-secondary/50 rounded-t-lg flex items-end justify-center pb-2 glow-secondary/20" 
+                              style={{ height: `${Math.max((tiempos.desarrollo / maxTiempo) * containerHeight, 30)}px` }}
+                            >
+                              <span className="text-xs font-bold text-white">{tiempos.desarrollo}'</span>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-sm font-semibold text-secondary">DESARROLLO</p>
+                              <p className="text-xs text-muted-foreground">Contenido</p>
+                            </div>
+                          </div>
+
+                          {/* Cierre */}
+                          <div className="flex-1 flex flex-col items-center gap-3">
+                            <div 
+                              className="w-full bg-gradient-to-t from-accent to-accent/50 rounded-t-lg flex items-end justify-center pb-2 glow-accent/20" 
+                              style={{ height: `${Math.max((tiempos.cierre / maxTiempo) * containerHeight, 30)}px` }}
+                            >
+                              <span className="text-xs font-bold text-white">{tiempos.cierre}'</span>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-sm font-semibold text-accent">CIERRE</p>
+                              <p className="text-xs text-muted-foreground">Reflexión</p>
+                            </div>
+                          </div>
+                        </>
+                      )
+                    })()}
+                  </div>
+
+                  {/* Timeline visual */}
+                  <div className="relative pt-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="text-xs font-semibold text-primary">0 min</div>
+                      <div className="text-xs font-semibold text-secondary">{tiempos.inicio}-{tiempos.inicio + tiempos.desarrollo} min</div>
+                      <div className="text-xs font-semibold text-accent">{tiempos.inicio + tiempos.desarrollo + tiempos.cierre} min</div>
+                    </div>
+                    <div className="w-full h-3 bg-gradient-to-r from-primary via-secondary to-accent rounded-full glow-primary/10" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Procesos Didácticos - Grid 5 columnas */}
+          {session.procesosDidacticos && session.procesosDidacticos.length > 0 && (
+            <Card className="glass-effect border-0 glow-accent/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-accent" />
+                  Procesos Didácticos
+                </CardTitle>
+                <CardDescription>5 procesos clave según MINEDU</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                  {session.procesosDidacticos.map((proceso, index) => (
+                    <div key={index} className="glass-effect rounded-lg p-3 text-center hover:glow-accent/30 transition-all duration-300">
+                      <div className="gradient-accent rounded-full w-10 h-10 flex items-center justify-center text-white font-bold text-sm mx-auto mb-2 glow-accent">
+                        {index + 1}
+                      </div>
+                      <p className="text-sm font-medium line-clamp-3">{proceso}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Materiales Disponibles */}
+          {session.materialesDisponibles && (
+            <Card className="glass-effect border-0 glow-primary/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="h-5 w-5 text-primary" />
+                  Materiales Disponibles
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="glass-effect rounded-lg p-4 border-l-4 border-primary bg-gradient-to-r from-primary/5 to-transparent">
+                  <p className="text-foreground leading-relaxed text-sm">{session.materialesDisponibles}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Materiales Didácticos Sugeridos - Grid 2 columnas */}
+          {session.materialesDidacticosSugeridos && session.materialesDidacticosSugeridos.length > 0 && (
+            <Card className="glass-effect border-0 glow-primary/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-primary" />
+                  Materiales Didácticos Sugeridos
+                </CardTitle>
+                <CardDescription>Recursos recomendados para potenciar la sesión</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {session.materialesDidacticosSugeridos.map((material, index) => (
+                    <div key={index} className="glass-effect rounded-lg p-3 border-l-4 border-primary flex items-start gap-3">
+                      <Package className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-foreground">{material}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Actividades Contextualizadas - Grid 2 columnas */}
+          {session.actividadesContextualizadas && session.actividadesContextualizadas.length > 0 && (
+            <Card className="glass-effect border-0 glow-secondary/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-secondary" />
+                  Actividades Contextualizadas
+                </CardTitle>
+                <CardDescription>Estrategias adaptadas al contexto local</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {session.actividadesContextualizadas.map((actividad, index) => (
+                    <div key={index} className="glass-effect rounded-lg p-3 border-l-4 border-secondary flex items-start gap-3">
+                      <Zap className="h-4 w-4 text-secondary flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-foreground">{actividad}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Botones de Acción */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-8">
             <Button
               onClick={onBack}
               variant="outline"
-              className="glass-effect border-primary/30 hover:glow-primary px-8 bg-transparent"
+              className="glass-effect border-primary/30 hover:glow-primary h-12 bg-transparent"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Generar Nueva Sesión
+              Nueva Sesión
+            </Button>
+            <Button
+              onClick={handleSaveSession}
+              disabled={isSaving}
+              className="gradient-secondary glow-secondary hover:scale-105 transition-all duration-300 h-12"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Guardar Sesión
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={handleExportPDF}
+              disabled={isExporting}
+              className="gradient-primary glow-primary hover:scale-105 transition-all duration-300 h-12"
+            >
+              {isExporting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Generando PDF...
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4 mr-2" />
+                  Descargar PDF
+                </>
+              )}
             </Button>
           </div>
         </div>

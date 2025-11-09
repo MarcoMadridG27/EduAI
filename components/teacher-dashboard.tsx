@@ -1,31 +1,69 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Clock, Calendar, BookOpen, Users, Target, Brain, Sparkles, TrendingUp } from "lucide-react"
+import { ArrowLeft, Clock, Calendar, BookOpen, Users, Target, Brain, Sparkles, TrendingUp, Loader2 } from "lucide-react"
 import type { SessionData } from "@/app/page"
 
 interface TeacherDashboardProps {
   user: { name: string; email: string }
   sessions: SessionData[]
   onBack: () => void
+  onOpenSession: (session: SessionData) => void
 }
 
-export function TeacherDashboard({ user, sessions, onBack }: TeacherDashboardProps) {
-  const totalSessions = sessions.length
-  const timesSaved = totalSessions * 45 // 45 minutos por sesión
-  const resourcesUsed = [...new Set(sessions.flatMap((s) => s.recursos || []))].length
-  const contextsUsed = [...new Set(sessions.map((s) => s.contexto))].length
-  const competenciasUsadas = [...new Set(sessions.flatMap((s) => s.competenciasSeleccionadas || []))].length
+export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: TeacherDashboardProps) {
+  const [savedSessions, setSavedSessions] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("es-PE", {
-      day: "numeric",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date)
+  const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || "http://127.0.0.1:8000"
+
+  // Cargar sesiones guardadas del backend
+  useEffect(() => {
+    const loadSessions = async () => {
+      try {
+        const accessToken = localStorage.getItem("access_token")
+        if (!accessToken) return
+
+        const res = await fetch(`${AUTH_URL}/sessions?user_id=${user.email}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+
+        if (res.ok) {
+          const data = await res.json()
+          setSavedSessions(data)
+        }
+      } catch (err) {
+        console.error("Error cargando sesiones:", err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadSessions()
+  }, [user.email, AUTH_URL])
+
+  const totalSessions = savedSessions.length
+  const timesSaved = totalSessions * 45 // 45 minutos por sesión
+  const competenciasUsadas = [...new Set(savedSessions.flatMap((s) => s.session_data?.competenciasSeleccionadas || []))].length
+  const contextsUsed = [...new Set(savedSessions.map((s) => s.session_data?.contexto).filter(Boolean))].length
+
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString)
+      return new Intl.DateTimeFormat("es-PE", {
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(date)
+    } catch {
+      return "N/A"
+    }
   }
 
   return (
@@ -52,7 +90,7 @@ export function TeacherDashboard({ user, sessions, onBack }: TeacherDashboardPro
                 <h1 className="font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   Dashboard Docente
                 </h1>
-                <p className="text-sm text-muted-foreground font-medium">{user.name} • Virú, La Libertad</p>
+                <p className="text-sm text-muted-foreground font-medium">{user.name}</p>
               </div>
             </div>
           </div>
@@ -135,24 +173,29 @@ export function TeacherDashboard({ user, sessions, onBack }: TeacherDashboardPro
               <CardTitle className="flex items-center gap-3 text-2xl">
                 <Calendar className="h-6 w-6 text-secondary" />
                 <span className="bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
-                  Historial de Sesiones
+                  Historial de Sesiones Guardadas
                 </span>
               </CardTitle>
               <CardDescription className="text-base">
-                Todas las sesiones generadas con IA y currículo nacional
+                Sesiones generadas con IA y guardadas en tu perfil
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {sessions.length === 0 ? (
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <Loader2 className="h-12 w-12 text-secondary mx-auto mb-4 animate-spin" />
+                  <p className="text-muted-foreground">Cargando sesiones guardadas...</p>
+                </div>
+              ) : savedSessions.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="gradient-primary rounded-full p-6 w-24 h-24 mx-auto mb-6 glow-primary">
-                    <Target className="h-12 w-12 text-white mx-auto" />
+                    <BookOpen className="h-12 w-12 text-white mx-auto" />
                   </div>
                   <h3 className="text-xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    ¡Comienza tu primera sesión!
+                    Aún no tienes sesiones guardadas
                   </h3>
                   <p className="text-muted-foreground mb-6">
-                    Genera sesiones de aprendizaje personalizadas con IA para tus estudiantes de Virú
+                    Genera y guarda sesiones de aprendizaje personalizadas con IA
                   </p>
                   <Button
                     onClick={onBack}
@@ -164,61 +207,61 @@ export function TeacherDashboard({ user, sessions, onBack }: TeacherDashboardPro
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {sessions.map((session, index) => (
-                    <div
-                      key={index}
-                      className="glass-effect rounded-xl p-6 hover:glow-accent/20 transition-all duration-300 border-l-4 border-primary"
-                    >
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h3 className="font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                            {session.tema}
-                          </h3>
-                          <p className="text-muted-foreground font-medium">
-                            {session.grado} grado • {formatDate(session.createdAt)} • {session.contexto}
-                          </p>
-                        </div>
-                        <Badge className="gradient-secondary text-white glow-secondary">
-                          <Brain className="h-3 w-3 mr-1" />
-                          IA + Currículo
-                        </Badge>
-                      </div>
-
-                      {session.competenciasSeleccionadas && session.competenciasSeleccionadas.length > 0 && (
-                        <div className="mb-4">
-                          <h4 className="text-sm font-semibold text-muted-foreground mb-2">COMPETENCIAS:</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {session.competenciasSeleccionadas.slice(0, 2).map((competencia, compIndex) => (
-                              <Badge key={compIndex} variant="secondary" className="glass-effect text-xs">
-                                <Target className="h-3 w-3 mr-1" />
-                                {competencia.length > 40 ? `${competencia.substring(0, 40)}...` : competencia}
-                              </Badge>
-                            ))}
-                            {session.competenciasSeleccionadas.length > 2 && (
-                              <Badge variant="secondary" className="glass-effect text-xs">
-                                +{session.competenciasSeleccionadas.length - 2} más
-                              </Badge>
-                            )}
+                  {savedSessions.map((item, index) => {
+                    const session = item.session_data
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => onOpenSession(session)}
+                        className="w-full text-left glass-effect rounded-xl p-6 hover:glow-accent/20 transition-all duration-300 border-l-4 border-primary hover:border-accent hover:scale-105"
+                      >
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <h3 className="font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                              {session.tema}
+                            </h3>
+                            <p className="text-muted-foreground font-medium">
+                              Ciclo {session.ciclo} • {formatDate(item.created_at)} • {session.contexto}
+                            </p>
                           </div>
+                          <Badge className="gradient-secondary text-white glow-secondary">
+                            <Brain className="h-3 w-3 mr-1" />
+                            IA + Currículo
+                          </Badge>
                         </div>
-                      )}
 
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {(session.recursos || []).slice(0, 4).map((recurso) => (
-                          <Badge key={recurso} variant="outline" className="glass-effect text-xs">
-                            {recurso}
-                          </Badge>
-                        ))}
-                        {(session.recursos || []).length > 4 && (
-                          <Badge variant="outline" className="glass-effect text-xs">
-                            +{(session.recursos || []).length - 4} más
-                          </Badge>
+                        {session.competenciasSeleccionadas && session.competenciasSeleccionadas.length > 0 && (
+                          <div className="mb-4">
+                            <h4 className="text-sm font-semibold text-muted-foreground mb-2">COMPETENCIAS:</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {session.competenciasSeleccionadas.slice(0, 2).map((competencia: string, compIndex: number) => (
+                                <Badge key={compIndex} variant="secondary" className="glass-effect text-xs">
+                                  <Target className="h-3 w-3 mr-1" />
+                                  {competencia.length > 40 ? `${competencia.substring(0, 40)}...` : competencia}
+                                </Badge>
+                              ))}
+                              {session.competenciasSeleccionadas.length > 2 && (
+                                <Badge variant="secondary" className="glass-effect text-xs">
+                                  +{session.competenciasSeleccionadas.length - 2} más
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
                         )}
-                      </div>
 
-                      <p className="text-muted-foreground line-clamp-2 leading-relaxed">{session.objetivo}</p>
-                    </div>
-                  ))}
+                        {session.horasClase && (
+                          <div className="text-sm text-muted-foreground mb-3">
+                            <Clock className="h-4 w-4 inline mr-2" />
+                            {session.horasClase} {session.horasClase === 1 ? "hora" : "horas"} de clase
+                          </div>
+                        )}
+
+                        <p className="text-muted-foreground line-clamp-2 leading-relaxed">
+                          {session.competenciaDescripcion || "Sesión generada con inteligencia artificial"}
+                        </p>
+                      </button>
+                    )
+                  })}
                 </div>
               )}
             </CardContent>

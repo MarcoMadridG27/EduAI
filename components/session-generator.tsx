@@ -16,6 +16,7 @@ interface SessionGeneratorProps {
   user: { name: string; email: string }
   onSessionGenerated: (session: SessionData) => void
   onViewDashboard: () => void
+  onLogout: () => void
   editingSession?: SessionData | null
 }
 
@@ -33,7 +34,7 @@ const ciclosDescripciones = {
 
 const contextosLocales = ["Urbano", "Rural", "Agrícola", "Pesquero", "Comercial", "Minero", "Turístico"]
 
-export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, editingSession }: SessionGeneratorProps) {
+export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, onLogout, editingSession }: SessionGeneratorProps) {
   const [tema, setTema] = useState("")
   const [competenciasSeleccionadas, setCompetenciasSeleccionadas] = useState<string[]>([])
   const [ciclo, setCiclo] = useState("")
@@ -76,6 +77,7 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, ed
         body: formData,
       });
       if (!response.ok) throw new Error("Error al generar la sesión");
+      
       let sessionData = await response.json();
       // Si viene error y raw, intentar extraer el JSON real
       if (sessionData && sessionData.error && sessionData.raw) {
@@ -125,6 +127,13 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, ed
             >
               <BarChart3 className="h-4 w-4 mr-2" />
               Dashboard
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={onLogout}
+              className="glass-effect hover:opacity-90 transition-all duration-300"
+            >
+              Cerrar Sesión
             </Button>
             <div className="flex items-center gap-3 glass-effect px-4 py-2 rounded-full">
               <User className="h-4 w-4 text-accent" />
