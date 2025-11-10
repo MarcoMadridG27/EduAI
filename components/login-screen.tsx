@@ -16,7 +16,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
   const [googleReady, setGoogleReady] = useState(false)
   const googleButtonRef = useRef<HTMLDivElement>(null)
 
-  const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || "https://eduai-auth.onrender.com"
+  const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || "https://eduai-auth-1.onrender.com"
   const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
   // Maneja respuesta de Google Identity
