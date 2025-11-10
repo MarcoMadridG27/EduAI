@@ -35,7 +35,7 @@ export function SessionResults({ session, onBack, onViewDashboard, onEdit }: Ses
   const [isSaving, setIsSaving] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
   const contentRef = useRef<HTMLDivElement>(null)
-  const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || "http://127.0.0.1:8000"
+  const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || "https://eduai-auth.onrender.com"
 
   // Parsear distribución horaria del backend
   const parseDistribucionHoras = () => {
