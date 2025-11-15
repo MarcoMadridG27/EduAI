@@ -8,16 +8,31 @@ import { SessionResults } from "@/components/session-results"
 import { TeacherDashboard } from "@/components/teacher-dashboard"
 
 export type SessionData = {
+  // Datos Generales (nuevos campos)
+  datosGenerales?: {
+    titulo: string
+    docente: string
+    fecha: string
+    grado: string
+    seccion: string
+  }
+
   // Inputs del formulario
   tema: string
   competenciasSeleccionadas: string[]
+  capacidades?: string[] // Capacidades seleccionadas
   ciclo: string
   contexto: string
   horasClase: number
   materialesDisponibles: string
+  enfoqueTransversal?: string
+  competenciaTransversal?: string
 
-  // Outputs generados
+  // Outputs generados por IA
   competenciaDescripcion: string // Competencia + descripción del nivel esperado según ciclo
+  criteriosEvaluacion?: string // Criterios de evaluación (generado por IA)
+  evidenciasAprendizaje?: string // Evidencias de aprendizaje (generado por IA)
+  propositoSesion?: string // Propósito de la sesión (generado por IA)
   secuenciaMetodologica: {
     inicio: string
     desarrollo: string
@@ -27,6 +42,73 @@ export type SessionData = {
   actividadesContextualizadas: string[] // Actividades del entorno social elegido
   distribucionHoras: string // Cómo se reparte la secuencia en el tiempo
   materialesDidacticosSugeridos: string[]
+
+  // Recursos Adicionales (nuevo)
+  recursosAdicionales?: {
+    fichasDeTrabajo?: Array<{
+      titulo: string
+      instrucciones: string
+      ejercicios: string[]
+    }>
+    problemasYEjercicios?: Array<{
+      nivel: string
+      problema: string
+      respuesta: string
+      criterio: string
+    }>
+    juegoDidactico?: {
+      titulo: string
+      duracion: string
+      participantes: string
+      materiales: string
+      instrucciones: string[]
+      niveles: {
+        basico: string
+        intermedio: string
+        avanzado: string
+      }
+      reflexion: string
+    }
+    actividadDeActivacion?: Array<{
+      titulo: string
+      duracion: string
+      descripcion: string
+    }>
+    evaluacionFormativa?: {
+      titulo: string
+      duracion: string
+      instrucciones: string
+      preguntas: Array<{
+        tipo: string
+        pregunta: string
+        opciones?: string[]
+        respuesta_correcta: string
+        criterio: string
+      }>
+      rubrica: string
+    }
+    comunicadoParaPadres?: string
+    actividadesDiferenciadas?: {
+      refuerzo?: Array<{
+        titulo: string
+        descripcion: string
+        tiempo: string
+        objetivo: string
+      }>
+      consolidacion?: Array<{
+        titulo: string
+        descripcion: string
+        tiempo: string
+        objetivo: string
+      }>
+      profundizacion?: Array<{
+        titulo: string
+        descripcion: string
+        tiempo: string
+        objetivo: string
+      }>
+    }
+  }
 
   // Metadata
   createdAt: Date

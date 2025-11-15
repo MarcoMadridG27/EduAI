@@ -1,0 +1,44 @@
+✅ Competencia 1: Resuelve problemas de cantidad
+Capacidades
+
+Traduce cantidades a expresiones matemáticas.
+(Modela la situación y representa datos con números, operaciones o expresiones).
+
+Comunica su comprensión sobre los números y operaciones.
+
+Usa estrategias y procedimientos para resolver problemas de cantidad.
+
+Argumenta afirmaciones sobre relaciones numéricas y operaciones.
+
+✅ Competencia 2: Resuelve problemas de regularidad, equivalencia y cambio
+Capacidades
+
+Traduce relaciones y cambios a expresiones algebraicas.
+
+Comunica su comprensión del álgebra y funciones.
+
+Usa estrategias y procedimientos para representar o resolver relaciones y cambios.
+
+Argumenta afirmaciones sobre relaciones algebraicas y funciones.
+
+✅ Competencia 3: Resuelve problemas de forma, movimiento y localización
+Capacidades
+
+Traduce información y propiedades geométricas.
+
+Comunica su comprensión de las formas y relaciones geométricas.
+
+Usa estrategias y procedimientos para resolver problemas geométricos.
+
+Argumenta afirmaciones sobre relaciones geométricas.
+
+✅ Competencia 4: Resuelve problemas de gestión de datos e incertidumbre
+Capacidades
+
+Traduce información estadística y probabilística.
+
+Comunica su comprensión de datos, variabilidad e incertidumbre.
+
+Usa estrategias y procedimientos para analizar datos o situaciones aleatorias.
+
+Argumenta afirmaciones basadas en datos y probabilidades.
