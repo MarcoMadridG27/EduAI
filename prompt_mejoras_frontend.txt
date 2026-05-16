@@ -1,0 +1,250 @@
+=============================================================
+PROMPT PARA AGENTE DE MEJORA DE FRONTEND
+Aplicación: Generador de Sesiones de Aprendizaje - Matemática Secundaria Perú (MINEDU)
+=============================================================
+
+Eres un experto en UI/UX y desarrollo frontend. Necesito que mejores una aplicación web para generar sesiones de aprendizaje de matemáticas para docentes de secundaria en Perú, basada en el Currículo Nacional (CNEB - RM 649-2016-MINEDU).
+
+A continuación te detallo todos los cambios, mejoras y correcciones que debes aplicar.
+
+---
+
+## 1. LAYOUT Y ESTRUCTURA GENERAL
+
+- El formulario completo debe estar centrado horizontalmente en la pantalla, con un ancho máximo de 720px en desktop y 100% en móvil.
+- Agrega padding lateral de al menos 16px en mobile.
+- El fondo de la página debe ser un degradado sutil oscuro (por ejemplo de #0f0f1a a #1a1a2e), no negro puro.
+- La tarjeta del formulario debe tener un fondo ligeramente más claro que el fondo de página (ej: #16213e o #1e1e2e), con border-radius de 16px y un box-shadow suave.
+- Añade un header visual en la parte superior de la página (fuera de la tarjeta) con el título "Genera tu Sesión de Aprendizaje ⚡" en gradiente de color (morado → cyan), subtítulo pequeño en gris claro, e idealmente un ícono o badge que diga "Powered by IA".
+- Divide el formulario en secciones claramente separadas con un divider visual (línea sutil) entre cada sección.
+- Cada sección debe tener un ícono + título de sección en color destacado (morado o cyan), como ya tienes, pero asegúrate de que haya suficiente espacio (margin-top: 32px) entre secciones.
+- El botón "Generar Sesión de Aprendizaje" debe estar pegado al fondo de la tarjeta, ser full-width, con gradiente morado→azul, altura mínima de 52px, texto bold, y efecto hover con brillo (glow).
+
+---
+
+## 2. CORRECCIÓN: GRADO Y CICLO (LÓGICA AUTOMÁTICA)
+
+PROBLEMA ACTUAL: El formulario tiene campos separados de "Grado" y "Ciclo" que el usuario debe seleccionar manualmente.
+
+SOLUCIÓN: Eliminar el campo "Ciclo" como selector independiente. En su lugar:
+- El usuario solo selecciona el GRADO (1° a 5° de secundaria).
+- El ciclo se asigna AUTOMÁTICAMENTE según la lógica del CNEB:
+  - 1° Secundaria → Ciclo VI
+  - 2° Secundaria → Ciclo VI
+  - 3° Secundaria → Ciclo VII
+  - 4° Secundaria → Ciclo VII
+  - 5° Secundaria → Ciclo VII
+- Mostrar el ciclo detectado como un badge/chip informativo de solo lectura debajo del selector de grado, por ejemplo: "📚 Ciclo VI (1° y 2° de secundaria)"
+- Este badge debe aparecer con una animación suave (fade-in) al seleccionar el grado.
+
+---
+
+## 3. SECCIÓN: COMPETENCIAS Y CAPACIDADES
+
+### 3.1 Diseño de las competencias
+- Las 4 competencias deben mostrarse como tarjetas seleccionables (no simples checkboxes con texto plano).
+- Cada tarjeta de competencia debe tener:
+  - Un ícono representativo a la izquierda (sugerencias abajo)
+  - El nombre de la competencia en texto blanco
+  - Un checkbox o indicador visual de selección a la derecha
+  - Al estar seleccionada: borde izquierdo de 3px en color morado/cyan + fondo ligeramente más claro
+- Íconos sugeridos por competencia:
+  - "Resuelve problemas de cantidad" → 🔢 o ícono de calculadora
+  - "Resuelve problemas de regularidad, equivalencia y cambio" → 📐 o ícono de función
+  - "Resuelve problemas de forma, movimiento y localización" → 📏 o ícono de geometría
+  - "Resuelve problemas de gestión de datos e incertidumbre" → 📊 o ícono de gráfica
+
+### 3.2 Aparición de capacidades
+PROBLEMA ACTUAL: Las capacidades aparecen debajo de todas las competencias en una lista plana, lo que puede confundir si hay múltiples competencias seleccionadas.
+
+SOLUCIÓN PROPUESTA: Usar un sistema de acordeón/expansion panel:
+- Cuando el usuario selecciona una competencia, inmediatamente debajo de ESA tarjeta se despliega (con animación slide-down) su lista de capacidades.
+- Si se seleccionan múltiples competencias, cada una muestra sus propias capacidades justo debajo de ella.
+- Las capacidades dentro de cada competencia deben mostrarse como chips/badges seleccionables (no como filas de checkbox), con fondo oscuro y borde al seleccionarlas.
+- Máximo visual claro de cuál capacidad pertenece a cuál competencia.
+
+### 3.3 Nombres correctos de las capacidades (CORREGIR ERRORES)
+Verificar que los nombres de las capacidades correspondan EXACTAMENTE al CNEB. 
+
+Capacidades correctas por competencia:
+
+**Resuelve problemas de cantidad:**
+- Traduce cantidades a expresiones numéricas
+- Comunica su comprensión sobre los números y las operaciones
+- Usa estrategias y procedimientos de estimación y cálculo
+- Argumenta afirmaciones sobre las relaciones numéricas y las operaciones
+
+**Resuelve problemas de regularidad, equivalencia y cambio:**
+- Traduce datos y condiciones a expresiones algebraicas y gráficas
+- Comunica su comprensión sobre las relaciones algebraicas
+- Usa estrategias y procedimientos para encontrar equivalencias y reglas generales
+- Argumenta afirmaciones sobre relaciones de cambio y equivalencia
+
+**Resuelve problemas de forma, movimiento y localización:**
+- Modela objetos con formas geométricas y sus transformaciones
+- Comunica su comprensión sobre las formas y relaciones geométricas
+- Usa estrategias y procedimientos para orientarse en el espacio
+- Argumenta afirmaciones sobre relaciones geométricas
+
+**Resuelve problemas de gestión de datos e incertidumbre:**
+- Representa datos con gráficos y medidas estadísticas o probabilísticas
+- Comunica su comprensión de los conceptos estadísticos y probabilísticos
+- Usa estrategias y procedimientos para recopilar y procesar datos
+- Sustenta conclusiones o decisiones con base en la información obtenida
+
+NOTA: En la imagen actual aparece "Traduce cantidades a expresiones matemáticas" — el nombre correcto es "Traduce cantidades a expresiones NUMÉRICAS". Corregir este y otros nombres que no coincidan exactamente.
+
+---
+
+## 4. SECCIÓN: TÍTULO DE LA SESIÓN
+
+- Mover el campo "Título de la Sesión" DESPUÉS de la sección de Competencias y Capacidades (actualmente aparece antes).
+- Razón pedagógica: el docente primero define qué va a trabajar (competencias/capacidades) y luego nombra la sesión con coherencia.
+- El placeholder debe ser más específico, por ejemplo: "Ej: Calculando el IGV en las compras del mercado usando porcentajes"
+- Añadir debajo del campo una nota en texto pequeño gris: "El título debe reflejar la situación significativa que motivará el aprendizaje"
+
+---
+
+## 5. NUEVA SECCIÓN: SITUACIÓN SIGNIFICATIVA / TEMA
+
+Agregar un campo nuevo OBLIGATORIO entre Competencias y Título llamado "Tema o Situación Significativa":
+- Tipo: input de texto (no textarea, una sola línea)
+- Label: "Tema central de la sesión *"
+- Placeholder: "Ej: Fracciones, Porcentajes, Ecuaciones lineales, Área de figuras planas..."
+- Nota debajo: "Ingresa el contenido matemático que trabajarás. La IA lo relacionará con el contexto social que selecciones."
+- Este campo es clave para que la IA genere una sesión específica y no genérica.
+
+---
+
+## 6. SECCIÓN: ENFOQUES TRANSVERSALES
+
+- Los dos dropdowns actuales (Enfoque Transversal y Competencia Transversal) están bien conceptualmente.
+- Mejorar visualmente: mostrarlos en una fila de 2 columnas en desktop, apilados en mobile.
+- Poblar los dropdowns con las opciones reales del CNEB:
+
+**Enfoques Transversales (opciones):**
+- Enfoque de Derechos
+- Enfoque Inclusivo o de Atención a la Diversidad
+- Enfoque Intercultural
+- Enfoque de Igualdad de Género
+- Enfoque Ambiental
+- Enfoque de Búsqueda de la Excelencia
+- Enfoque de Orientación al Bien Común
+
+**Competencias Transversales (opciones):**
+- Se desenvuelve en entornos virtuales generados por las TIC
+- Gestiona su aprendizaje de manera autónoma
+
+- Cuando el usuario seleccione un Enfoque Transversal, mostrar debajo una descripción breve del enfoque (texto en gris pequeño, máximo 2 líneas).
+
+---
+
+## 7. SECCIÓN: CONTEXTO Y DURACIÓN
+
+- El selector de "Contexto Social" debe tener opciones claras y reales. Poblar con:
+  - Urbano (ciudad / zona metropolitana)
+  - Urbano-marginal (periferia de ciudad)
+  - Rural (zona campo, sierra, selva)
+  - Costero / litoral
+  - Comunidad indígena o bilingüe
+- Añadir una nota debajo: "El contexto social ajusta los ejemplos y situaciones que usará la IA en tu sesión"
+
+- El campo "Horas de Clase" debe mostrar equivalencia de tiempo de forma más clara:
+  - 1 hora = 45 min
+  - 2 horas = 90 min
+  - 3 horas = 135 min (2h 15min)
+  - Mostrar esto como texto dinámico que cambia según el número ingresado.
+
+---
+
+## 8. NUEVA SECCIÓN: INSTRUMENTO DE EVALUACIÓN (opcional)
+
+Agregar antes del botón final una sección "Evaluación" con un selector:
+- Label: "Instrumento de evaluación preferido (opcional)"
+- Opciones:
+  - Que la IA lo decida automáticamente (opción por defecto)
+  - Lista de cotejo
+  - Rúbrica
+  - Escala de valoración
+  - Ficha de observación
+- Este dato se enviará al prompt de la IA para que genere el instrumento correcto.
+
+---
+
+## 9. PALETA DE COLORES Y ESTILO VISUAL
+
+Mantener el estilo oscuro actual pero con estas mejoras:
+
+- Fondo página: gradiente de #0f0f1a → #1a1a2e
+- Fondo tarjeta formulario: #16213e con borde sutil rgba(255,255,255,0.08)
+- Color primario (acentos, títulos de sección): #8B5CF6 (morado)
+- Color secundario (highlights, badges): #06B6D4 (cyan)
+- Color de éxito / seleccionado: #10B981 (verde esmeralda)
+- Texto principal: #F1F5F9
+- Texto secundario / notas: #94A3B8
+- Inputs: fondo #1e293b, borde #334155, foco borde #8B5CF6
+- Botón principal: gradiente #7C3AED → #2563EB, glow en hover
+
+---
+
+## 10. MICROINTERACCIONES Y UX
+
+- Todos los campos requeridos (*) deben mostrar un mensaje de error amigable debajo si se intenta enviar sin completar, en rojo suave (#F87171).
+- Al hacer click en "Generar Sesión", mostrar un skeleton loader o animación de carga (con mensajes rotativos como "Analizando el currículo...", "Diseñando la sesión...", "Preparando las evidencias...").
+- Añadir tooltips (?) en los campos más técnicos (Enfoque Transversal, Competencia Transversal) que al hover muestren una explicación breve.
+- Las secciones del formulario deben aparecer con una animación suave de entrada (fade-in + slide-up) cuando la página carga.
+- El scroll del formulario debe ser suave.
+- En mobile, los campos de 2 columnas deben apilarse a 1 columna.
+
+---
+
+## 11. ORDEN FINAL RECOMENDADO DEL FORMULARIO
+
+El formulario debe seguir este orden lógico-pedagógico:
+
+1. 📋 DATOS GENERALES
+   - Nombre del Docente
+   - Fecha
+   - Grado (con badge automático de Ciclo)
+   - Sección
+
+2. 🎯 COMPETENCIAS Y CAPACIDADES
+   - Selección de competencia(s) con tarjetas
+   - Capacidades desplegables por competencia (acordeón)
+
+3. 📝 CONTENIDO DE LA SESIÓN
+   - Tema central / Situación significativa (NUEVO - obligatorio)
+   - Título de la sesión (mover aquí desde arriba)
+
+4. 🌐 ENFOQUES TRANSVERSALES
+   - Enfoque Transversal
+   - Competencia Transversal
+
+5. ⏱️ CONTEXTO Y DURACIÓN
+   - Contexto Social (con opciones claras)
+   - Horas de Clase
+
+6. 🎲 MATERIALES DIDÁCTICOS
+   - Material No Estructurado (opcional)
+
+7. 📊 EVALUACIÓN (NUEVA SECCIÓN)
+   - Instrumento de evaluación preferido
+
+8. [BOTÓN] ✨ Generar Sesión de Aprendizaje
+
+---
+
+## 12. NOTA FINAL PARA EL AGENTE
+
+La aplicación usa IA para generar los siguientes campos automáticamente (NO mostrarlos en el formulario):
+- Propósito de la sesión
+- Criterios de evaluación
+- Evidencias de aprendizaje
+- Desarrollo de la sesión (inicio, desarrollo, cierre)
+- Recursos y materiales estructurados
+
+Asegúrate de que el formulario sea limpio, no sobrecargue al docente con demasiadas opciones, y que cada campo tenga un propósito claro. El objetivo es que un docente pueda completarlo en menos de 2 minutos.
+
+=============================================================
+FIN DEL PROMPT
+=============================================================

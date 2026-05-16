@@ -191,30 +191,30 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
   }
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-900 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 right-20 w-64 h-64 gradient-primary rounded-full blur-3xl opacity-10 animate-pulse"></div>
-        <div className="absolute bottom-20 left-20 w-64 h-64 gradient-secondary rounded-full blur-3xl opacity-10 animate-pulse delay-1000"></div>
+        <div className="absolute top-20 right-20 w-64 h-64 bg-blue-600 rounded-full blur-3xl opacity-10 animate-pulse"></div>
+        <div className="absolute bottom-20 left-20 w-64 h-64 bg-indigo-600 rounded-full blur-3xl opacity-10 animate-pulse delay-1000"></div>
       </div>
 
       {/* Header */}
-      <header className="glass-effect border-b border-border/20 relative z-10">
+      <header className="bg-white border border-slate-200 shadow-sm border-b border-slate-200 border-b relative z-10">
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={onBack} className="glass-effect hover:glow-primary/20">
+            <Button variant="ghost" onClick={onBack} className="bg-white border border-slate-200 shadow-sm hover:shadow-sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Volver
             </Button>
             <div className="flex items-center gap-3">
-              <div className="gradient-primary rounded-2xl p-2 glow-primary">
+              <div className="bg-blue-600 rounded-2xl p-2 shadow-sm">
                 <Brain className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="font-bold text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                <h1 className="font-bold text-lg text-blue-800 font-bold">
                   Sesión Generada
                 </h1>
-                <p className="text-sm text-muted-foreground">Con IA y Currículo Nacional</p>
+                <p className="text-sm text-slate-500">Con IA y Currículo Nacional</p>
               </div>
             </div>
           </div>
@@ -222,7 +222,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
             <Button
               variant="outline"
               onClick={onViewDashboard}
-              className="glass-effect border-secondary/30 hover:glow-secondary bg-transparent"
+              className="bg-white border border-slate-200 shadow-sm border-indigo-500/30 hover:shadow-sm bg-transparent"
             >
               <BarChart3 className="h-4 w-4 mr-2" />
               Dashboard
@@ -230,7 +230,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
             <Button
               variant="outline"
               onClick={() => setIsEditing(!isEditing)}
-              className={`glass-effect border-accent/30 hover:glow-accent bg-transparent ${isEditing ? 'glow-accent' : ''}`}
+              className={`bg-white border border-slate-200 shadow-sm border-emerald-500/30 hover:shadow-sm bg-transparent ${isEditing ? 'shadow-sm' : ''}`}
             >
               <Edit3 className="h-4 w-4 mr-2" />
               {isEditing ? "Vista Previa" : "Editar Contenido"}
@@ -246,41 +246,41 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
           {/* SIDEBAR */}
           <div className="w-full lg:w-1/3 space-y-6 flex-shrink-0">
              <div className="sticky top-24 space-y-6">
-                <div className="glass-effect rounded-xl p-4 border-l-4 border-primary">
+                <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4 border-l-4 border-blue-500">
                   <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
-                    <BookOpen className="h-5 w-5 text-primary" />
+                    <BookOpen className="h-5 w-5 text-blue-600" />
                     Contexto y Entradas
                   </h3>
-                  <p className="text-xs text-muted-foreground">Resumen de la información base de la sesión.</p>
+                  <p className="text-xs text-slate-500">Resumen de la información base de la sesión.</p>
                 </div>
 
                 {/* Resumen Rápido */}
                 <div className="grid grid-cols-2 gap-4">
-                  <Card className="glass-effect border-0 glow-primary/10">
+                  <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                     <CardContent className="p-4 text-center space-y-1">
-                      <BookOpen className="h-6 w-6 text-primary mx-auto" />
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Tema</p>
+                      <BookOpen className="h-6 w-6 text-blue-600 mx-auto" />
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wide">Tema</p>
                       <p className="font-bold text-sm line-clamp-2">{editedSession.tema}</p>
                     </CardContent>
                   </Card>
-                  <Card className="glass-effect border-0 glow-secondary/10">
+                  <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                     <CardContent className="p-4 text-center space-y-1">
-                      <GraduationCap className="h-6 w-6 text-secondary mx-auto" />
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Ciclo</p>
+                      <GraduationCap className="h-6 w-6 text-indigo-600 mx-auto" />
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wide">Ciclo</p>
                       <p className="font-bold text-sm">{editedSession.ciclo}</p>
                     </CardContent>
                   </Card>
-                  <Card className="glass-effect border-0 glow-accent/10">
+                  <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                     <CardContent className="p-4 text-center space-y-1">
-                      <Clock className="h-6 w-6 text-accent mx-auto" />
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Duración</p>
+                      <Clock className="h-6 w-6 text-emerald-600 mx-auto" />
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wide">Duración</p>
                       <p className="font-bold text-sm">{editedSession.horasClase} h</p>
                     </CardContent>
                   </Card>
-                  <Card className="glass-effect border-0 glow-primary/10">
+                  <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                     <CardContent className="p-4 text-center space-y-1">
-                      <MapPin className="h-6 w-6 text-primary mx-auto" />
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Contexto</p>
+                      <MapPin className="h-6 w-6 text-blue-600 mx-auto" />
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wide">Contexto</p>
                       <p className="font-bold text-xs line-clamp-2">{editedSession.contexto}</p>
                     </CardContent>
                   </Card>
@@ -288,35 +288,35 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                 {/* Datos Generales */}
                 {editedSession.datosGenerales && (
-                  <Card className="glass-effect border-0 glow-primary/10">
+                  <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
-                        <GraduationCap className="h-4 w-4 text-primary" />
+                        <GraduationCap className="h-4 w-4 text-blue-600" />
                         Datos Generales
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2 text-xs">
-                      <p><span className="text-muted-foreground">Título:</span> {editedSession.datosGenerales.titulo}</p>
-                      <p><span className="text-muted-foreground">Docente:</span> {editedSession.datosGenerales.docente}</p>
-                      <p><span className="text-muted-foreground">Fecha:</span> {editedSession.datosGenerales.fecha}</p>
-                      <p><span className="text-muted-foreground">Grado y Sección:</span> {editedSession.datosGenerales.grado} - {editedSession.datosGenerales.seccion}</p>
+                      <p><span className="text-slate-500">Título:</span> {editedSession.datosGenerales.titulo}</p>
+                      <p><span className="text-slate-500">Docente:</span> {editedSession.datosGenerales.docente}</p>
+                      <p><span className="text-slate-500">Fecha:</span> {editedSession.datosGenerales.fecha}</p>
+                      <p><span className="text-slate-500">Grado y Sección:</span> {editedSession.datosGenerales.grado} - {editedSession.datosGenerales.seccion}</p>
                     </CardContent>
                   </Card>
                 )}
 
                 {/* Competencias */}
                 {editedSession.competenciasSeleccionadas && editedSession.competenciasSeleccionadas.length > 0 && (
-                  <Card className="glass-effect border-0 glow-secondary/10">
+                  <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
-                        <Target className="h-4 w-4 text-secondary" />
+                        <Target className="h-4 w-4 text-indigo-600" />
                         Competencias
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {editedSession.competenciasSeleccionadas.map((comp) => (
-                        <div key={comp} className="glass-effect rounded p-2 text-xs border-l-2 border-secondary flex items-start gap-2">
-                          <CheckCircle className="h-3 w-3 text-secondary flex-shrink-0 mt-0.5" />
+                        <div key={comp} className="bg-white border border-slate-200 shadow-sm rounded p-2 text-xs border-l-2 border-indigo-500 flex items-start gap-2">
+                          <CheckCircle className="h-3 w-3 text-indigo-600 flex-shrink-0 mt-0.5" />
                           <p>{comp}</p>
                         </div>
                       ))}
@@ -326,17 +326,17 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                 {/* Capacidades */}
                 {editedSession.capacidades && editedSession.capacidades.length > 0 && (
-                  <Card className="glass-effect border-0 glow-accent/10">
+                  <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
-                        <Zap className="h-4 w-4 text-accent" />
+                        <Zap className="h-4 w-4 text-emerald-600" />
                         Capacidades
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
                       {editedSession.capacidades.map((cap) => (
-                        <div key={cap} className="glass-effect rounded p-2 text-xs border-l-2 border-accent flex items-start gap-2">
-                          <CheckCircle className="h-3 w-3 text-accent flex-shrink-0 mt-0.5" />
+                        <div key={cap} className="bg-white border border-slate-200 shadow-sm rounded p-2 text-xs border-l-2 border-emerald-500 flex items-start gap-2">
+                          <CheckCircle className="h-3 w-3 text-emerald-600 flex-shrink-0 mt-0.5" />
                           <p>{cap}</p>
                         </div>
                       ))}
@@ -346,15 +346,15 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                 {/* Materiales Disponibles */}
                 {editedSession.materialesDisponibles && (
-                  <Card className="glass-effect border-0 glow-primary/10">
+                  <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
-                        <Package className="h-4 w-4 text-primary" />
+                        <Package className="h-4 w-4 text-blue-600" />
                         Materiales Disponibles
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-xs text-foreground/80">{editedSession.materialesDisponibles}</p>
+                      <p className="text-xs text-slate-800/80">{editedSession.materialesDisponibles}</p>
                     </CardContent>
                   </Card>
                 )}
@@ -363,16 +363,16 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
           {/* MAIN CONTENT */}
           <div className="w-full lg:w-2/3 space-y-6">
-             <div className="glass-effect rounded-xl p-2 mb-2 flex flex-wrap sm:flex-nowrap overflow-x-auto gap-2 border-b border-border/20 sticky top-[80px] z-20 backdrop-blur-xl">
-               <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'secuencia' ? 'bg-primary/20 text-primary glow-primary/20 font-bold' : 'text-muted-foreground hover:text-foreground'}`} onClick={() => setActiveTab('secuencia')}>
+             <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-2 mb-2 flex flex-wrap sm:flex-nowrap overflow-x-auto gap-2 border-b border-slate-200 border-b sticky top-[80px] z-20 backdrop-blur-xl">
+               <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'secuencia' ? 'bg-blue-100 text-blue-600 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'}`} onClick={() => setActiveTab('secuencia')}>
                  <BookOpen className="h-4 w-4 mr-2" />
                  Secuencia Didáctica
                </Button>
-               <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'evaluacion' ? 'bg-accent/20 text-accent glow-accent/20 font-bold' : 'text-muted-foreground hover:text-foreground'}`} onClick={() => setActiveTab('evaluacion')}>
+               <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'evaluacion' ? 'bg-emerald-100 text-emerald-600 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'}`} onClick={() => setActiveTab('evaluacion')}>
                  <CheckCircle className="h-4 w-4 mr-2" />
                  Evaluación
                </Button>
-               <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'recursos' ? 'bg-secondary/20 text-secondary glow-secondary/20 font-bold' : 'text-muted-foreground hover:text-foreground'}`} onClick={() => setActiveTab('recursos')}>
+               <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'recursos' ? 'bg-indigo-100 text-indigo-600 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'}`} onClick={() => setActiveTab('recursos')}>
                  <Package className="h-4 w-4 mr-2" />
                  Recursos Adicionales
                </Button>
@@ -384,19 +384,19 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                   <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {/* Propósito de la Sesión */}
                     {editedSession.propositoSesion && (
-                      <Card className="glass-effect border-0 glow-secondary/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <Target className="h-5 w-5 text-secondary" />
+                            <Target className="h-5 w-5 text-indigo-600" />
                             Propósito de la Sesión
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           {isEditing ? (
-                            <Textarea value={editedSession.propositoSesion} onChange={(e) => setEditedSession({...editedSession, propositoSesion: e.target.value})} className="min-h-[80px] glass-effect" />
+                            <Textarea value={editedSession.propositoSesion} onChange={(e) => setEditedSession({...editedSession, propositoSesion: e.target.value})} className="min-h-[80px] bg-white border border-slate-200 shadow-sm" />
                           ) : (
-                            <div className="glass-effect rounded-lg p-4 border-l-4 border-secondary bg-gradient-to-r from-secondary/5 to-transparent">
-                              <p className="text-foreground leading-relaxed text-sm">{editedSession.propositoSesion}</p>
+                            <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-indigo-500 bg-gradient-to-r from-indigo-50 to-transparent">
+                              <p className="text-slate-800 leading-relaxed text-sm">{editedSession.propositoSesion}</p>
                             </div>
                           )}
                         </CardContent>
@@ -405,19 +405,19 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                     {/* Descripción de Competencia */}
                     {editedSession.competenciaDescripcion && (
-                      <Card className="glass-effect border-0 glow-secondary/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <Brain className="h-5 w-5 text-secondary" />
+                            <Brain className="h-5 w-5 text-indigo-600" />
                             Descripción de la Competencia
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           {isEditing ? (
-                            <Textarea value={editedSession.competenciaDescripcion} onChange={(e) => setEditedSession({...editedSession, competenciaDescripcion: e.target.value})} className="min-h-[100px] glass-effect" />
+                            <Textarea value={editedSession.competenciaDescripcion} onChange={(e) => setEditedSession({...editedSession, competenciaDescripcion: e.target.value})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                           ) : (
-                            <div className="glass-effect rounded-lg p-4 border-l-4 border-secondary bg-gradient-to-r from-secondary/5 to-transparent">
-                              <p className="text-foreground leading-relaxed text-sm">{editedSession.competenciaDescripcion}</p>
+                            <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-indigo-500 bg-gradient-to-r from-indigo-50 to-transparent">
+                              <p className="text-slate-800 leading-relaxed text-sm">{editedSession.competenciaDescripcion}</p>
                             </div>
                           )}
                         </CardContent>
@@ -426,46 +426,46 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                     {/* Secuencia Metodológica */}
                     {editedSession.secuenciaMetodologica && (
-                      <Card className="glass-effect border-0 glow-accent/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <BookOpen className="h-5 w-5 text-accent" />
+                            <BookOpen className="h-5 w-5 text-emerald-600" />
                             Secuencia Metodológica
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="space-y-6">
                             {/* INICIO */}
-                            <div className="glass-effect rounded-lg p-4 border-l-4 border-primary">
-                              <h4 className="font-bold text-primary mb-2 flex items-center gap-2">
-                                <span className="gradient-primary rounded-full w-6 h-6 flex items-center justify-center text-white text-xs">1</span> INICIO
+                            <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-blue-500">
+                              <h4 className="font-bold text-blue-600 mb-2 flex items-center gap-2">
+                                <span className="bg-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">1</span> INICIO
                               </h4>
                               {isEditing ? (
-                                <Textarea value={editedSession.secuenciaMetodologica.inicio} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: {...editedSession.secuenciaMetodologica, inicio: e.target.value}})} className="min-h-[100px] glass-effect" />
+                                <Textarea value={editedSession.secuenciaMetodologica.inicio} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: {...editedSession.secuenciaMetodologica, inicio: e.target.value}})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                               ) : (
-                                <div className="text-sm text-foreground space-y-2" dangerouslySetInnerHTML={{__html: editedSession.secuenciaMetodologica.inicio.replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-primary'>$1</strong>").replaceAll("\n", "<br>")}} />
+                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{__html: editedSession.secuenciaMetodologica.inicio.replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-blue-600'>$1</strong>").replaceAll("\n", "<br>")}} />
                               )}
                             </div>
                             {/* DESARROLLO */}
-                            <div className="glass-effect rounded-lg p-4 border-l-4 border-secondary">
-                              <h4 className="font-bold text-secondary mb-2 flex items-center gap-2">
-                                <span className="gradient-secondary rounded-full w-6 h-6 flex items-center justify-center text-white text-xs">2</span> DESARROLLO
+                            <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-indigo-500">
+                              <h4 className="font-bold text-indigo-600 mb-2 flex items-center gap-2">
+                                <span className="bg-indigo-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">2</span> DESARROLLO
                               </h4>
                               {isEditing ? (
-                                <Textarea value={editedSession.secuenciaMetodologica.desarrollo} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: {...editedSession.secuenciaMetodologica, desarrollo: e.target.value}})} className="min-h-[100px] glass-effect" />
+                                <Textarea value={editedSession.secuenciaMetodologica.desarrollo} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: {...editedSession.secuenciaMetodologica, desarrollo: e.target.value}})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                               ) : (
-                                <div className="text-sm text-foreground space-y-2" dangerouslySetInnerHTML={{__html: editedSession.secuenciaMetodologica.desarrollo.replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-secondary'>$1</strong>").replaceAll("\n", "<br>")}} />
+                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{__html: editedSession.secuenciaMetodologica.desarrollo.replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-indigo-600'>$1</strong>").replaceAll("\n", "<br>")}} />
                               )}
                             </div>
                             {/* CIERRE */}
-                            <div className="glass-effect rounded-lg p-4 border-l-4 border-accent">
-                              <h4 className="font-bold text-accent mb-2 flex items-center gap-2">
-                                <span className="gradient-accent rounded-full w-6 h-6 flex items-center justify-center text-white text-xs">3</span> CIERRE
+                            <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-emerald-500">
+                              <h4 className="font-bold text-emerald-600 mb-2 flex items-center gap-2">
+                                <span className="bg-emerald-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">3</span> CIERRE
                               </h4>
                               {isEditing ? (
-                                <Textarea value={editedSession.secuenciaMetodologica.cierre} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: {...editedSession.secuenciaMetodologica, cierre: e.target.value}})} className="min-h-[100px] glass-effect" />
+                                <Textarea value={editedSession.secuenciaMetodologica.cierre} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: {...editedSession.secuenciaMetodologica, cierre: e.target.value}})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                               ) : (
-                                <div className="text-sm text-foreground space-y-2" dangerouslySetInnerHTML={{__html: editedSession.secuenciaMetodologica.cierre.replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-accent'>$1</strong>").replaceAll("\n", "<br>")}} />
+                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{__html: editedSession.secuenciaMetodologica.cierre.replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-emerald-600'>$1</strong>").replaceAll("\n", "<br>")}} />
                               )}
                             </div>
                           </div>
@@ -475,10 +475,10 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                     {/* Distribución Horaria */}
                     {editedSession.distribucionHoras && (
-                      <Card className="glass-effect border-0 glow-secondary/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <Clock className="h-5 w-5 text-secondary" />
+                            <Clock className="h-5 w-5 text-indigo-600" />
                             Distribución Horaria
                           </CardTitle>
                         </CardHeader>
@@ -491,27 +491,27 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                                 return (
                                   <>
                                     <div className="flex-1 flex flex-col items-center gap-3">
-                                      <div className="w-full bg-gradient-to-t from-primary to-primary/50 rounded-t-lg flex items-end justify-center pb-2 glow-primary/20" style={{ height: `${Math.max((tiempos.inicio / maxTiempo) * containerHeight, 30)}px` }}>
+                                      <div className="w-full bg-gradient-to-t from-blue-500 to-primary/50 rounded-t-lg flex items-end justify-center pb-2 shadow-sm" style={{ height: `${Math.max((tiempos.inicio / maxTiempo) * containerHeight, 30)}px` }}>
                                         <span className="text-xs font-bold text-white">{tiempos.inicio}'</span>
                                       </div>
                                       <div className="text-center">
-                                        <p className="text-sm font-semibold text-primary">INICIO</p>
+                                        <p className="text-sm font-semibold text-blue-600">INICIO</p>
                                       </div>
                                     </div>
                                     <div className="flex-1 flex flex-col items-center gap-3">
-                                      <div className="w-full bg-gradient-to-t from-secondary to-secondary/50 rounded-t-lg flex items-end justify-center pb-2 glow-secondary/20" style={{ height: `${Math.max((tiempos.desarrollo / maxTiempo) * containerHeight, 30)}px` }}>
+                                      <div className="w-full bg-gradient-to-t from-indigo-500 to-secondary/50 rounded-t-lg flex items-end justify-center pb-2 shadow-sm" style={{ height: `${Math.max((tiempos.desarrollo / maxTiempo) * containerHeight, 30)}px` }}>
                                         <span className="text-xs font-bold text-white">{tiempos.desarrollo}'</span>
                                       </div>
                                       <div className="text-center">
-                                        <p className="text-sm font-semibold text-secondary">DESARROLLO</p>
+                                        <p className="text-sm font-semibold text-indigo-600">DESARROLLO</p>
                                       </div>
                                     </div>
                                     <div className="flex-1 flex flex-col items-center gap-3">
-                                      <div className="w-full bg-gradient-to-t from-accent to-accent/50 rounded-t-lg flex items-end justify-center pb-2 glow-accent/20" style={{ height: `${Math.max((tiempos.cierre / maxTiempo) * containerHeight, 30)}px` }}>
+                                      <div className="w-full bg-gradient-to-t from-emerald-500 to-emerald-500/50 rounded-t-lg flex items-end justify-center pb-2 shadow-sm" style={{ height: `${Math.max((tiempos.cierre / maxTiempo) * containerHeight, 30)}px` }}>
                                         <span className="text-xs font-bold text-white">{tiempos.cierre}'</span>
                                       </div>
                                       <div className="text-center">
-                                        <p className="text-sm font-semibold text-accent">CIERRE</p>
+                                        <p className="text-sm font-semibold text-emerald-600">CIERRE</p>
                                       </div>
                                     </div>
                                   </>
@@ -520,11 +520,11 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                             </div>
                             <div className="relative pt-4">
                               <div className="flex items-center justify-between mb-3">
-                                <div className="text-xs font-semibold text-primary">0 min</div>
-                                <div className="text-xs font-semibold text-secondary">{tiempos.inicio}-{tiempos.inicio + tiempos.desarrollo} min</div>
-                                <div className="text-xs font-semibold text-accent">{tiempos.inicio + tiempos.desarrollo + tiempos.cierre} min</div>
+                                <div className="text-xs font-semibold text-blue-600">0 min</div>
+                                <div className="text-xs font-semibold text-indigo-600">{tiempos.inicio}-{tiempos.inicio + tiempos.desarrollo} min</div>
+                                <div className="text-xs font-semibold text-emerald-600">{tiempos.inicio + tiempos.desarrollo + tiempos.cierre} min</div>
                               </div>
-                              <div className="w-full h-3 bg-gradient-to-r from-primary via-secondary to-accent rounded-full glow-primary/10" />
+                              <div className="w-full h-3 bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500 rounded-full hover:shadow-md transition-all" />
                             </div>
                           </div>
                         </CardContent>
@@ -533,18 +533,18 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                     {/* Procesos Didácticos */}
                     {editedSession.procesosDidacticos && editedSession.procesosDidacticos.length > 0 && (
-                      <Card className="glass-effect border-0 glow-accent/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <BookOpen className="h-5 w-5 text-accent" />
+                            <BookOpen className="h-5 w-5 text-emerald-600" />
                             Procesos Didácticos
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
                             {editedSession.procesosDidacticos.map((proceso, index) => (
-                              <div key={`proceso-${index}`} className="glass-effect rounded-lg p-3 text-center">
-                                <div className="gradient-accent rounded-full w-8 h-8 flex items-center justify-center text-white font-bold text-xs mx-auto mb-2">{index + 1}</div>
+                              <div key={`proceso-${index}`} className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 text-center">
+                                <div className="bg-emerald-600 rounded-full w-8 h-8 flex items-center justify-center text-white font-bold text-xs mx-auto mb-2">{index + 1}</div>
                                 <p className="text-xs font-medium">{proceso}</p>
                               </div>
                             ))}
@@ -555,19 +555,19 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                     {/* Actividades Contextualizadas */}
                     {editedSession.actividadesContextualizadas && editedSession.actividadesContextualizadas.length > 0 && (
-                      <Card className="glass-effect border-0 glow-secondary/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <Zap className="h-5 w-5 text-secondary" />
+                            <Zap className="h-5 w-5 text-indigo-600" />
                             Actividades Contextualizadas
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {editedSession.actividadesContextualizadas.map((actividad, index) => (
-                              <div key={`act-${index}`} className="glass-effect rounded-lg p-3 border-l-4 border-secondary flex items-start gap-3">
-                                <Zap className="h-4 w-4 text-secondary flex-shrink-0 mt-0.5" />
-                                <p className="text-sm text-foreground">{actividad}</p>
+                              <div key={`act-${index}`} className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-l-4 border-indigo-500 flex items-start gap-3">
+                                <Zap className="h-4 w-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                                <p className="text-sm text-slate-800">{actividad}</p>
                               </div>
                             ))}
                           </div>
@@ -582,19 +582,19 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                   <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {/* Criterios de Evaluación */}
                     {editedSession.criteriosEvaluacion && (
-                      <Card className="glass-effect border-0 glow-accent/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <CheckCircle className="h-5 w-5 text-accent" />
+                            <CheckCircle className="h-5 w-5 text-emerald-600" />
                             Criterios de Evaluación
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           {isEditing ? (
-                            <Textarea value={editedSession.criteriosEvaluacion} onChange={(e) => setEditedSession({...editedSession, criteriosEvaluacion: e.target.value})} className="min-h-[120px] glass-effect" />
+                            <Textarea value={editedSession.criteriosEvaluacion} onChange={(e) => setEditedSession({...editedSession, criteriosEvaluacion: e.target.value})} className="min-h-[120px] bg-white border border-slate-200 shadow-sm" />
                           ) : (
-                            <div className="glass-effect rounded-lg p-4 border-l-4 border-accent bg-gradient-to-r from-accent/5 to-transparent">
-                              <pre className="text-foreground leading-relaxed text-sm whitespace-pre-wrap font-sans">{editedSession.criteriosEvaluacion}</pre>
+                            <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-emerald-500 bg-gradient-to-r from-emerald-50 to-transparent">
+                              <pre className="text-slate-800 leading-relaxed text-sm whitespace-pre-wrap font-sans">{editedSession.criteriosEvaluacion}</pre>
                             </div>
                           )}
                         </CardContent>
@@ -603,19 +603,19 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                     {/* Evidencias de Aprendizaje */}
                     {editedSession.evidenciasAprendizaje && (
-                      <Card className="glass-effect border-0 glow-primary/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <BarChart3 className="h-5 w-5 text-primary" />
+                            <BarChart3 className="h-5 w-5 text-blue-600" />
                             Evidencias de Aprendizaje
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           {isEditing ? (
-                            <Textarea value={editedSession.evidenciasAprendizaje} onChange={(e) => setEditedSession({...editedSession, evidenciasAprendizaje: e.target.value})} className="min-h-[100px] glass-effect" />
+                            <Textarea value={editedSession.evidenciasAprendizaje} onChange={(e) => setEditedSession({...editedSession, evidenciasAprendizaje: e.target.value})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                           ) : (
-                            <div className="glass-effect rounded-lg p-4 border-l-4 border-primary bg-gradient-to-r from-primary/5 to-transparent">
-                              <pre className="text-foreground leading-relaxed text-sm whitespace-pre-wrap font-sans">{editedSession.evidenciasAprendizaje}</pre>
+                            <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-blue-500 bg-gradient-to-r from-blue-50 to-transparent">
+                              <pre className="text-slate-800 leading-relaxed text-sm whitespace-pre-wrap font-sans">{editedSession.evidenciasAprendizaje}</pre>
                             </div>
                           )}
                         </CardContent>
@@ -624,22 +624,22 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                     {/* Evaluación Formativa (Corregido mapeo arrays) */}
                     {ra.evaluacionFormativa && ra.evaluacionFormativa.preguntas && ra.evaluacionFormativa.preguntas.length > 0 && (
-                      <Card className="glass-effect border-0 glow-accent/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <CheckCircle className="h-5 w-5 text-accent" />
+                            <CheckCircle className="h-5 w-5 text-emerald-600" />
                             Evaluación Formativa
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
                           <div className="space-y-2">
                             {ra.evaluacionFormativa.preguntas.map((pregunta: string, idx: number) => (
-                              <details key={`preg-${idx}`} className="glass-effect rounded p-3 text-sm border-l-2 border-accent">
-                                <summary className="cursor-pointer font-medium text-foreground">Pregunta {idx + 1}</summary>
-                                <div className="mt-2 space-y-1 text-xs pl-4 border-l border-border/50">
-                                  <p className="font-medium text-foreground">{pregunta}</p>
-                                  <p className="text-primary"><strong>Respuesta:</strong> {ra.evaluacionFormativa?.respuestas?.[idx]}</p>
-                                  <p className="text-muted-foreground"><strong>Criterios:</strong> {ra.evaluacionFormativa?.criterios?.[idx]}</p>
+                              <details key={`preg-${idx}`} className="bg-white border border-slate-200 shadow-sm rounded p-3 text-sm border-l-2 border-emerald-500">
+                                <summary className="cursor-pointer font-medium text-slate-800">Pregunta {idx + 1}</summary>
+                                <div className="mt-2 space-y-1 text-xs pl-4 border-l border-slate-300">
+                                  <p className="font-medium text-slate-800">{pregunta}</p>
+                                  <p className="text-blue-600"><strong>Respuesta:</strong> {ra.evaluacionFormativa?.respuestas?.[idx]}</p>
+                                  <p className="text-slate-500"><strong>Criterios:</strong> {ra.evaluacionFormativa?.criterios?.[idx]}</p>
                                 </div>
                               </details>
                             ))}
@@ -655,19 +655,19 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                   <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {/* Materiales Didácticos Sugeridos */}
                     {editedSession.materialesDidacticosSugeridos && editedSession.materialesDidacticosSugeridos.length > 0 && (
-                      <Card className="glass-effect border-0 glow-primary/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <Lightbulb className="h-5 w-5 text-primary" />
+                            <Lightbulb className="h-5 w-5 text-blue-600" />
                             Materiales Sugeridos
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {editedSession.materialesDidacticosSugeridos.map((material) => (
-                              <div key={safeKeyFromString(material) || material} className="glass-effect rounded-lg p-3 border-l-4 border-primary flex items-start gap-3">
-                                <Package className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                                <p className="text-sm text-foreground">{material}</p>
+                              <div key={safeKeyFromString(material) || material} className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-l-4 border-blue-500 flex items-start gap-3">
+                                <Package className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                                <p className="text-sm text-slate-800">{material}</p>
                               </div>
                             ))}
                           </div>
@@ -677,17 +677,17 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                     {/* Actividades de Activación */}
                     {ra.actividadDeActivacion && ra.actividadDeActivacion.length > 0 && (
-                      <Card className="glass-effect border-0 glow-secondary/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <Lightbulb className="h-5 w-5 text-secondary" />
+                            <Lightbulb className="h-5 w-5 text-indigo-600" />
                             Actividades de Activación
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {ra.actividadDeActivacion.map((act: any, idx: number) => (
-                              <div key={`act-${idx}`} className="glass-effect rounded-lg p-3 border-l-4 border-secondary">
+                              <div key={`act-${idx}`} className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-l-4 border-indigo-500">
                                 <p className="text-sm mt-1">{act}</p>
                               </div>
                             ))}
@@ -698,24 +698,24 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                     {/* Fichas de Trabajo */}
                     {ra.fichasDeTrabajo && ra.fichasDeTrabajo.length > 0 && (
-                      <Card className="glass-effect border-0 glow-primary/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <BookOpen className="h-5 w-5 text-primary" />
+                            <BookOpen className="h-5 w-5 text-blue-600" />
                             Fichas de Trabajo
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
                           {ra.fichasDeTrabajo.map((ficha: any, idx: number) => (
-                            <details key={`ficha-${idx}`} className="glass-effect rounded-lg p-4 border-l-4 border-secondary">
-                              <summary className="font-semibold text-sm cursor-pointer hover:text-secondary transition-colors">
+                            <details key={`ficha-${idx}`} className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-indigo-500">
+                              <summary className="font-semibold text-sm cursor-pointer hover:text-indigo-600 transition-colors">
                                 {ficha.titulo || `Ficha ${idx+1}`}
                               </summary>
                               <div className="mt-3 space-y-2 text-sm">
-                                <p className="text-muted-foreground"><strong>Instrucciones:</strong> {ficha.instrucciones}</p>
+                                <p className="text-slate-500"><strong>Instrucciones:</strong> {ficha.instrucciones}</p>
                                 <div>
-                                  <strong className="text-foreground">Ejercicios:</strong>
-                                  <ul className="list-disc list-inside space-y-1 mt-1 text-foreground/80">
+                                  <strong className="text-slate-800">Ejercicios:</strong>
+                                  <ul className="list-disc list-inside space-y-1 mt-1 text-slate-800/80">
                                     {ficha.ejercicios && ficha.ejercicios.map((ejercicio: any, i: number) => (
                                       <li key={`ej-${i}`}>{ejercicio}</li>
                                     ))}
@@ -730,25 +730,25 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                     {/* Problemas y Ejercicios (Corregido mapeo respuesta) */}
                     {ra.problemasYEjercicios && ra.problemasYEjercicios.length > 0 && (
-                      <Card className="glass-effect border-0 glow-accent/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <CheckCircle className="h-5 w-5 text-accent" />
+                            <CheckCircle className="h-5 w-5 text-emerald-600" />
                             Problemas y Ejercicios
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {ra.problemasYEjercicios.map((problema: any, idx: number) => (
-                              <details key={`problema-${idx}`} className="glass-effect rounded-lg p-3 border-l-4 border-accent">
+                              <details key={`problema-${idx}`} className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-l-4 border-emerald-500">
                                 <summary className="font-semibold text-xs uppercase cursor-pointer">
                                   {problema.nivel || `Problema ${idx + 1}`}
                                 </summary>
                                 <div className="mt-2 space-y-1 text-xs">
                                   <p><strong>Problema:</strong> {problema.problema || problema.enunciado}</p>
-                                  <p className="text-muted-foreground"><strong>Respuesta:</strong> {problema.respuesta_esperada || problema.respuesta}</p>
+                                  <p className="text-slate-500"><strong>Respuesta:</strong> {problema.respuesta_esperada || problema.respuesta}</p>
                                   {(problema.criterios || problema.criterio) && (
-                                    <p className="text-muted-foreground"><strong>Criterios:</strong> {problema.criterios || problema.criterio}</p>
+                                    <p className="text-slate-500"><strong>Criterios:</strong> {problema.criterios || problema.criterio}</p>
                                   )}
                                 </div>
                               </details>
@@ -760,10 +760,10 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                     {/* Juego Didáctico */}
                     {ra.juegoDidactico && (
-                      <Card className="glass-effect border-0 glow-primary/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <Zap className="h-5 w-5 text-primary" />
+                            <Zap className="h-5 w-5 text-blue-600" />
                             {ra.juegoDidactico.titulo || ra.juegoDidactico.nombre || "Juego Didáctico"}
                           </CardTitle>
                         </CardHeader>
@@ -775,12 +775,12 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                           {ra.juegoDidactico.materiales && (
                             <div>
                               <strong className="text-sm">Materiales:</strong>
-                              <p className="text-xs text-muted-foreground">{ra.juegoDidactico.materiales}</p>
+                              <p className="text-xs text-slate-500">{ra.juegoDidactico.materiales}</p>
                             </div>
                           )}
                           <div>
                             <strong className="text-sm">Instrucciones:</strong>
-                            <ol className="list-decimal list-inside space-y-1 mt-1 text-xs text-foreground/80">
+                            <ol className="list-decimal list-inside space-y-1 mt-1 text-xs text-slate-800/80">
                               {juegoInstrucciones.map((instr: any, i: number) => (
                                 <li key={`instr-${i}`}>{instr}</li>
                               ))}
@@ -792,10 +792,10 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                     {/* Actividades Diferenciadas (Corregido a arrays de strings) */}
                     {ra.actividadesDiferenciadas && (
-                      <Card className="glass-effect border-0 glow-secondary/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <Target className="h-5 w-5 text-secondary" />
+                            <Target className="h-5 w-5 text-indigo-600" />
                             Actividades Diferenciadas
                           </CardTitle>
                         </CardHeader>
@@ -803,8 +803,8 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                             {/* Refuerzo */}
                             {ra.actividadesDiferenciadas.refuerzo && ra.actividadesDiferenciadas.refuerzo.length > 0 && (
-                              <div className="glass-effect rounded-lg p-3 border-t-4 border-primary space-y-2">
-                                <p className="font-semibold text-sm text-primary">Refuerzo</p>
+                              <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-t-4 border-blue-500 space-y-2">
+                                <p className="font-semibold text-sm text-blue-600">Refuerzo</p>
                                 <ul className="list-disc list-inside space-y-1 mt-1 text-xs">
                                   {ra.actividadesDiferenciadas.refuerzo.map((act: string, idx: number) => (
                                     <li key={`ref-${idx}`}>{act}</li>
@@ -814,8 +814,8 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                             )}
                             {/* Consolidación */}
                             {ra.actividadesDiferenciadas.consolidacion && ra.actividadesDiferenciadas.consolidacion.length > 0 && (
-                              <div className="glass-effect rounded-lg p-3 border-t-4 border-secondary space-y-2">
-                                <p className="font-semibold text-sm text-secondary">Consolidación</p>
+                              <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-t-4 border-indigo-500 space-y-2">
+                                <p className="font-semibold text-sm text-indigo-600">Consolidación</p>
                                 <ul className="list-disc list-inside space-y-1 mt-1 text-xs">
                                   {ra.actividadesDiferenciadas.consolidacion.map((act: string, idx: number) => (
                                     <li key={`cons-${idx}`}>{act}</li>
@@ -825,8 +825,8 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                             )}
                             {/* Profundización */}
                             {ra.actividadesDiferenciadas.profundizacion && ra.actividadesDiferenciadas.profundizacion.length > 0 && (
-                              <div className="glass-effect rounded-lg p-3 border-t-4 border-accent space-y-2">
-                                <p className="font-semibold text-sm text-accent">Profundización</p>
+                              <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-t-4 border-emerald-500 space-y-2">
+                                <p className="font-semibold text-sm text-emerald-600">Profundización</p>
                                 <ul className="list-disc list-inside space-y-1 mt-1 text-xs">
                                   {ra.actividadesDiferenciadas.profundizacion.map((act: string, idx: number) => (
                                     <li key={`prof-${idx}`}>{act}</li>
@@ -841,15 +841,15 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
                     {/* Comunicado para Padres */}
                     {ra.comunicadoParaPadres && (
-                      <Card className="glass-effect border-0 glow-primary/10">
+                      <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <GraduationCap className="h-5 w-5 text-primary" />
+                            <GraduationCap className="h-5 w-5 text-blue-600" />
                             Comunicado para Padres
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <pre className="text-xs text-foreground/80 leading-relaxed whitespace-pre-wrap font-sans">{ra.comunicadoParaPadres}</pre>
+                          <pre className="text-xs text-slate-800/80 leading-relaxed whitespace-pre-wrap font-sans">{ra.comunicadoParaPadres}</pre>
                         </CardContent>
                       </Card>
                     )}
@@ -860,11 +860,11 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
         </div>
 
         {/* Botones de Acción */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 pt-6 border-t border-border/20 w-full max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 pt-6 border-t border-slate-200 border-b w-full max-w-7xl mx-auto">
             <Button
               onClick={onBack}
               variant="outline"
-              className="glass-effect border-primary/30 hover:glow-primary h-12 bg-transparent"
+              className="bg-white border border-slate-200 shadow-sm border-blue-500/30 hover:shadow-sm h-12 bg-transparent"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Nueva Sesión
@@ -872,7 +872,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
             <Button
               onClick={handleSaveSession}
               disabled={isSaving}
-              className="gradient-secondary glow-secondary hover:scale-105 transition-all duration-300 h-12"
+              className="bg-indigo-600 shadow-sm hover:scale-105 transition-all duration-300 h-12"
             >
               {isSaving ? (
                 <>
@@ -889,7 +889,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
             <Button
               onClick={handleExportPDF}
               disabled={isExporting}
-              className="gradient-primary glow-primary hover:scale-105 transition-all duration-300 h-12"
+              className="bg-blue-600 shadow-sm hover:scale-105 transition-all duration-300 h-12"
             >
               {isExporting ? (
                 <>

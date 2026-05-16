@@ -1,16 +1,19 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
 import { Progress } from "@/components/ui/progress"
-import { Brain, User, BarChart3, Loader2, Sparkles, Zap, Target, Clock, Package, Calendar, Award, CheckCircle2, X } from "lucide-react"
+import { 
+  Brain, User, BarChart3, Loader2, Sparkles, Target, Clock, Package, 
+  Calendar, Award, CheckCircle2, X, Calculator, LineChart, Ruler, BarChart, 
+  ChevronDown, ChevronUp, Info, FileText, BookOpen, GraduationCap
+} from "lucide-react"
 import type { SessionData } from "@/app/page"
 
 interface SessionGeneratorProps {
@@ -21,43 +24,42 @@ interface SessionGeneratorProps {
   editingSession?: SessionData | null
 }
 
-const competenciasNacionales = [
-  "Resuelve problemas de cantidad",
-  "Resuelve problemas de regularidad, equivalencia y cambios",
-  "Resuelve problemas de forma, movimiento y localización",
-  "Resuelve problemas de gestión de datos e incertidumbre",
+const competenciasData = [
+  { name: "Resuelve problemas de cantidad", icon: Calculator },
+  { name: "Resuelve problemas de regularidad, equivalencia y cambio", icon: LineChart },
+  { name: "Resuelve problemas de forma, movimiento y localización", icon: Ruler },
+  { name: "Resuelve problemas de gestión de datos e incertidumbre", icon: BarChart }
 ]
 
-// Mapeo de capacidades según competencias
 const capacidadesPorCompetencia: Record<string, string[]> = {
   "Resuelve problemas de cantidad": [
-    "Traduce cantidades a expresiones matemáticas",
-    "Comunica su comprensión sobre los números y operaciones",
-    "Usa estrategias y procedimientos para resolver problemas de cantidad",
-    "Argumenta afirmaciones sobre relaciones numéricas y operaciones"
+    "Traduce cantidades a expresiones numéricas",
+    "Comunica su comprensión sobre los números y las operaciones",
+    "Usa estrategias y procedimientos de estimación y cálculo",
+    "Argumenta afirmaciones sobre las relaciones numéricas y las operaciones"
   ],
-  "Resuelve problemas de regularidad, equivalencia y cambios": [
-    "Traduce relaciones y cambios a expresiones algebraicas",
-    "Comunica su comprensión del álgebra y funciones",
-    "Usa estrategias y procedimientos para representar o resolver relaciones y cambios",
-    "Argumenta afirmaciones sobre relaciones algebraicas y funciones"
+  "Resuelve problemas de regularidad, equivalencia y cambio": [
+    "Traduce datos y condiciones a expresiones algebraicas y gráficas",
+    "Comunica su comprensión sobre las relaciones algebraicas",
+    "Usa estrategias y procedimientos para encontrar equivalencias y reglas generales",
+    "Argumenta afirmaciones sobre relaciones de cambio y equivalencia"
   ],
   "Resuelve problemas de forma, movimiento y localización": [
-    "Traduce información y propiedades geométricas",
-    "Comunica su comprensión de las formas y relaciones geométricas",
-    "Usa estrategias y procedimientos para resolver problemas geométricos",
+    "Modela objetos con formas geométricas y sus transformaciones",
+    "Comunica su comprensión sobre las formas y relaciones geométricas",
+    "Usa estrategias y procedimientos para orientarse en el espacio",
     "Argumenta afirmaciones sobre relaciones geométricas"
   ],
   "Resuelve problemas de gestión de datos e incertidumbre": [
-    "Traduce información estadística y probabilística",
-    "Comunica su comprensión de datos, variabilidad e incertidumbre",
-    "Usa estrategias y procedimientos para analizar datos o situaciones aleatorias",
-    "Argumenta afirmaciones basadas en datos y probabilidades"
+    "Representa datos con gráficos y medidas estadísticas o probabilísticas",
+    "Comunica su comprensión de los conceptos estadísticos y probabilísticos",
+    "Usa estrategias y procedimientos para recopilar y procesar datos",
+    "Sustenta conclusiones o decisiones con base en la información obtenida"
   ]
 }
 
 const competenciasTransversales = [
-  "Se desenvuelve en entornos virtuales generados por las TICs",
+  "Se desenvuelve en entornos virtuales generados por las TIC",
   "Gestiona su aprendizaje de manera autónoma"
 ]
 
@@ -65,86 +67,122 @@ const enfoquesTransversales = [
   "Enfoque de Derechos",
   "Enfoque Inclusivo o de Atención a la Diversidad",
   "Enfoque Intercultural",
-  "Enfoque Igualdad de Género",
+  "Enfoque de Igualdad de Género",
   "Enfoque Ambiental",
-  "Enfoque Orientación al Bien Común",
-  "Enfoque Búsqueda de la Excelencia"
+  "Enfoque de Búsqueda de la Excelencia",
+  "Enfoque de Orientación al Bien Común"
 ]
 
-const ciclosDescripciones = {
-  VI: "1º y 2º de secundaria (11-13 años)",
-  VII: "3º, 4º y 5º de secundaria (14-17 años)",
+const enfoquesDescripciones: Record<string, string> = {
+  "Enfoque de Derechos": "Fomenta el reconocimiento de los derechos y deberes, promoviendo la participación democrática.",
+  "Enfoque Inclusivo o de Atención a la Diversidad": "Busca que todos los estudiantes tengan las mismas oportunidades de aprendizaje.",
+  "Enfoque Intercultural": "Promueve el intercambio y enriquecimiento mutuo entre distintas culturas.",
+  "Enfoque de Igualdad de Género": "Reconoce que hombres y mujeres tienen los mismos derechos y oportunidades.",
+  "Enfoque Ambiental": "Orienta hacia la formación de una conciencia crítica sobre el cuidado del medio ambiente.",
+  "Enfoque de Búsqueda de la Excelencia": "Incentiva el desarrollo del máximo potencial para el éxito personal y social.",
+  "Enfoque de Orientación al Bien Común": "Promueve valores, virtudes cívicas y sentido de justicia para la construcción de una sociedad equitativa."
 }
 
-const contextosLocales = ["Urbano", "Rural", "Agrícola", "Pesquero", "Comercial", "Minero", "Turístico"]
+const contextosLocales = [
+  "Urbano (ciudad / zona metropolitana)",
+  "Urbano-marginal (periferia de ciudad)",
+  "Rural (zona campo, sierra, selva)",
+  "Costero / litoral",
+  "Comunidad indígena o bilingüe"
+]
 
-// Materiales predefinidos según contexto
+const instrumentosEvaluacion = [
+  "Que la IA lo decida automáticamente",
+  "Lista de cotejo",
+  "Rúbrica",
+  "Escala de valoración",
+  "Ficha de observación"
+]
+
 const materialesPorContexto: Record<string, string[]> = {
-  "Urbano": ["Pizarra acrílica", "Plumones", "Proyector", "Laptop", "Calculadoras", "Reglas", "Compás", "Transportador"],
-  "Rural": ["Pizarra", "Tizas", "Borrador", "Papel bond", "Lápices", "Reglas", "Material del entorno (piedras, semillas)"],
-  "Agrícola": ["Pizarra", "Tizas", "Papel bond", "Productos agrícolas (frutas, semillas)", "Cuerdas", "Estacas"],
-  "Pesquero": ["Pizarra", "Tizas", "Redes", "Cuerdas", "Boyas", "Material marino"],
-  "Comercial": ["Pizarra acrílica", "Plumones", "Calculadoras", "Billetes didácticos", "Monedas", "Etiquetas de precios"],
-  "Minero": ["Pizarra", "Tizas", "Minerales", "Balanza", "Material del entorno"],
-  "Turístico": ["Pizarra acrílica", "Plumones", "Mapas", "Brochures", "Fotos", "Material audiovisual"]
+  "Urbano": ["Pizarra acrílica", "Plumones", "Proyector", "Laptop", "Calculadoras", "Reglas", "Compás"],
+  "Urbano-marginal": ["Pizarra", "Plumones", "Papelotes", "Material reciclado", "Reglas"],
+  "Rural": ["Pizarra", "Tizas", "Borrador", "Papel bond", "Lápices", "Material del entorno (piedras, semillas)"],
+  "Costero": ["Pizarra", "Plumones", "Conchas marinas", "Redes", "Cuerdas", "Material del entorno"],
+  "Comunidad": ["Pizarra", "Tizas", "Materiales de la comunidad", "Elementos naturales", "Telares"]
 }
 
 export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, onLogout, editingSession }: SessionGeneratorProps) {
-  // Nuevos campos
   const [nombreDocente, setNombreDocente] = useState("")
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
   const [grado, setGrado] = useState("")
   const [seccion, setSeccion] = useState("")
-  const [tituloSesion, setTituloSesion] = useState("")
   
-  // Campos existentes actualizados
+  const ciclo = useMemo(() => {
+    if (["1", "2"].includes(grado)) return "VI"
+    if (["3", "4", "5"].includes(grado)) return "VII"
+    return ""
+  }, [grado])
+  
   const [competenciasSeleccionadas, setCompetenciasSeleccionadas] = useState<string[]>([])
   const [capacidadesSeleccionadas, setCapacidadesSeleccionadas] = useState<string[]>([])
+  const [competenciaExpandida, setCompetenciaExpandida] = useState<string | null>(null)
+  
+  const [tema, setTema] = useState("")
+  const [tituloSesion, setTituloSesion] = useState("")
+  
   const [enfoqueTransversal, setEnfoqueTransversal] = useState("")
   const [competenciaTransversal, setCompetenciaTransversal] = useState("")
   
-  const [ciclo, setCiclo] = useState("")
   const [contexto, setContexto] = useState("")
   const [horasClase, setHorasClase] = useState<number>(1)
   
-  // Materiales
   const [materialesSeleccionados, setMaterialesSeleccionados] = useState<string[]>([])
   const [materialesNoEstructurados, setMaterialesNoEstructurados] = useState("")
+
+  const [instrumentoEvaluacion, setInstrumentoEvaluacion] = useState(instrumentosEvaluacion[0])
   
-  // Estado de generación
   const [isGenerating, setIsGenerating] = useState(false)
   const [progress, setProgress] = useState(0)
   const [currentStep, setCurrentStep] = useState("")
+  const [showErrors, setShowErrors] = useState(false)
 
   useEffect(() => {
     if (editingSession) {
-      setTituloSesion(editingSession.tema || "")
+      setTema(editingSession.tema || "")
+      setTituloSesion(editingSession.tituloSesion || editingSession.tema || "")
       setCompetenciasSeleccionadas(Array.isArray(editingSession.competenciasSeleccionadas) ? editingSession.competenciasSeleccionadas : [])
-      setCiclo(editingSession.ciclo)
-      setContexto(editingSession.contexto)
-      setHorasClase(editingSession.horasClase)
+      setContexto(editingSession.contexto || "")
+      setHorasClase(editingSession.horasClase || 1)
     }
   }, [editingSession])
 
-  // Actualizar materiales cuando cambia el contexto
-  useEffect(() => {
-    if (contexto && materialesPorContexto[contexto]) {
-      setMaterialesSeleccionados(materialesPorContexto[contexto])
-    }
-  }, [contexto])
+  const getContextoBase = (ctx: string) => {
+    if (!ctx) return ""
+    if (ctx.includes("Urbano (")) return "Urbano"
+    if (ctx.includes("Urbano-marginal")) return "Urbano-marginal"
+    if (ctx.includes("Rural")) return "Rural"
+    if (ctx.includes("Costero")) return "Costero"
+    if (ctx.includes("Comunidad")) return "Comunidad"
+    return ""
+  }
 
-  // Obtener capacidades disponibles según competencias seleccionadas
-  const capacidadesDisponibles = competenciasSeleccionadas.flatMap(
-    comp => capacidadesPorCompetencia[comp] || []
-  )
+  const contextoBase = getContextoBase(contexto)
+
+  useEffect(() => {
+    if (contextoBase && materialesPorContexto[contextoBase]) {
+      setMaterialesSeleccionados(materialesPorContexto[contextoBase])
+    } else {
+      setMaterialesSeleccionados([])
+    }
+  }, [contextoBase])
 
   const handleCompetenciaChange = (competencia: string, checked: boolean) => {
     if (checked) {
       setCompetenciasSeleccionadas((prev) => [...prev, competencia])
+      setCompetenciaExpandida(competencia)
     } else {
       setCompetenciasSeleccionadas((prev) => prev.filter((c) => c !== competencia))
       const capacidadesToRemove = capacidadesPorCompetencia[competencia] || []
       setCapacidadesSeleccionadas((prev) => prev.filter((c) => !capacidadesToRemove.includes(c)))
+      if (competenciaExpandida === competencia) {
+        setCompetenciaExpandida(null)
+      }
     }
   }
 
@@ -164,9 +202,16 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, on
     )
   }
 
+  const toggleAccordion = (competencia: string) => {
+    setCompetenciaExpandida(competenciaExpandida === competencia ? null : competencia)
+  }
+
+  const isValid = nombreDocente && tema && tituloSesion && competenciasSeleccionadas.length > 0 && grado && contexto && horasClase
+
   const generateSession = async () => {
-    if (!nombreDocente || !tituloSesion || competenciasSeleccionadas.length === 0 || !ciclo || !contexto || !horasClase) {
-      alert("Por favor completa todos los campos obligatorios")
+    if (!isValid) {
+      setShowErrors(true)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
 
@@ -180,24 +225,30 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, on
         ...(materialesNoEstructurados ? [materialesNoEstructurados] : [])
       ].join(", ")
 
-      const message = `Título: ${tituloSesion}
+      const evalInst = instrumentoEvaluacion === instrumentosEvaluacion[0] ? "A decisión de la IA" : instrumentoEvaluacion
+
+      const message = `Tema de la Sesión: ${tema}
+Título: ${tituloSesion}
 Docente: ${nombreDocente}
 Fecha: ${fecha}
-Grado: ${grado}
+Grado: ${grado}º Secundaria
 Sección: ${seccion}
 Competencias: ${competenciasSeleccionadas.join(", ")}
 Capacidades: ${capacidadesSeleccionadas.join(", ")}
 Enfoque Transversal: ${enfoqueTransversal}
 Competencia Transversal: ${competenciaTransversal}
 Ciclo: ${ciclo}
-Contexto: ${contexto}
-Duración: ${horasClase} horas
+Contexto Social: ${contexto}
+Duración: ${horasClase} horas (${horasClase * 45} minutos)
 Materiales: ${materialesCombinados}
+Instrumento de Evaluación Sugerido: ${evalInst}
 
 Nota: La IA debe generar automáticamente:
+- Propósito de la Sesión
 - Criterios de Evaluación
 - Evidencias de Aprendizaje
-- Propósito de la Sesión`
+- Desarrollo de la sesión (Inicio, Desarrollo, Cierre)
+- Recursos y materiales estructurados`
 
       const sessionId = user.email || user.name || "frontend"
       const wsUrl = (process.env.NEXT_PUBLIC_WEBHOOK_URL || "http://localhost:10000/webhook")
@@ -205,14 +256,26 @@ Nota: La IA debe generar automáticamente:
         .replace("https", "wss")
         .replace("/webhook", "/ws/generate")
 
-      console.log("=== Conectando a WebSocket ===")
-      console.log("URL:", wsUrl)
-
       const ws = new WebSocket(wsUrl)
       let currentProgress = 0
 
+      const loadingMessages = [
+        "Analizando el currículo nacional...",
+        "Diseñando la secuencia didáctica...",
+        "Preparando las evidencias y criterios...",
+        "Ajustando al contexto social...",
+        "Casi listo..."
+      ]
+      
+      let messageIndex = 0
+      const messageInterval = setInterval(() => {
+        if (currentProgress < 90) {
+          setCurrentStep(loadingMessages[messageIndex % loadingMessages.length])
+          messageIndex++
+        }
+      }, 3000)
+
       ws.onopen = () => {
-        console.log("WebSocket conectado. Enviando mensaje...")
         ws.send(JSON.stringify({
           session_id: sessionId,
           message: message
@@ -224,16 +287,16 @@ Nota: La IA debe generar automáticamente:
           const data = JSON.parse(event.data)
           
           if (data.status === 'progress') {
-            console.log("Cargando:", data.step)
-            setCurrentStep(data.step || "Generando...")
+            if (data.step) setCurrentStep(data.step)
             if (data.progress) {
               setProgress(data.progress)
+              currentProgress = data.progress
             } else {
               currentProgress = Math.min(currentProgress + 15, 90)
               setProgress(currentProgress)
             }
           } else if (data.status === 'completed') {
-            console.log("¡Terminó!", data.data)
+            clearInterval(messageInterval)
             setProgress(100)
             setCurrentStep("¡Sesión generada exitosamente!")
             
@@ -246,12 +309,13 @@ Nota: La IA debe generar automáticamente:
               ws.close()
             }, 1000)
           } else if (data.status === 'error') {
+            clearInterval(messageInterval)
             setIsGenerating(false)
             alert("Error de IA: " + (data.message || "desconocido"))
             ws.close()
           }
         } catch (e) {
-          console.error("Error procesando mensaje:", e)
+          clearInterval(messageInterval)
           setIsGenerating(false)
           alert("Error al procesar la respuesta del servidor")
           ws.close()
@@ -259,7 +323,7 @@ Nota: La IA debe generar automáticamente:
       }
 
       ws.onerror = (error) => {
-        console.error("Error en WebSocket:", error)
+        clearInterval(messageInterval)
         setIsGenerating(false)
         setProgress(0)
         setCurrentStep("")
@@ -268,470 +332,619 @@ Nota: La IA debe generar automáticamente:
       }
 
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Error desconocido al generar la sesión"
+      const errorMessage = err instanceof Error ? err.message : "Error desconocido"
       alert(`Error: ${errorMessage}\n\nPor favor, intenta de nuevo.`)
-      console.error("Error generando sesión:", err)
       setIsGenerating(false)
-      setProgress(0)
-      setCurrentStep("")
     }
   }
 
-  return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 right-20 w-64 h-64 gradient-primary rounded-full blur-3xl opacity-10 animate-pulse"></div>
-        <div className="absolute bottom-20 left-20 w-64 h-64 gradient-secondary rounded-full blur-3xl opacity-10 animate-pulse delay-1000"></div>
-      </div>
+  // Helper para el progreso general del formulario
+  const calculateFormProgress = () => {
+    let fields = 0;
+    let totalFields = 6;
+    if (nombreDocente) fields++;
+    if (grado) fields++;
+    if (competenciasSeleccionadas.length > 0) fields++;
+    if (tema) fields++;
+    if (tituloSesion) fields++;
+    if (contexto) fields++;
+    return (fields / totalFields) * 100;
+  }
 
-      <header className="glass-effect border-b border-border/20 relative z-10">
-        <div className="container mx-auto px-4 py-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="gradient-primary rounded-2xl p-3 glow-primary">
-              <Brain className="h-8 w-8 text-white" />
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 relative font-sans">
+      
+      {/* HEADER LUMINOSO Y LIMPIO */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div className="container mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="bg-blue-600 rounded-lg p-2 shadow-md shadow-blue-600/20">
+              <Brain className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                EduAI Matemática
+              <h1 className="font-bold text-xl md:text-2xl text-slate-800 flex items-center gap-2">
+                Genera tu Sesión de Aprendizaje
               </h1>
-              <p className="text-sm text-muted-foreground font-medium">Generador de Sesiones con IA</p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs md:text-sm text-slate-500 font-medium">Asistente para docentes de matemática</p>
+                <span className="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full border border-indigo-100 font-semibold">Powered by IA</span>
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
             <Button
               variant="outline"
               onClick={onViewDashboard}
-              className="glass-effect border-secondary/30 hover:glow-secondary hover:border-secondary/60 transition-all duration-300 bg-transparent"
+              className="bg-white border-slate-300 hover:bg-slate-50 text-slate-700 transition-all h-9 text-sm font-medium shadow-sm"
             >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Dashboard
+              <BarChart3 className="h-4 w-4 mr-2 text-slate-500" />
+              <span className="hidden sm:inline">Dashboard</span>
             </Button>
-            <Button
-              variant="destructive"
-              onClick={onLogout}
-              className="glass-effect hover:opacity-90 transition-all duration-300"
-            >
-              Cerrar Sesión
-            </Button>
-            <div className="flex items-center gap-3 glass-effect px-4 py-2 rounded-full">
-              <User className="h-4 w-4 text-accent" />
-              <span className="text-sm font-medium">{user.name}</span>
+            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
+              <div className="bg-blue-100 p-1 rounded-full">
+                <User className="h-3 w-3 text-blue-600" />
+              </div>
+              <span className="text-sm font-medium text-slate-700 truncate max-w-[100px] sm:max-w-[150px]">{user.name}</span>
             </div>
+            <Button
+              variant="ghost"
+              onClick={onLogout}
+              className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-2 sm:px-3 font-medium"
+              title="Cerrar Sesión"
+            >
+              <X className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Salir</span>
+            </Button>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8 relative z-10">
-        <div className="max-w-2xl mx-auto space-y-8">
-          <div className="text-center space-y-4">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Sparkles className="h-8 w-8 text-accent animate-pulse" />
-              <h2 className="text-4xl font-bold text-balance bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                {editingSession ? "Editar Sesión de Aprendizaje" : "Genera tu Sesión de Aprendizaje"}
-              </h2>
-              <Zap className="h-8 w-8 text-primary animate-pulse" />
+      {/* Progress Modal */}
+      {isGenerating && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+          <Card className="bg-white border border-slate-200 shadow-2xl max-w-md w-full rounded-2xl">
+            <CardHeader className="text-center pb-6">
+              <div className="flex justify-center mb-4">
+                <div className="bg-blue-600 rounded-full p-4 shadow-lg shadow-blue-600/30 animate-pulse">
+                  <Brain className="h-10 w-10 text-white" />
+                </div>
+              </div>
+              <CardTitle className="text-2xl text-slate-800 font-bold">
+                Diseñando tu Sesión
+              </CardTitle>
+              <CardDescription className="text-base text-blue-600 font-medium mt-1">
+                {currentStep}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Progress value={progress} className="h-2.5 bg-slate-100" indicatorClassName="bg-blue-600" />
+                <div className="flex justify-between text-xs text-slate-500 font-medium px-1">
+                  <span>{progress}% completado</span>
+                  <span>~{Math.max(1, Math.ceil((100 - progress) / 15))}s restantes</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* CONTENIDO PRINCIPAL A 2 COLUMNAS */}
+      <div className="max-w-7xl mx-auto px-4 py-8 relative z-10 pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* SIDEBAR - RESUMEN (Pegajoso en Desktop) */}
+          <div className="hidden lg:block lg:col-span-4 sticky top-24 space-y-6">
+            <div className="mb-2">
+              <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Nueva Sesión</h2>
+              <p className="text-slate-500 mt-1">Completa el formulario para generar tu clase con Inteligencia Artificial.</p>
             </div>
-            <p className="text-muted-foreground text-balance text-lg font-medium">
-              Ingresa el tema y el sistema buscará automáticamente en el currículo nacional
-            </p>
+            
+            <Card className="bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden">
+              <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2 text-slate-700">
+                  <BookOpen className="h-4 w-4 text-blue-600" />
+                  Resumen de la Sesión
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-5 space-y-4">
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Docente</p>
+                  <p className="text-sm font-medium text-slate-800">{nombreDocente || <span className="text-slate-300 italic">No especificado</span>}</p>
+                </div>
+                
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Grado y Ciclo</p>
+                  <p className="text-sm font-medium text-slate-800">
+                    {grado ? `${grado}º Secundaria ${ciclo ? `(Ciclo ${ciclo})` : ''}` : <span className="text-slate-300 italic">No especificado</span>}
+                  </p>
+                </div>
+                
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Tema Central</p>
+                  <p className="text-sm font-medium text-slate-800 line-clamp-2">{tema || <span className="text-slate-300 italic">No especificado</span>}</p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Competencias ({competenciasSeleccionadas.length})</p>
+                  {competenciasSeleccionadas.length > 0 ? (
+                    <ul className="text-xs text-slate-700 space-y-1 list-disc list-inside">
+                      {competenciasSeleccionadas.map(c => <li key={c} className="truncate">{c}</li>)}
+                    </ul>
+                  ) : (
+                    <p className="text-sm font-medium text-slate-300 italic">Ninguna seleccionada</p>
+                  )}
+                </div>
+
+                <div className="space-y-1 pt-2 border-t border-slate-100">
+                  <div className="flex justify-between items-center text-xs mb-1">
+                    <span className="font-semibold text-slate-600">Progreso general</span>
+                    <span className="text-blue-600 font-bold">{Math.round(calculateFormProgress())}%</span>
+                  </div>
+                  <Progress value={calculateFormProgress()} className="h-2 bg-slate-100" indicatorClassName="bg-emerald-500" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3">
+              <Sparkles className="h-5 w-5 text-blue-600 shrink-0" />
+              <p className="text-xs text-blue-800 font-medium leading-relaxed">
+                La IA estructurará tu sesión automáticamente siguiendo el enfoque del Currículo Nacional (CNEB) y adaptando las actividades a tu contexto social seleccionado.
+              </p>
+            </div>
           </div>
 
-          {/* Progress Modal */}
-          {isGenerating && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <Card className="glass-effect border-0 glow-primary/20 max-w-md w-full">
-                <CardHeader className="text-center pb-4">
-                  <div className="flex justify-center mb-4">
-                    <div className="gradient-primary rounded-full p-4 glow-primary animate-pulse">
-                      <Brain className="h-12 w-12 text-white" />
+          {/* FORMULARIO PRINCIPAL */}
+          <div className="col-span-1 lg:col-span-8 space-y-6">
+            
+            {/* Título en Móvil */}
+            <div className="lg:hidden mb-6">
+              <h2 className="text-2xl font-bold text-slate-800">Nueva Sesión</h2>
+              <p className="text-slate-500 text-sm mt-1">Completa el formulario para generar tu clase con IA.</p>
+            </div>
+
+            <Card className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden">
+              <CardContent className="p-6 sm:p-8 space-y-10">
+                
+                {/* 1. DATOS GENERALES */}
+                <section className="space-y-5 animate-in fade-in">
+                  <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <div className="bg-indigo-100 p-1.5 rounded-md">
+                      <GraduationCap className="h-5 w-5 text-indigo-600" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-800">1. Datos Generales</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <Label htmlFor="nombreDocente" className="text-sm font-semibold text-slate-700">
+                        Nombre del Docente <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="nombreDocente"
+                        placeholder="Ej: María García"
+                        value={nombreDocente}
+                        onChange={(e) => setNombreDocente(e.target.value)}
+                        className={`h-11 bg-white border-${showErrors && !nombreDocente ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm transition-all`}
+                      />
+                      {showErrors && !nombreDocente && <p className="text-xs text-red-500 font-medium">Este campo es requerido</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="fecha" className="text-sm font-semibold text-slate-700">Fecha</Label>
+                      <Input
+                        id="fecha"
+                        type="date"
+                        value={fecha}
+                        onChange={(e) => setFecha(e.target.value)}
+                        className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="grado" className="text-sm font-semibold text-slate-700">
+                        Grado <span className="text-red-500">*</span>
+                      </Label>
+                      <Select value={grado} onValueChange={setGrado}>
+                        <SelectTrigger className={`h-11 bg-white border-${showErrors && !grado ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm`}>
+                          <SelectValue placeholder="Selecciona el grado" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border-slate-200 text-slate-900">
+                          <SelectItem value="1">1º Secundaria</SelectItem>
+                          <SelectItem value="2">2º Secundaria</SelectItem>
+                          <SelectItem value="3">3º Secundaria</SelectItem>
+                          <SelectItem value="4">4º Secundaria</SelectItem>
+                          <SelectItem value="5">5º Secundaria</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {showErrors && !grado && <p className="text-xs text-red-500 font-medium">Selecciona un grado</p>}
+                      
+                      {ciclo && (
+                        <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold animate-in fade-in duration-300">
+                          <BookOpen className="h-3 w-3" />
+                          Ciclo {ciclo}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="seccion" className="text-sm font-semibold text-slate-700">Sección</Label>
+                      <Input
+                        id="seccion"
+                        placeholder="Ej: A, B, Única"
+                        value={seccion}
+                        onChange={(e) => setSeccion(e.target.value)}
+                        className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm"
+                      />
                     </div>
                   </div>
-                  <CardTitle className="text-2xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    Generando Sesión con IA
-                  </CardTitle>
-                  <CardDescription className="text-base mt-2">
-                    {currentStep}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Progress value={progress} className="h-3" />
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">
-                      {progress}% completado
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Tiempo estimado: {Math.ceil((100 - progress) / 15)} segundos
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
+                </section>
 
-          <Card className="glass-effect border-0 glow-primary/10">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                Formulario de Sesión
-              </CardTitle>
-              <CardDescription className="text-base">Completa todos los campos para generar tu sesión</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              {/* Datos Generales */}
-              <div className="space-y-6">
-                <h3 className="text-lg font-bold flex items-center gap-2 text-primary">
-                  <Award className="h-5 w-5" />
-                  Datos Generales
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <Label htmlFor="nombreDocente" className="text-base font-semibold">
-                      Nombre del Docente <span className="text-red-500">*</span>
+                {/* 2. COMPETENCIAS Y CAPACIDADES */}
+                <section className="space-y-5 animate-in fade-in">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-blue-100 p-1.5 rounded-md">
+                        <Target className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-800">2. Competencias y Capacidades</h3>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <Label className="text-sm font-semibold text-slate-700">
+                      Competencias del CNEB <span className="text-red-500">*</span>
                     </Label>
-                    <Input
-                      id="nombreDocente"
-                      placeholder="Ej: María García"
-                      value={nombreDocente}
-                      onChange={(e) => setNombreDocente(e.target.value)}
-                      className="h-12 glass-effect border-border/50 focus:border-primary focus:glow-primary transition-all duration-300"
+                    
+                    <div className="grid grid-cols-1 gap-3">
+                      {competenciasData.map((comp) => {
+                        const Icon = comp.icon
+                        const isSelected = competenciasSeleccionadas.includes(comp.name)
+                        const isExpanded = competenciaExpandida === comp.name
+                        const capacidades = capacidadesPorCompetencia[comp.name] || []
+                        
+                        return (
+                          <div key={comp.name} className="flex flex-col">
+                            {/* Tarjeta de Competencia */}
+                            <div 
+                              className={`flex items-center p-4 rounded-xl border transition-all duration-200 cursor-pointer shadow-sm ${
+                                isSelected 
+                                  ? "bg-blue-50 border-blue-500 ring-1 ring-blue-500" 
+                                  : "bg-white border-slate-200 hover:border-blue-300 hover:bg-slate-50"
+                              }`}
+                              onClick={() => {
+                                if (!isSelected) {
+                                  handleCompetenciaChange(comp.name, true)
+                                } else {
+                                  toggleAccordion(comp.name)
+                                }
+                              }}
+                            >
+                              <div className={`p-2.5 rounded-lg mr-4 ${isSelected ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "bg-slate-100 text-slate-500"}`}>
+                                <Icon className="h-5 w-5" />
+                              </div>
+                              <div className={`flex-1 font-semibold text-sm ${isSelected ? "text-blue-900" : "text-slate-700"}`}>
+                                {comp.name}
+                              </div>
+                              <div className="flex items-center gap-3">
+                                {isSelected && (
+                                  <button 
+                                    onClick={(e) => { e.stopPropagation(); toggleAccordion(comp.name) }}
+                                    className="text-slate-400 hover:text-blue-600 p-1 bg-white rounded-md border border-slate-200"
+                                  >
+                                    {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                                  </button>
+                                )}
+                                <Checkbox
+                                  checked={isSelected}
+                                  onCheckedChange={(checked) => handleCompetenciaChange(comp.name, checked as boolean)}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className={`h-5 w-5 border-2 rounded ${isSelected ? "border-blue-600 bg-blue-600 text-white" : "border-slate-300"}`}
+                                />
+                              </div>
+                            </div>
+
+                            {/* Acordeón de Capacidades */}
+                            {isSelected && isExpanded && (
+                              <div className="mt-2 ml-4 p-4 bg-slate-50 border border-slate-200 rounded-xl animate-in slide-in-from-top-2">
+                                <p className="text-xs text-slate-600 font-semibold mb-3 flex items-center gap-1.5 uppercase tracking-wide">
+                                  Selecciona las capacidades:
+                                </p>
+                                <div className="flex flex-col gap-2">
+                                  {capacidades.map((capacidad) => {
+                                    const isCapSelected = capacidadesSeleccionadas.includes(capacidad)
+                                    return (
+                                      <div 
+                                        key={capacidad}
+                                        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                                          isCapSelected 
+                                            ? "bg-white border-blue-200 shadow-sm" 
+                                            : "bg-transparent border-transparent hover:bg-slate-100"
+                                        }`}
+                                        onClick={() => handleCapacidadChange(capacidad, !isCapSelected)}
+                                      >
+                                        <Checkbox
+                                          checked={isCapSelected}
+                                          onCheckedChange={(checked) => handleCapacidadChange(capacidad, checked as boolean)}
+                                          className="mt-0.5 border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 rounded"
+                                        />
+                                        <span className={`text-sm leading-snug font-medium ${isCapSelected ? "text-slate-900" : "text-slate-600"}`}>
+                                          {capacidad}
+                                        </span>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                    {showErrors && competenciasSeleccionadas.length === 0 && (
+                      <p className="text-xs text-red-500 font-medium">Selecciona al menos una competencia</p>
+                    )}
+                  </div>
+                </section>
+
+                {/* 3. CONTENIDO DE LA SESIÓN */}
+                <section className="space-y-5 animate-in fade-in">
+                  <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <div className="bg-emerald-100 p-1.5 rounded-md">
+                      <FileText className="h-5 w-5 text-emerald-600" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-800">3. Contenido de la Sesión</h3>
+                  </div>
+
+                  <div className="space-y-5">
+                    <div className="space-y-2">
+                      <Label htmlFor="tema" className="text-sm font-semibold text-slate-700">
+                        Tema central de la sesión <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="tema"
+                        placeholder="Ej: Fracciones, Porcentajes, Ecuaciones lineales, Área de figuras..."
+                        value={tema}
+                        onChange={(e) => setTema(e.target.value)}
+                        className={`h-11 bg-white border-${showErrors && !tema ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm`}
+                      />
+                      <p className="text-xs text-slate-500">
+                        El contenido matemático que trabajarás. La IA lo relacionará con el contexto social.
+                      </p>
+                      {showErrors && !tema && <p className="text-xs text-red-500 font-medium">El tema es obligatorio</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="tituloSesion" className="text-sm font-semibold text-slate-700">
+                        Título de la Sesión <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="tituloSesion"
+                        placeholder="Ej: Calculando el IGV en compras usando porcentajes"
+                        value={tituloSesion}
+                        onChange={(e) => setTituloSesion(e.target.value)}
+                        className={`h-11 bg-white border-${showErrors && !tituloSesion ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm`}
+                      />
+                      <p className="text-xs text-slate-500">
+                        El título debe reflejar la situación significativa que motivará el aprendizaje.
+                      </p>
+                      {showErrors && !tituloSesion && <p className="text-xs text-red-500 font-medium">El título es obligatorio</p>}
+                    </div>
+                  </div>
+                </section>
+
+                {/* 4. ENFOQUES TRANSVERSALES */}
+                <section className="space-y-5 animate-in fade-in">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-amber-100 p-1.5 rounded-md">
+                        <Sparkles className="h-5 w-5 text-amber-600" />
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-800">4. Enfoques Transversales</h3>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="enfoqueTransversal" className="text-sm font-semibold text-slate-700">Enfoque Transversal</Label>
+                      <Select value={enfoqueTransversal} onValueChange={setEnfoqueTransversal}>
+                        <SelectTrigger className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm">
+                          <SelectValue placeholder="Selecciona un enfoque" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border-slate-200 text-slate-900">
+                          {enfoquesTransversales.map((enfoque) => (
+                            <SelectItem key={enfoque} value={enfoque}>{enfoque}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {enfoqueTransversal && enfoquesDescripciones[enfoqueTransversal] && (
+                        <p className="text-xs text-slate-500 mt-1 bg-slate-50 p-2 rounded-md border border-slate-100">
+                          {enfoquesDescripciones[enfoqueTransversal]}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="competenciaTransversal" className="text-sm font-semibold text-slate-700">Competencia Transversal</Label>
+                      <Select value={competenciaTransversal} onValueChange={setCompetenciaTransversal}>
+                        <SelectTrigger className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm">
+                          <SelectValue placeholder="Selecciona una competencia" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border-slate-200 text-slate-900">
+                          {competenciasTransversales.map((comp) => (
+                            <SelectItem key={comp} value={comp}>{comp}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </section>
+
+                {/* 5. CONTEXTO Y DURACIÓN */}
+                <section className="space-y-5 animate-in fade-in">
+                  <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <div className="bg-rose-100 p-1.5 rounded-md">
+                      <Clock className="h-5 w-5 text-rose-600" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-800">5. Contexto y Duración</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="contexto" className="text-sm font-semibold text-slate-700">
+                        Contexto Social <span className="text-red-500">*</span>
+                      </Label>
+                      <Select value={contexto} onValueChange={setContexto}>
+                        <SelectTrigger className={`h-11 bg-white border-${showErrors && !contexto ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm`}>
+                          <SelectValue placeholder="Selecciona el contexto" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border-slate-200 text-slate-900">
+                          {contextosLocales.map((ctx) => (
+                            <SelectItem key={ctx} value={ctx}>{ctx}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {showErrors && !contexto && <p className="text-xs text-red-500 font-medium">Selecciona el contexto social</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="horas" className="text-sm font-semibold text-slate-700">
+                        Horas de Clase <span className="text-red-500">*</span>
+                      </Label>
+                      <div className="flex items-center gap-3">
+                        <Input
+                          id="horas"
+                          type="number"
+                          min="1"
+                          max="8"
+                          value={horasClase}
+                          onChange={(e) => setHorasClase(Number.parseInt(e.target.value) || 1)}
+                          className="w-20 h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 text-center font-bold shadow-sm"
+                        />
+                        <div className="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-lg flex-1">
+                          <span className="text-sm text-slate-700 font-medium flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-slate-400" />
+                            {horasClase === 1 ? "1 hora = 45 min" : `${horasClase} horas = ${horasClase * 45} min`}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* 6. MATERIALES DIDÁCTICOS */}
+                <section className="space-y-5 animate-in fade-in">
+                  <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <div className="bg-violet-100 p-1.5 rounded-md">
+                      <Package className="h-5 w-5 text-violet-600" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-800">6. Materiales Didácticos</h3>
+                  </div>
+
+                  {contextoBase && materialesPorContexto[contextoBase] && (
+                    <div className="space-y-3">
+                      <Label className="text-sm font-semibold text-slate-700">Sugeridos para {contextoBase}</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {materialesPorContexto[contextoBase].map((material) => {
+                          const isSelected = materialesSeleccionados.includes(material)
+                          return (
+                            <Button
+                              key={material}
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => toggleMaterial(material)}
+                              className={`h-9 rounded-full transition-all border shadow-sm ${
+                                isSelected
+                                  ? "bg-violet-50 border-violet-300 text-violet-700 hover:bg-violet-100"
+                                  : "bg-white border-slate-300 text-slate-600 hover:border-slate-400 hover:bg-slate-50"
+                              }`}
+                            >
+                              {isSelected ? <CheckCircle2 className="h-3.5 w-3.5 mr-1.5 text-violet-600" /> : null}
+                              {material}
+                            </Button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="materialesNoEstructurados" className="text-sm font-semibold text-slate-700">Material No Estructurado (opcional)</Label>
+                    <Textarea
+                      id="materialesNoEstructurados"
+                      placeholder="Ej: chapas, piedritas, palitos, recortes de periódicos..."
+                      value={materialesNoEstructurados}
+                      onChange={(e) => setMaterialesNoEstructurados(e.target.value)}
+                      className="min-h-[80px] bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm resize-none"
                     />
                   </div>
+                </section>
 
-                  <div className="space-y-3">
-                    <Label htmlFor="fecha" className="text-base font-semibold flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-accent" />
-                      Fecha
-                    </Label>
-                    <Input
-                      id="fecha"
-                      type="date"
-                      value={fecha}
-                      onChange={(e) => setFecha(e.target.value)}
-                      className="h-12 glass-effect border-border/50 focus:border-primary focus:glow-primary transition-all duration-300"
-                    />
+                {/* 7. EVALUACIÓN */}
+                <section className="space-y-5 animate-in fade-in pb-2">
+                  <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <div className="bg-fuchsia-100 p-1.5 rounded-md">
+                      <Award className="h-5 w-5 text-fuchsia-600" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-800">7. Evaluación</h3>
                   </div>
 
-                  <div className="space-y-3">
-                    <Label htmlFor="grado" className="text-base font-semibold">
-                      Grado
-                    </Label>
-                    <Select value={grado} onValueChange={setGrado}>
-                      <SelectTrigger className="h-12 glass-effect border-border/50 focus:border-primary focus:glow-primary transition-all duration-300">
-                        <SelectValue placeholder="Selecciona el grado" />
+                  <div className="space-y-2">
+                    <Label htmlFor="instrumentoEvaluacion" className="text-sm font-semibold text-slate-700">Instrumento de evaluación (opcional)</Label>
+                    <Select value={instrumentoEvaluacion} onValueChange={setInstrumentoEvaluacion}>
+                      <SelectTrigger className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm">
+                        <SelectValue placeholder="Selecciona un instrumento" />
                       </SelectTrigger>
-                      <SelectContent className="glass-effect border-border/50">
-                        <SelectItem value="1">1º Secundaria</SelectItem>
-                        <SelectItem value="2">2º Secundaria</SelectItem>
-                        <SelectItem value="3">3º Secundaria</SelectItem>
-                        <SelectItem value="4">4º Secundaria</SelectItem>
-                        <SelectItem value="5">5º Secundaria</SelectItem>
+                      <SelectContent className="bg-white border-slate-200 text-slate-900">
+                        {instrumentosEvaluacion.map((inst) => (
+                          <SelectItem key={inst} value={inst}>{inst}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label htmlFor="seccion" className="text-base font-semibold">
-                      Sección
-                    </Label>
-                    <Input
-                      id="seccion"
-                      placeholder="Ej: A, B, C"
-                      value={seccion}
-                      onChange={(e) => setSeccion(e.target.value)}
-                      className="h-12 glass-effect border-border/50 focus:border-primary focus:glow-primary transition-all duration-300"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <Label htmlFor="tituloSesion" className="text-base font-semibold">
-                    Título de la Sesión <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="tituloSesion"
-                    placeholder="Ej: Resolviendo problemas de fracciones en situaciones cotidianas"
-                    value={tituloSesion}
-                    onChange={(e) => setTituloSesion(e.target.value)}
-                    className="h-12 glass-effect border-border/50 focus:border-primary focus:glow-primary transition-all duration-300"
-                  />
-                </div>
-              </div>
-
-              {/* Competencias y Capacidades */}
-              <div className="space-y-6">
-                <h3 className="text-lg font-bold flex items-center gap-2 text-primary">
-                  <Target className="h-5 w-5" />
-                  Competencias y Capacidades
-                </h3>
-
-                <div className="space-y-4">
-                  <Label className="text-base font-semibold">
-                    Competencias <span className="text-red-500">*</span>
-                  </Label>
-                  <div className="space-y-3">
-                    {competenciasNacionales.map((competencia, index) => (
-                      <div key={index} className="glass-effect rounded-xl p-4">
-                        <div className="flex items-start space-x-3">
-                          <Checkbox
-                            id={`competencia-${index}`}
-                            checked={competenciasSeleccionadas.includes(competencia)}
-                            onCheckedChange={(checked) => handleCompetenciaChange(competencia, checked as boolean)}
-                            className="border-border/50 mt-1"
-                          />
-                          <Label
-                            htmlFor={`competencia-${index}`}
-                            className="font-medium cursor-pointer text-sm leading-relaxed"
-                          >
-                            {competencia}
-                          </Label>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Capacidades - Se muestran solo si hay competencias seleccionadas */}
-                {capacidadesDisponibles.length > 0 && (
-                  <div className="space-y-4">
-                    <Label className="text-base font-semibold flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-secondary" />
-                      Capacidades (selecciona las que aplicarán)
-                    </Label>
-                    <p className="text-xs text-muted-foreground">
-                      Capacidades disponibles según las competencias seleccionadas
+                    <p className="text-xs text-slate-500">
+                      La IA generará automáticamente los criterios de evaluación y evidencias basados en este instrumento.
                     </p>
-                    <div className="space-y-3">
-                      {capacidadesDisponibles.map((capacidad, index) => (
-                        <div key={`capacidad-${index}`} className="glass-effect rounded-xl p-3">
-                          <div className="flex items-start space-x-3">
-                            <Checkbox
-                              id={`capacidad-${index}`}
-                              checked={capacidadesSeleccionadas.includes(capacidad)}
-                              onCheckedChange={(checked) => handleCapacidadChange(capacidad, checked as boolean)}
-                              className="border-border/50 mt-1"
-                            />
-                            <Label
-                              htmlFor={`capacidad-${index}`}
-                              className="font-medium cursor-pointer text-sm leading-relaxed"
-                            >
-                              {capacidad}
-                            </Label>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
                   </div>
-                )}
+                </section>
+              </CardContent>
+            </Card>
 
-                {/* Nota informativa sobre campos generados por IA */}
-                <div className="glass-effect rounded-lg p-4 border-l-4 border-accent bg-gradient-to-r from-accent/5 to-transparent">
-                  <div className="flex items-start gap-3">
-                    <Brain className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-semibold text-accent mb-1">Generación Automática con IA</p>
-                      <p className="text-xs text-muted-foreground">
-                        Los <strong>Criterios de Evaluación</strong>, <strong>Evidencias de Aprendizaje</strong> y <strong>Propósito de la Sesión</strong> serán generados automáticamente por la IA según la información que proporciones.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Enfoques Transversales */}
-              <div className="space-y-6">
-                <h3 className="text-lg font-bold flex items-center gap-2 text-secondary">
-                  <Sparkles className="h-5 w-5" />
-                  Enfoques Transversales
-                </h3>
-
-                <div className="space-y-3">
-                  <Label htmlFor="enfoqueTransversal" className="text-base font-semibold">
-                    Enfoque Transversal
-                  </Label>
-                  <Select value={enfoqueTransversal} onValueChange={setEnfoqueTransversal}>
-                    <SelectTrigger className="h-12 glass-effect border-border/50 focus:border-secondary focus:glow-secondary transition-all duration-300">
-                      <SelectValue placeholder="Selecciona el enfoque transversal" />
-                    </SelectTrigger>
-                    <SelectContent className="glass-effect border-border/50">
-                      {enfoquesTransversales.map((enfoque) => (
-                        <SelectItem key={enfoque} value={enfoque}>
-                          {enfoque}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-3">
-                  <Label htmlFor="competenciaTransversal" className="text-base font-semibold">
-                    Competencia Transversal
-                  </Label>
-                  <Select value={competenciaTransversal} onValueChange={setCompetenciaTransversal}>
-                    <SelectTrigger className="h-12 glass-effect border-border/50 focus:border-secondary focus:glow-secondary transition-all duration-300">
-                      <SelectValue placeholder="Selecciona la competencia transversal" />
-                    </SelectTrigger>
-                    <SelectContent className="glass-effect border-border/50">
-                      {competenciasTransversales.map((comp) => (
-                        <SelectItem key={comp} value={comp}>
-                          {comp}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Contexto y Duración */}
-              <div className="space-y-6">
-                <h3 className="text-lg font-bold flex items-center gap-2 text-accent">
-                  <Clock className="h-5 w-5" />
-                  Contexto y Duración
-                </h3>
-
-                <div className="space-y-4">
-                  <Label className="text-base font-semibold">
-                    Ciclo <span className="text-red-500">*</span>
-                  </Label>
-                  <RadioGroup value={ciclo} onValueChange={setCiclo} className="space-y-3">
-                    {Object.entries(ciclosDescripciones).map(([cicloKey, descripcion]) => (
-                      <div key={cicloKey} className="glass-effect rounded-xl p-4">
-                        <div className="flex items-center space-x-3">
-                          <RadioGroupItem value={cicloKey} id={`ciclo-${cicloKey}`} className="border-border/50" />
-                          <Label htmlFor={`ciclo-${cicloKey}`} className="cursor-pointer">
-                            <div>
-                              <div className="font-medium">Ciclo {cicloKey}</div>
-                              <div className="text-sm text-muted-foreground">{descripcion}</div>
-                            </div>
-                          </Label>
-                        </div>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </div>
-
-                <div className="space-y-3">
-                  <Label htmlFor="contexto" className="text-base font-semibold">
-                    Contexto Social <span className="text-red-500">*</span>
-                  </Label>
-                  <Select value={contexto} onValueChange={setContexto}>
-                    <SelectTrigger className="h-12 glass-effect border-border/50 focus:border-accent focus:glow-accent transition-all duration-300">
-                      <SelectValue placeholder="Selecciona el contexto social" />
-                    </SelectTrigger>
-                    <SelectContent className="glass-effect border-border/50">
-                      {contextosLocales.map((ctx) => (
-                        <SelectItem key={ctx} value={ctx}>
-                          {ctx}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">
-                    Los materiales se ajustarán automáticamente según el contexto
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <Label htmlFor="horas" className="text-base font-semibold">
-                    Horas de Clase <span className="text-red-500">*</span>
-                  </Label>
-                  <div className="flex items-center gap-4">
-                    <Input
-                      id="horas"
-                      type="number"
-                      min="1"
-                      max="6"
-                      value={horasClase}
-                      onChange={(e) => setHorasClase(Number.parseInt(e.target.value) || 1)}
-                      className="w-24 h-12 glass-effect border-border/50 focus:border-accent focus:glow-accent transition-all duration-300 text-center"
-                    />
-                    <span className="text-sm text-muted-foreground">
-                      {horasClase === 1 ? "1 hora (45 min)" : `${horasClase} horas (${horasClase * 45} min total)`}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Materiales */}
-              <div className="space-y-6">
-                <h3 className="text-lg font-bold flex items-center gap-2 text-primary">
-                  <Package className="h-5 w-5" />
-                  Materiales Didácticos
-                </h3>
-
-                {contexto && materialesPorContexto[contexto] && (
-                  <div className="space-y-3">
-                    <Label className="text-base font-semibold">
-                      Materiales Disponibles (según contexto {contexto})
-                    </Label>
-                    <div className="flex flex-wrap gap-2">
-                      {materialesPorContexto[contexto].map((material) => (
-                        <Button
-                          key={material}
-                          type="button"
-                          variant={materialesSeleccionados.includes(material) ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => toggleMaterial(material)}
-                          className={`glass-effect transition-all duration-300 ${
-                            materialesSeleccionados.includes(material)
-                              ? "gradient-primary glow-primary text-white"
-                              : "hover:border-primary/50"
-                          }`}
-                        >
-                          {materialesSeleccionados.includes(material) ? (
-                            <CheckCircle2 className="h-4 w-4 mr-2" />
-                          ) : (
-                            <X className="h-4 w-4 mr-2" />
-                          )}
-                          {material}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="space-y-3">
-                  <Label htmlFor="materialesNoEstructurados" className="text-base font-semibold">
-                    Material No Estructurado (opcional)
-                  </Label>
-                  <Textarea
-                    id="materialesNoEstructurados"
-                    placeholder="Ej: chapas, piedritas, palitos, semillas, tapas de botella..."
-                    value={materialesNoEstructurados}
-                    onChange={(e) => setMaterialesNoEstructurados(e.target.value)}
-                    className="min-h-[80px] glass-effect border-border/50 focus:border-primary focus:glow-primary transition-all duration-300 resize-none"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Agrega materiales no estructurados del entorno que puedas utilizar
-                  </p>
-                </div>
-              </div>
-
+            {/* BOTÓN GENERAR */}
+            <div className="pt-4 animate-in fade-in sticky bottom-4 z-20">
               <Button
                 onClick={generateSession}
-                disabled={!nombreDocente || !tituloSesion || competenciasSeleccionadas.length === 0 || !ciclo || !contexto || !horasClase || isGenerating}
-                className="w-full h-14 gradient-primary glow-primary hover:scale-105 transition-all duration-300 font-bold text-lg disabled:opacity-50 disabled:hover:scale-100"
-                size="lg"
+                disabled={isGenerating}
+                className={`w-full h-14 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 ${
+                  isGenerating 
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200 shadow-none" 
+                    : "bg-blue-600 hover:bg-blue-700 text-white hover:shadow-blue-600/30 hover:-translate-y-0.5"
+                }`}
               >
                 {isGenerating ? (
                   <>
-                    <Loader2 className="h-5 w-5 mr-3 animate-spin" />
-                    Generando sesión con IA...
+                    <Loader2 className="h-5 w-5 mr-3 animate-spin text-slate-400" />
+                    Generando sesión...
                   </>
                 ) : (
                   <>
-                    <Brain className="h-5 w-5 mr-3" />
-                    {editingSession ? "Actualizar Sesión de Aprendizaje" : "Generar Sesión de Aprendizaje"}
-                    <Sparkles className="h-5 w-5 ml-3 animate-pulse" />
+                    <Brain className="h-6 w-6 mr-3 text-white" />
+                    {editingSession ? "Actualizar Sesión" : "Generar Sesión con IA"}
                   </>
                 )}
               </Button>
-
-              {(!nombreDocente || !tituloSesion || competenciasSeleccionadas.length === 0 || !ciclo || !contexto) && (
-                <p className="text-sm text-muted-foreground text-center">
-                  <span className="text-red-500">*</span> Completa todos los campos obligatorios para generar la sesión
-                </p>
+              
+              {showErrors && !isValid && (
+                <div className="mt-4 text-center p-3 rounded-lg bg-red-50 border border-red-100">
+                  <p className="text-sm font-semibold text-red-600 flex items-center justify-center gap-2">
+                    <Info className="h-4 w-4" />
+                    Revisa los campos marcados en rojo antes de continuar
+                  </p>
+                </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+
+          </div>
         </div>
       </div>
     </div>

@@ -7,8 +7,8 @@ import { Suspense } from "react"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "EduAI Matemática - Virú",
-  description: "Software educativo con IA para docentes de Matemática en Virú, La Libertad, Perú",
+  title: "Sesion +",
+  description: "Software educativo con IA para docentes de Matemática en Perú",
   generator: "v0.app",
 }
 
