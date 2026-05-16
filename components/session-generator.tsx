@@ -138,6 +138,16 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, on
     comp => capacidadesPorCompetencia[comp] || []
   )
 
+  const handleCompetenciaChange = (competencia: string, checked: boolean) => {
+    if (checked) {
+      setCompetenciasSeleccionadas((prev) => [...prev, competencia])
+    } else {
+      setCompetenciasSeleccionadas((prev) => prev.filter((c) => c !== competencia))
+      const capacidadesToRemove = capacidadesPorCompetencia[competencia] || []
+      setCapacidadesSeleccionadas((prev) => prev.filter((c) => !capacidadesToRemove.includes(c)))
+    }
+  }
+
   const handleCapacidadChange = (capacidad: string, checked: boolean) => {
     if (checked) {
       setCapacidadesSeleccionadas((prev) => [...prev, capacidad])
@@ -154,39 +164,6 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, on
     )
   }
 
-  const simulateProgress = () => {
-    const steps = [
-      { progress: 15, message: "Analizando competencias y capacidades..." },
-      { progress: 30, message: "Generando criterios de evaluación..." },
-      { progress: 45, message: "Definiendo evidencias de aprendizaje..." },
-      { progress: 60, message: "Estructurando propósito de la sesión..." },
-      { progress: 75, message: "Integrando enfoque transversal..." },
-      { progress: 90, message: "Finalizando secuencia metodológica..." },
-      { progress: 100, message: "¡Sesión generada con éxito!" }
-    ]
-
-    let currentStepIndex = 0
-    const interval = setInterval(() => {
-      if (currentStepIndex < steps.length) {
-        setProgress(steps[currentStepIndex].progress)
-        setCurrentStep(steps[currentStepIndex].message)
-        currentStepIndex++
-      } else {
-        clearInterval(interval)
-      }
-    }, 2000)
-
-    return interval
-  }
-
-  const handleCompetenciaChange = (competencia: string, checked: boolean) => {
-    if (checked) {
-      setCompetenciasSeleccionadas((prev) => [...prev, competencia])
-    } else {
-      setCompetenciasSeleccionadas((prev) => prev.filter((c) => c !== competencia))
-    }
-  }
-
   const generateSession = async () => {
     if (!nombreDocente || !tituloSesion || competenciasSeleccionadas.length === 0 || !ciclo || !contexto || !horasClase) {
       alert("Por favor completa todos los campos obligatorios")
@@ -195,9 +172,7 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, on
 
     setIsGenerating(true)
     setProgress(0)
-    setCurrentStep("Iniciando generación con IA...")
-    
-    const progressInterval = simulateProgress()
+    setCurrentStep("Iniciando conexión con IA...")
 
     try {
       const materialesCombinados = [
@@ -224,77 +199,75 @@ Nota: La IA debe generar automáticamente:
 - Evidencias de Aprendizaje
 - Propósito de la Sesión`
 
-      const formData = new FormData()
-      formData.append("Body", message)
-      formData.append("From", user.email || user.name || "frontend")
+      const sessionId = user.email || user.name || "frontend"
+      const wsUrl = (process.env.NEXT_PUBLIC_WEBHOOK_URL || "http://localhost:10000/webhook")
+        .replace("http", "ws")
+        .replace("https", "wss")
+        .replace("/webhook", "/ws/generate")
 
-      console.log("=== Enviando request al backend ===")
-      console.log("URL:", process.env.NEXT_PUBLIC_WEBHOOK_URL || "https://eduai-pjfa.onrender.com/webhook")
-      console.log("Body (message):", message)
-      console.log("From:", user.email || user.name || "frontend")
-      console.log("FormData entries:")
-      for (const [key, value] of formData.entries()) {
-        console.log(`  ${key}:`, value)
+      console.log("=== Conectando a WebSocket ===")
+      console.log("URL:", wsUrl)
+
+      const ws = new WebSocket(wsUrl)
+      let currentProgress = 0
+
+      ws.onopen = () => {
+        console.log("WebSocket conectado. Enviando mensaje...")
+        ws.send(JSON.stringify({
+          session_id: sessionId,
+          message: message
+        }))
       }
-      console.log("===================================")
 
-      const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_URL || "https://eduai-pjfa.onrender.com/webhook", {
-        method: "POST",
-        body: formData,
-      })
-
-      if (!response.ok) throw new Error("Error al generar la sesión")
-      
-      const responseText = await response.text()
-      let sessionData
-      
-      try {
-        // Intenta parsear directamente
-        sessionData = JSON.parse(responseText)
-      } catch (e) {
-        console.warn("JSON parse failed, trying to extract from markdown:", e)
-        
-        // Intenta extraer JSON de markdown code blocks
-        const match = responseText.match(/```json\s*([\s\S]*?)\s*```/)
-        if (match && match[1]) {
-          try {
-            sessionData = JSON.parse(match[1])
-          } catch (e2) {
-            console.error("Failed to parse JSON from markdown block:", e2)
-            throw new Error("El formato de respuesta de la IA no es válido")
-          }
-        } else {
-          // Intenta encontrar cualquier estructura JSON en el texto
-          const jsonMatch = responseText.match(/\{[\s\S]*\}/)
-          if (jsonMatch) {
-            try {
-              sessionData = JSON.parse(jsonMatch[0])
-            } catch (e3) {
-              console.error("Failed to parse extracted JSON:", e3)
-              console.error("Raw response:", responseText.substring(0, 500))
-              throw new Error("No se pudo extraer JSON válido de la respuesta")
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data)
+          
+          if (data.status === 'progress') {
+            console.log("Cargando:", data.step)
+            setCurrentStep(data.step || "Generando...")
+            if (data.progress) {
+              setProgress(data.progress)
+            } else {
+              currentProgress = Math.min(currentProgress + 15, 90)
+              setProgress(currentProgress)
             }
-          } else {
-            console.error("No JSON found in response:", responseText.substring(0, 500))
-            throw new Error("La respuesta no contiene JSON válido")
+          } else if (data.status === 'completed') {
+            console.log("¡Terminó!", data.data)
+            setProgress(100)
+            setCurrentStep("¡Sesión generada exitosamente!")
+            
+            if (!data.data || typeof data.data !== 'object') {
+              throw new Error("La sesión generada no tiene el formato correcto")
+            }
+            
+            setTimeout(() => {
+              onSessionGenerated(data.data)
+              ws.close()
+            }, 1000)
+          } else if (data.status === 'error') {
+            setIsGenerating(false)
+            alert("Error de IA: " + (data.message || "desconocido"))
+            ws.close()
           }
+        } catch (e) {
+          console.error("Error procesando mensaje:", e)
+          setIsGenerating(false)
+          alert("Error al procesar la respuesta del servidor")
+          ws.close()
         }
       }
-      
-      // Validar que sessionData tiene la estructura mínima esperada
-      if (!sessionData || typeof sessionData !== 'object') {
-        throw new Error("La sesión generada no tiene el formato correcto")
+
+      ws.onerror = (error) => {
+        console.error("Error en WebSocket:", error)
+        setIsGenerating(false)
+        setProgress(0)
+        setCurrentStep("")
+        alert("Error de conexión al generar la sesión. Asegúrate de que el backend esté en ejecución.")
+        ws.close()
       }
 
-      clearInterval(progressInterval)
-      setProgress(100)
-      setCurrentStep("¡Sesión generada exitosamente!")
-      
-      setTimeout(() => {
-        onSessionGenerated(sessionData)
-      }, 1000)
     } catch (err) {
-      clearInterval(progressInterval)
       const errorMessage = err instanceof Error ? err.message : "Error desconocido al generar la sesión"
       alert(`Error: ${errorMessage}\n\nPor favor, intenta de nuevo.`)
       console.error("Error generando sesión:", err)

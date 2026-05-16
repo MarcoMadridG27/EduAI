@@ -49,6 +49,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
   const [isSaving, setIsSaving] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  const [activeTab, setActiveTab] = useState<'secuencia'|'evaluacion'|'recursos'>('secuencia')
   const contentRef = useRef<HTMLDivElement>(null)
   const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || "https://eduai-auth-1.onrender.com"
 
@@ -60,9 +61,9 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
     if (!editedSession.distribucionHoras) return { inicio: 0, desarrollo: 0, cierre: 0 }
     
     const text = editedSession.distribucionHoras.toLowerCase()
-    const inicioRegex = /inicio:?\s*(\d+)\s*minutos?/i
-    const desarrolloRegex = /desarrollo:?\s*(\d+)\s*minutos?/i
-    const cierreRegex = /cierre:?\s*(\d+)\s*minutos?/i
+    const inicioRegex = /inicio\D*(\d+)/i
+    const desarrolloRegex = /desarrollo\D*(\d+)/i
+    const cierreRegex = /cierre\D*(\d+)/i
     
     const inicioMatch = inicioRegex.exec(text)
     const desarrolloMatch = desarrolloRegex.exec(text)
@@ -238,779 +239,627 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
         </div>
       </header>
 
+
       <div className="container mx-auto px-4 py-8 relative z-10">
-        <div className="max-w-6xl mx-auto space-y-6" ref={contentRef}>
+        <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto" ref={contentRef}>
           
-          {/* Datos Generales */}
-          {editedSession.datosGenerales && (
-            <Card className="glass-effect border-0 glow-primary/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5 text-primary" />
-                  Datos Generales de la Sesión
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                  <div className="glass-effect rounded-lg p-3 text-center">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Título</p>
-                    <p className="font-semibold text-sm">{editedSession.datosGenerales.titulo}</p>
-                  </div>
-                  <div className="glass-effect rounded-lg p-3 text-center">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Docente</p>
-                    <p className="font-semibold text-sm">{editedSession.datosGenerales.docente}</p>
-                  </div>
-                  <div className="glass-effect rounded-lg p-3 text-center">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Fecha</p>
-                    <p className="font-semibold text-sm">{editedSession.datosGenerales.fecha}</p>
-                  </div>
-                  <div className="glass-effect rounded-lg p-3 text-center">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Grado</p>
-                    <p className="font-semibold text-sm">{editedSession.datosGenerales.grado}</p>
-                  </div>
-                  <div className="glass-effect rounded-lg p-3 text-center">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Sección</p>
-                    <p className="font-semibold text-sm">{editedSession.datosGenerales.seccion}</p>
-                  </div>
+          {/* SIDEBAR */}
+          <div className="w-full lg:w-1/3 space-y-6 flex-shrink-0">
+             <div className="sticky top-24 space-y-6">
+                <div className="glass-effect rounded-xl p-4 border-l-4 border-primary">
+                  <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    Contexto y Entradas
+                  </h3>
+                  <p className="text-xs text-muted-foreground">Resumen de la información base de la sesión.</p>
                 </div>
-              </CardContent>
-            </Card>
-          )}
 
-          {/* Resumen Rápido - 4 columnas */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="glass-effect border-0 glow-primary/10">
-              <CardContent className="pt-6">
-                <div className="text-center space-y-2">
-                  <BookOpen className="h-8 w-8 text-primary mx-auto" />
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Tema</p>
-                  <p className="font-bold text-sm line-clamp-3 leading-tight">{editedSession.tema}</p>
+                {/* Resumen Rápido */}
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="glass-effect border-0 glow-primary/10">
+                    <CardContent className="p-4 text-center space-y-1">
+                      <BookOpen className="h-6 w-6 text-primary mx-auto" />
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Tema</p>
+                      <p className="font-bold text-sm line-clamp-2">{editedSession.tema}</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="glass-effect border-0 glow-secondary/10">
+                    <CardContent className="p-4 text-center space-y-1">
+                      <GraduationCap className="h-6 w-6 text-secondary mx-auto" />
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Ciclo</p>
+                      <p className="font-bold text-sm">{editedSession.ciclo}</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="glass-effect border-0 glow-accent/10">
+                    <CardContent className="p-4 text-center space-y-1">
+                      <Clock className="h-6 w-6 text-accent mx-auto" />
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Duración</p>
+                      <p className="font-bold text-sm">{editedSession.horasClase} h</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="glass-effect border-0 glow-primary/10">
+                    <CardContent className="p-4 text-center space-y-1">
+                      <MapPin className="h-6 w-6 text-primary mx-auto" />
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Contexto</p>
+                      <p className="font-bold text-xs line-clamp-2">{editedSession.contexto}</p>
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
 
-            <Card className="glass-effect border-0 glow-secondary/10">
-              <CardContent className="pt-6">
-                <div className="text-center space-y-2">
-                  <GraduationCap className="h-8 w-8 text-secondary mx-auto" />
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Ciclo</p>
-                  <p className="font-bold text-lg">{editedSession.ciclo}</p>
-                </div>
-              </CardContent>
-            </Card>
+                {/* Datos Generales */}
+                {editedSession.datosGenerales && (
+                  <Card className="glass-effect border-0 glow-primary/10">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <GraduationCap className="h-4 w-4 text-primary" />
+                        Datos Generales
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-xs">
+                      <p><span className="text-muted-foreground">Título:</span> {editedSession.datosGenerales.titulo}</p>
+                      <p><span className="text-muted-foreground">Docente:</span> {editedSession.datosGenerales.docente}</p>
+                      <p><span className="text-muted-foreground">Fecha:</span> {editedSession.datosGenerales.fecha}</p>
+                      <p><span className="text-muted-foreground">Grado y Sección:</span> {editedSession.datosGenerales.grado} - {editedSession.datosGenerales.seccion}</p>
+                    </CardContent>
+                  </Card>
+                )}
 
-            <Card className="glass-effect border-0 glow-accent/10">
-              <CardContent className="pt-6">
-                <div className="text-center space-y-2">
-                  <Clock className="h-8 w-8 text-accent mx-auto" />
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Duración</p>
-                  <p className="font-bold text-lg">{editedSession.horasClase} hora{editedSession.horasClase === 1 ? '' : 's'}</p>
-                </div>
-              </CardContent>
-            </Card>
+                {/* Competencias */}
+                {editedSession.competenciasSeleccionadas && editedSession.competenciasSeleccionadas.length > 0 && (
+                  <Card className="glass-effect border-0 glow-secondary/10">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Target className="h-4 w-4 text-secondary" />
+                        Competencias
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {editedSession.competenciasSeleccionadas.map((comp) => (
+                        <div key={comp} className="glass-effect rounded p-2 text-xs border-l-2 border-secondary flex items-start gap-2">
+                          <CheckCircle className="h-3 w-3 text-secondary flex-shrink-0 mt-0.5" />
+                          <p>{comp}</p>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
 
-            <Card className="glass-effect border-0 glow-primary/10">
-              <CardContent className="pt-6">
-                <div className="text-center space-y-2">
-                  <MapPin className="h-8 w-8 text-primary mx-auto" />
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Contexto</p>
-                  <p className="font-bold text-sm line-clamp-3 leading-tight">{editedSession.contexto}</p>
-                </div>
-              </CardContent>
-            </Card>
+                {/* Capacidades */}
+                {editedSession.capacidades && editedSession.capacidades.length > 0 && (
+                  <Card className="glass-effect border-0 glow-accent/10">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Zap className="h-4 w-4 text-accent" />
+                        Capacidades
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {editedSession.capacidades.map((cap) => (
+                        <div key={cap} className="glass-effect rounded p-2 text-xs border-l-2 border-accent flex items-start gap-2">
+                          <CheckCircle className="h-3 w-3 text-accent flex-shrink-0 mt-0.5" />
+                          <p>{cap}</p>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Materiales Disponibles */}
+                {editedSession.materialesDisponibles && (
+                  <Card className="glass-effect border-0 glow-primary/10">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Package className="h-4 w-4 text-primary" />
+                        Materiales Disponibles
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-xs text-foreground/80">{editedSession.materialesDisponibles}</p>
+                    </CardContent>
+                  </Card>
+                )}
+             </div>
           </div>
 
-          {/* Competencias - Grid */}
-          {editedSession.competenciasSeleccionadas && editedSession.competenciasSeleccionadas.length > 0 && (
-            <Card className="glass-effect border-0 glow-secondary/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-secondary" />
-                  Competencias Seleccionadas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {editedSession.competenciasSeleccionadas.map((comp) => (
-                    <div key={comp} className="glass-effect rounded-lg p-3 border-l-4 border-secondary flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-secondary flex-shrink-0 mt-0.5" />
-                      <p className="text-sm text-foreground">{comp}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {/* MAIN CONTENT */}
+          <div className="w-full lg:w-2/3 space-y-6">
+             <div className="glass-effect rounded-xl p-2 mb-2 flex flex-wrap sm:flex-nowrap overflow-x-auto gap-2 border-b border-border/20 sticky top-[80px] z-20 backdrop-blur-xl">
+               <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'secuencia' ? 'bg-primary/20 text-primary glow-primary/20 font-bold' : 'text-muted-foreground hover:text-foreground'}`} onClick={() => setActiveTab('secuencia')}>
+                 <BookOpen className="h-4 w-4 mr-2" />
+                 Secuencia Didáctica
+               </Button>
+               <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'evaluacion' ? 'bg-accent/20 text-accent glow-accent/20 font-bold' : 'text-muted-foreground hover:text-foreground'}`} onClick={() => setActiveTab('evaluacion')}>
+                 <CheckCircle className="h-4 w-4 mr-2" />
+                 Evaluación
+               </Button>
+               <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'recursos' ? 'bg-secondary/20 text-secondary glow-secondary/20 font-bold' : 'text-muted-foreground hover:text-foreground'}`} onClick={() => setActiveTab('recursos')}>
+                 <Package className="h-4 w-4 mr-2" />
+                 Recursos Adicionales
+               </Button>
+             </div>
 
-          {/* Capacidades */}
-          {editedSession.capacidades && editedSession.capacidades.length > 0 && (
-            <Card className="glass-effect border-0 glow-accent/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-accent" />
-                  Capacidades
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {editedSession.capacidades.map((cap) => (
-                    <div key={cap} className="glass-effect rounded-lg p-3 border-l-4 border-accent flex items-start gap-2">
-                      <CheckCircle className="h-4 w-4 text-accent flex-shrink-0 mt-0.5" />
-                      <p className="text-sm text-foreground">{cap}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Enfoques Transversales */}
-          {(editedSession.enfoqueTransversal || editedSession.competenciaTransversal) && (
-            <Card className="glass-effect border-0 glow-primary/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5 text-primary" />
-                  Enfoques Transversales
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {editedSession.enfoqueTransversal && (
-                    <div className="glass-effect rounded-lg p-4 border-l-4 border-primary">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Enfoque Transversal</p>
-                      <p className="text-sm font-semibold">{editedSession.enfoqueTransversal}</p>
-                    </div>
-                  )}
-                  {editedSession.competenciaTransversal && (
-                    <div className="glass-effect rounded-lg p-4 border-l-4 border-primary">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Competencia Transversal</p>
-                      <p className="text-sm font-semibold">{editedSession.competenciaTransversal}</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Propósito de la Sesión */}
-          {editedSession.propositoSesion && (
-            <Card className="glass-effect border-0 glow-secondary/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-secondary" />
-                  Propósito de la Sesión
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {isEditing ? (
-                  <Textarea
-                    value={editedSession.propositoSesion}
-                    onChange={(e) => setEditedSession({...editedSession, propositoSesion: e.target.value})}
-                    className="min-h-[80px] glass-effect border-border/50 focus:border-secondary focus:glow-secondary transition-all duration-300"
-                  />
-                ) : (
-                  <div className="glass-effect rounded-lg p-4 border-l-4 border-secondary bg-gradient-to-r from-secondary/5 to-transparent">
-                    <p className="text-foreground leading-relaxed text-sm">{editedSession.propositoSesion}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Descripción de Competencia */}
-          {editedSession.competenciaDescripcion && (
-            <Card className="glass-effect border-0 glow-secondary/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Brain className="h-5 w-5 text-secondary" />
-                  Descripción de la Competencia
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {isEditing ? (
-                  <Textarea
-                    value={editedSession.competenciaDescripcion}
-                    onChange={(e) => setEditedSession({...editedSession, competenciaDescripcion: e.target.value})}
-                    className="min-h-[100px] glass-effect border-border/50 focus:border-secondary focus:glow-secondary transition-all duration-300"
-                  />
-                ) : (
-                  <div className="glass-effect rounded-lg p-4 border-l-4 border-secondary bg-gradient-to-r from-secondary/5 to-transparent">
-                    <p className="text-foreground leading-relaxed text-sm">{editedSession.competenciaDescripcion}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Criterios de Evaluación */}
-          {editedSession.criteriosEvaluacion && (
-            <Card className="glass-effect border-0 glow-accent/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-accent" />
-                  Criterios de Evaluación
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {isEditing ? (
-                  <Textarea
-                    value={editedSession.criteriosEvaluacion}
-                    onChange={(e) => setEditedSession({...editedSession, criteriosEvaluacion: e.target.value})}
-                    className="min-h-[120px] glass-effect border-border/50 focus:border-accent focus:glow-accent transition-all duration-300"
-                  />
-                ) : (
-                  <div className="glass-effect rounded-lg p-4 border-l-4 border-accent bg-gradient-to-r from-accent/5 to-transparent">
-                    <pre className="text-foreground leading-relaxed text-sm whitespace-pre-wrap font-sans">{editedSession.criteriosEvaluacion}</pre>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Evidencias de Aprendizaje */}
-          {editedSession.evidenciasAprendizaje && (
-            <Card className="glass-effect border-0 glow-primary/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-primary" />
-                  Evidencias de Aprendizaje
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {isEditing ? (
-                  <Textarea
-                    value={editedSession.evidenciasAprendizaje}
-                    onChange={(e) => setEditedSession({...editedSession, evidenciasAprendizaje: e.target.value})}
-                    className="min-h-[100px] glass-effect border-border/50 focus:border-primary focus:glow-primary transition-all duration-300"
-                  />
-                ) : (
-                  <div className="glass-effect rounded-lg p-4 border-l-4 border-primary bg-gradient-to-r from-primary/5 to-transparent">
-                    <pre className="text-foreground leading-relaxed text-sm whitespace-pre-wrap font-sans">{editedSession.evidenciasAprendizaje}</pre>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Secuencia Metodológica - 3 columnas */}
-          {editedSession.secuenciaMetodologica && (
-            <Card className="glass-effect border-0 glow-accent/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-accent" />
-                  Secuencia Metodológica
-                </CardTitle>
-                <CardDescription>Estructura pedagógica Inicio - Desarrollo - Cierre</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* INICIO */}
-                  <div className="glass-effect rounded-lg p-4 border-t-4 border-primary">
-                    <h4 className="font-bold text-primary mb-3 flex items-center gap-2">
-                      <span className="gradient-primary rounded-full w-6 h-6 flex items-center justify-center text-white text-xs">
-                        1
-                      </span>{" "}
-                      INICIO
-                    </h4>
-                    {isEditing ? (
-                      <Textarea
-                        value={editedSession.secuenciaMetodologica.inicio}
-                        onChange={(e) => setEditedSession({
-                          ...editedSession,
-                          secuenciaMetodologica: {
-                            ...editedSession.secuenciaMetodologica,
-                            inicio: e.target.value
-                          }
-                        })}
-                        className="min-h-[200px] glass-effect border-border/50 focus:border-primary focus:glow-primary transition-all duration-300"
-                      />
-                    ) : (
-                      <div
-                        className="text-sm text-foreground leading-relaxed space-y-2"
-                        dangerouslySetInnerHTML={{
-                          __html: editedSession.secuenciaMetodologica.inicio
-                            .replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-primary'>$1</strong>")
-                            .replaceAll("\n", "<br>"),
-                        }}
-                      />
-                    )}
-                  </div>
-
-                  {/* DESARROLLO */}
-                  <div className="glass-effect rounded-lg p-4 border-t-4 border-secondary">
-                    <h4 className="font-bold text-secondary mb-3 flex items-center gap-2">
-                      <span className="gradient-secondary rounded-full w-6 h-6 flex items-center justify-center text-white text-xs">
-                        2
-                      </span>{" "}
-                      DESARROLLO
-                    </h4>
-                    {isEditing ? (
-                      <Textarea
-                        value={editedSession.secuenciaMetodologica.desarrollo}
-                        onChange={(e) => setEditedSession({
-                          ...editedSession,
-                          secuenciaMetodologica: {
-                            ...editedSession.secuenciaMetodologica,
-                            desarrollo: e.target.value
-                          }
-                        })}
-                        className="min-h-[200px] glass-effect border-border/50 focus:border-secondary focus:glow-secondary transition-all duration-300"
-                      />
-                    ) : (
-                      <div
-                        className="text-sm text-foreground leading-relaxed space-y-2"
-                        dangerouslySetInnerHTML={{
-                          __html: editedSession.secuenciaMetodologica.desarrollo
-                            .replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-secondary'>$1</strong>")
-                            .replaceAll("\n", "<br>"),
-                        }}
-                      />
-                    )}
-                  </div>
-
-                  {/* CIERRE */}
-                  <div className="glass-effect rounded-lg p-4 border-t-4 border-accent">
-                    <h4 className="font-bold text-accent mb-3 flex items-center gap-2">
-                      <span className="gradient-accent rounded-full w-6 h-6 flex items-center justify-center text-white text-xs">
-                        3
-                      </span>{" "}
-                      CIERRE
-                    </h4>
-                    {isEditing ? (
-                      <Textarea
-                        value={editedSession.secuenciaMetodologica.cierre}
-                        onChange={(e) => setEditedSession({
-                          ...editedSession,
-                          secuenciaMetodologica: {
-                            ...editedSession.secuenciaMetodologica,
-                            cierre: e.target.value
-                          }
-                        })}
-                        className="min-h-[200px] glass-effect border-border/50 focus:border-accent focus:glow-accent transition-all duration-300"
-                      />
-                    ) : (
-                      <div
-                        className="text-sm text-foreground leading-relaxed space-y-2"
-                        dangerouslySetInnerHTML={{
-                          __html: editedSession.secuenciaMetodologica.cierre
-                            .replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-accent'>$1</strong>")
-                            .replaceAll("\n", "<br>"),
-                        }}
-                      />
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Distribución Horaria con visualización */}
-          {editedSession.distribucionHoras && (
-            <Card className="glass-effect border-0 glow-secondary/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-secondary" />
-                  Distribución Horaria
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {/* Vertical bar chart with dynamic data */}
-                  <div className="flex items-end justify-center gap-4 h-64">
-                    {(() => {
-                      // Calcular el máximo para proporcionalidad
-                      const maxTiempo = Math.max(tiempos.inicio, tiempos.desarrollo, tiempos.cierre, 1)
-                      const containerHeight = 256 // h-64 = 256px
-                      
-                      return (
-                        <>
-                          {/* Inicio */}
-                          <div className="flex-1 flex flex-col items-center gap-3">
-                            <div 
-                              className="w-full bg-gradient-to-t from-primary to-primary/50 rounded-t-lg flex items-end justify-center pb-2 glow-primary/20" 
-                              style={{ height: `${Math.max((tiempos.inicio / maxTiempo) * containerHeight, 30)}px` }}
-                            >
-                              <span className="text-xs font-bold text-white">{tiempos.inicio}'</span>
+             <div className="min-h-[600px] pb-10">
+               {/* TAB 1: SECUENCIA */}
+               {activeTab === 'secuencia' && (
+                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    {/* Propósito de la Sesión */}
+                    {editedSession.propositoSesion && (
+                      <Card className="glass-effect border-0 glow-secondary/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Target className="h-5 w-5 text-secondary" />
+                            Propósito de la Sesión
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          {isEditing ? (
+                            <Textarea value={editedSession.propositoSesion} onChange={(e) => setEditedSession({...editedSession, propositoSesion: e.target.value})} className="min-h-[80px] glass-effect" />
+                          ) : (
+                            <div className="glass-effect rounded-lg p-4 border-l-4 border-secondary bg-gradient-to-r from-secondary/5 to-transparent">
+                              <p className="text-foreground leading-relaxed text-sm">{editedSession.propositoSesion}</p>
                             </div>
-                            <div className="text-center">
-                              <p className="text-sm font-semibold text-primary">INICIO</p>
-                              <p className="text-xs text-muted-foreground">Motivación</p>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Descripción de Competencia */}
+                    {editedSession.competenciaDescripcion && (
+                      <Card className="glass-effect border-0 glow-secondary/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Brain className="h-5 w-5 text-secondary" />
+                            Descripción de la Competencia
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          {isEditing ? (
+                            <Textarea value={editedSession.competenciaDescripcion} onChange={(e) => setEditedSession({...editedSession, competenciaDescripcion: e.target.value})} className="min-h-[100px] glass-effect" />
+                          ) : (
+                            <div className="glass-effect rounded-lg p-4 border-l-4 border-secondary bg-gradient-to-r from-secondary/5 to-transparent">
+                              <p className="text-foreground leading-relaxed text-sm">{editedSession.competenciaDescripcion}</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Secuencia Metodológica */}
+                    {editedSession.secuenciaMetodologica && (
+                      <Card className="glass-effect border-0 glow-accent/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <BookOpen className="h-5 w-5 text-accent" />
+                            Secuencia Metodológica
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-6">
+                            {/* INICIO */}
+                            <div className="glass-effect rounded-lg p-4 border-l-4 border-primary">
+                              <h4 className="font-bold text-primary mb-2 flex items-center gap-2">
+                                <span className="gradient-primary rounded-full w-6 h-6 flex items-center justify-center text-white text-xs">1</span> INICIO
+                              </h4>
+                              {isEditing ? (
+                                <Textarea value={editedSession.secuenciaMetodologica.inicio} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: {...editedSession.secuenciaMetodologica, inicio: e.target.value}})} className="min-h-[100px] glass-effect" />
+                              ) : (
+                                <div className="text-sm text-foreground space-y-2" dangerouslySetInnerHTML={{__html: editedSession.secuenciaMetodologica.inicio.replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-primary'>$1</strong>").replaceAll("\n", "<br>")}} />
+                              )}
+                            </div>
+                            {/* DESARROLLO */}
+                            <div className="glass-effect rounded-lg p-4 border-l-4 border-secondary">
+                              <h4 className="font-bold text-secondary mb-2 flex items-center gap-2">
+                                <span className="gradient-secondary rounded-full w-6 h-6 flex items-center justify-center text-white text-xs">2</span> DESARROLLO
+                              </h4>
+                              {isEditing ? (
+                                <Textarea value={editedSession.secuenciaMetodologica.desarrollo} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: {...editedSession.secuenciaMetodologica, desarrollo: e.target.value}})} className="min-h-[100px] glass-effect" />
+                              ) : (
+                                <div className="text-sm text-foreground space-y-2" dangerouslySetInnerHTML={{__html: editedSession.secuenciaMetodologica.desarrollo.replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-secondary'>$1</strong>").replaceAll("\n", "<br>")}} />
+                              )}
+                            </div>
+                            {/* CIERRE */}
+                            <div className="glass-effect rounded-lg p-4 border-l-4 border-accent">
+                              <h4 className="font-bold text-accent mb-2 flex items-center gap-2">
+                                <span className="gradient-accent rounded-full w-6 h-6 flex items-center justify-center text-white text-xs">3</span> CIERRE
+                              </h4>
+                              {isEditing ? (
+                                <Textarea value={editedSession.secuenciaMetodologica.cierre} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: {...editedSession.secuenciaMetodologica, cierre: e.target.value}})} className="min-h-[100px] glass-effect" />
+                              ) : (
+                                <div className="text-sm text-foreground space-y-2" dangerouslySetInnerHTML={{__html: editedSession.secuenciaMetodologica.cierre.replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-accent'>$1</strong>").replaceAll("\n", "<br>")}} />
+                              )}
                             </div>
                           </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
-                          {/* Desarrollo */}
-                          <div className="flex-1 flex flex-col items-center gap-3">
-                            <div 
-                              className="w-full bg-gradient-to-t from-secondary to-secondary/50 rounded-t-lg flex items-end justify-center pb-2 glow-secondary/20" 
-                              style={{ height: `${Math.max((tiempos.desarrollo / maxTiempo) * containerHeight, 30)}px` }}
-                            >
-                              <span className="text-xs font-bold text-white">{tiempos.desarrollo}'</span>
+                    {/* Distribución Horaria */}
+                    {editedSession.distribucionHoras && (
+                      <Card className="glass-effect border-0 glow-secondary/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Clock className="h-5 w-5 text-secondary" />
+                            Distribución Horaria
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-6">
+                            <div className="flex items-end justify-center gap-4 h-48">
+                              {(() => {
+                                const maxTiempo = Math.max(tiempos.inicio, tiempos.desarrollo, tiempos.cierre, 1)
+                                const containerHeight = 192
+                                return (
+                                  <>
+                                    <div className="flex-1 flex flex-col items-center gap-3">
+                                      <div className="w-full bg-gradient-to-t from-primary to-primary/50 rounded-t-lg flex items-end justify-center pb-2 glow-primary/20" style={{ height: `${Math.max((tiempos.inicio / maxTiempo) * containerHeight, 30)}px` }}>
+                                        <span className="text-xs font-bold text-white">{tiempos.inicio}'</span>
+                                      </div>
+                                      <div className="text-center">
+                                        <p className="text-sm font-semibold text-primary">INICIO</p>
+                                      </div>
+                                    </div>
+                                    <div className="flex-1 flex flex-col items-center gap-3">
+                                      <div className="w-full bg-gradient-to-t from-secondary to-secondary/50 rounded-t-lg flex items-end justify-center pb-2 glow-secondary/20" style={{ height: `${Math.max((tiempos.desarrollo / maxTiempo) * containerHeight, 30)}px` }}>
+                                        <span className="text-xs font-bold text-white">{tiempos.desarrollo}'</span>
+                                      </div>
+                                      <div className="text-center">
+                                        <p className="text-sm font-semibold text-secondary">DESARROLLO</p>
+                                      </div>
+                                    </div>
+                                    <div className="flex-1 flex flex-col items-center gap-3">
+                                      <div className="w-full bg-gradient-to-t from-accent to-accent/50 rounded-t-lg flex items-end justify-center pb-2 glow-accent/20" style={{ height: `${Math.max((tiempos.cierre / maxTiempo) * containerHeight, 30)}px` }}>
+                                        <span className="text-xs font-bold text-white">{tiempos.cierre}'</span>
+                                      </div>
+                                      <div className="text-center">
+                                        <p className="text-sm font-semibold text-accent">CIERRE</p>
+                                      </div>
+                                    </div>
+                                  </>
+                                )
+                              })()}
                             </div>
-                            <div className="text-center">
-                              <p className="text-sm font-semibold text-secondary">DESARROLLO</p>
-                              <p className="text-xs text-muted-foreground">Contenido</p>
+                            <div className="relative pt-4">
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="text-xs font-semibold text-primary">0 min</div>
+                                <div className="text-xs font-semibold text-secondary">{tiempos.inicio}-{tiempos.inicio + tiempos.desarrollo} min</div>
+                                <div className="text-xs font-semibold text-accent">{tiempos.inicio + tiempos.desarrollo + tiempos.cierre} min</div>
+                              </div>
+                              <div className="w-full h-3 bg-gradient-to-r from-primary via-secondary to-accent rounded-full glow-primary/10" />
                             </div>
                           </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
-                          {/* Cierre */}
-                          <div className="flex-1 flex flex-col items-center gap-3">
-                            <div 
-                              className="w-full bg-gradient-to-t from-accent to-accent/50 rounded-t-lg flex items-end justify-center pb-2 glow-accent/20" 
-                              style={{ height: `${Math.max((tiempos.cierre / maxTiempo) * containerHeight, 30)}px` }}
-                            >
-                              <span className="text-xs font-bold text-white">{tiempos.cierre}'</span>
-                            </div>
-                            <div className="text-center">
-                              <p className="text-sm font-semibold text-accent">CIERRE</p>
-                              <p className="text-xs text-muted-foreground">Reflexión</p>
-                            </div>
+                    {/* Procesos Didácticos */}
+                    {editedSession.procesosDidacticos && editedSession.procesosDidacticos.length > 0 && (
+                      <Card className="glass-effect border-0 glow-accent/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <BookOpen className="h-5 w-5 text-accent" />
+                            Procesos Didácticos
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+                            {editedSession.procesosDidacticos.map((proceso, index) => (
+                              <div key={`proceso-${index}`} className="glass-effect rounded-lg p-3 text-center">
+                                <div className="gradient-accent rounded-full w-8 h-8 flex items-center justify-center text-white font-bold text-xs mx-auto mb-2">{index + 1}</div>
+                                <p className="text-xs font-medium">{proceso}</p>
+                              </div>
+                            ))}
                           </div>
-                        </>
-                      )
-                    })()}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Actividades Contextualizadas */}
+                    {editedSession.actividadesContextualizadas && editedSession.actividadesContextualizadas.length > 0 && (
+                      <Card className="glass-effect border-0 glow-secondary/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Zap className="h-5 w-5 text-secondary" />
+                            Actividades Contextualizadas
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {editedSession.actividadesContextualizadas.map((actividad, index) => (
+                              <div key={`act-${index}`} className="glass-effect rounded-lg p-3 border-l-4 border-secondary flex items-start gap-3">
+                                <Zap className="h-4 w-4 text-secondary flex-shrink-0 mt-0.5" />
+                                <p className="text-sm text-foreground">{actividad}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
                   </div>
+               )}
 
-                  {/* Timeline visual */}
-                  <div className="relative pt-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="text-xs font-semibold text-primary">0 min</div>
-                      <div className="text-xs font-semibold text-secondary">{tiempos.inicio}-{tiempos.inicio + tiempos.desarrollo} min</div>
-                      <div className="text-xs font-semibold text-accent">{tiempos.inicio + tiempos.desarrollo + tiempos.cierre} min</div>
-                    </div>
-                    <div className="w-full h-3 bg-gradient-to-r from-primary via-secondary to-accent rounded-full glow-primary/10" />
+               {/* TAB 2: EVALUACION */}
+               {activeTab === 'evaluacion' && (
+                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    {/* Criterios de Evaluación */}
+                    {editedSession.criteriosEvaluacion && (
+                      <Card className="glass-effect border-0 glow-accent/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <CheckCircle className="h-5 w-5 text-accent" />
+                            Criterios de Evaluación
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          {isEditing ? (
+                            <Textarea value={editedSession.criteriosEvaluacion} onChange={(e) => setEditedSession({...editedSession, criteriosEvaluacion: e.target.value})} className="min-h-[120px] glass-effect" />
+                          ) : (
+                            <div className="glass-effect rounded-lg p-4 border-l-4 border-accent bg-gradient-to-r from-accent/5 to-transparent">
+                              <pre className="text-foreground leading-relaxed text-sm whitespace-pre-wrap font-sans">{editedSession.criteriosEvaluacion}</pre>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Evidencias de Aprendizaje */}
+                    {editedSession.evidenciasAprendizaje && (
+                      <Card className="glass-effect border-0 glow-primary/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <BarChart3 className="h-5 w-5 text-primary" />
+                            Evidencias de Aprendizaje
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          {isEditing ? (
+                            <Textarea value={editedSession.evidenciasAprendizaje} onChange={(e) => setEditedSession({...editedSession, evidenciasAprendizaje: e.target.value})} className="min-h-[100px] glass-effect" />
+                          ) : (
+                            <div className="glass-effect rounded-lg p-4 border-l-4 border-primary bg-gradient-to-r from-primary/5 to-transparent">
+                              <pre className="text-foreground leading-relaxed text-sm whitespace-pre-wrap font-sans">{editedSession.evidenciasAprendizaje}</pre>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Evaluación Formativa (Corregido mapeo arrays) */}
+                    {ra.evaluacionFormativa && ra.evaluacionFormativa.preguntas && ra.evaluacionFormativa.preguntas.length > 0 && (
+                      <Card className="glass-effect border-0 glow-accent/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <CheckCircle className="h-5 w-5 text-accent" />
+                            Evaluación Formativa
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div className="space-y-2">
+                            {ra.evaluacionFormativa.preguntas.map((pregunta: string, idx: number) => (
+                              <details key={`preg-${idx}`} className="glass-effect rounded p-3 text-sm border-l-2 border-accent">
+                                <summary className="cursor-pointer font-medium text-foreground">Pregunta {idx + 1}</summary>
+                                <div className="mt-2 space-y-1 text-xs pl-4 border-l border-border/50">
+                                  <p className="font-medium text-foreground">{pregunta}</p>
+                                  <p className="text-primary"><strong>Respuesta:</strong> {ra.evaluacionFormativa?.respuestas?.[idx]}</p>
+                                  <p className="text-muted-foreground"><strong>Criterios:</strong> {ra.evaluacionFormativa?.criterios?.[idx]}</p>
+                                </div>
+                              </details>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+               )}
 
-          {/* Procesos Didácticos - Grid 5 columnas */}
-          {editedSession.procesosDidacticos && editedSession.procesosDidacticos.length > 0 && (
-            <Card className="glass-effect border-0 glow-accent/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-accent" />
-                  Procesos Didácticos
-                </CardTitle>
-                <CardDescription>5 procesos clave según MINEDU</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-                  {editedSession.procesosDidacticos.map((proceso, index) => (
-                    <div key={safeKeyFromString(proceso) || `proceso-${index}`} className="glass-effect rounded-lg p-3 text-center hover:glow-accent/30 transition-all duration-300">
-                      <div className="gradient-accent rounded-full w-10 h-10 flex items-center justify-center text-white font-bold text-sm mx-auto mb-2 glow-accent">
-                        {index + 1}
-                      </div>
-                      <p className="text-sm font-medium line-clamp-3">{proceso}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+               {/* TAB 3: RECURSOS */}
+               {activeTab === 'recursos' && (
+                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    {/* Materiales Didácticos Sugeridos */}
+                    {editedSession.materialesDidacticosSugeridos && editedSession.materialesDidacticosSugeridos.length > 0 && (
+                      <Card className="glass-effect border-0 glow-primary/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Lightbulb className="h-5 w-5 text-primary" />
+                            Materiales Sugeridos
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {editedSession.materialesDidacticosSugeridos.map((material) => (
+                              <div key={safeKeyFromString(material) || material} className="glass-effect rounded-lg p-3 border-l-4 border-primary flex items-start gap-3">
+                                <Package className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                                <p className="text-sm text-foreground">{material}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
-          {/* Materiales Disponibles */}
-          {editedSession.materialesDisponibles && (
-            <Card className="glass-effect border-0 glow-primary/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Package className="h-5 w-5 text-primary" />
-                  Materiales Disponibles
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="glass-effect rounded-lg p-4 border-l-4 border-primary bg-gradient-to-r from-primary/5 to-transparent">
-                  <p className="text-foreground leading-relaxed text-sm">{editedSession.materialesDisponibles}</p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                    {/* Actividades de Activación */}
+                    {ra.actividadDeActivacion && ra.actividadDeActivacion.length > 0 && (
+                      <Card className="glass-effect border-0 glow-secondary/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Lightbulb className="h-5 w-5 text-secondary" />
+                            Actividades de Activación
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {ra.actividadDeActivacion.map((act: any, idx: number) => (
+                              <div key={`act-${idx}`} className="glass-effect rounded-lg p-3 border-l-4 border-secondary">
+                                <p className="text-sm mt-1">{act}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
-          {/* Materiales Didácticos Sugeridos - Grid 2 columnas */}
-          {editedSession.materialesDidacticosSugeridos && editedSession.materialesDidacticosSugeridos.length > 0 && (
-            <Card className="glass-effect border-0 glow-primary/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5 text-primary" />
-                  Materiales Didácticos Sugeridos
-                </CardTitle>
-                <CardDescription>Recursos recomendados para potenciar la sesión</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {editedSession.materialesDidacticosSugeridos.map((material) => (
-                    <div key={safeKeyFromString(material) || material} className="glass-effect rounded-lg p-3 border-l-4 border-primary flex items-start gap-3">
-                      <Package className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                      <p className="text-sm text-foreground">{material}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                    {/* Fichas de Trabajo */}
+                    {ra.fichasDeTrabajo && ra.fichasDeTrabajo.length > 0 && (
+                      <Card className="glass-effect border-0 glow-primary/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <BookOpen className="h-5 w-5 text-primary" />
+                            Fichas de Trabajo
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          {ra.fichasDeTrabajo.map((ficha: any, idx: number) => (
+                            <details key={`ficha-${idx}`} className="glass-effect rounded-lg p-4 border-l-4 border-secondary">
+                              <summary className="font-semibold text-sm cursor-pointer hover:text-secondary transition-colors">
+                                {ficha.titulo || `Ficha ${idx+1}`}
+                              </summary>
+                              <div className="mt-3 space-y-2 text-sm">
+                                <p className="text-muted-foreground"><strong>Instrucciones:</strong> {ficha.instrucciones}</p>
+                                <div>
+                                  <strong className="text-foreground">Ejercicios:</strong>
+                                  <ul className="list-disc list-inside space-y-1 mt-1 text-foreground/80">
+                                    {ficha.ejercicios && ficha.ejercicios.map((ejercicio: any, i: number) => (
+                                      <li key={`ej-${i}`}>{ejercicio}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              </div>
+                            </details>
+                          ))}
+                        </CardContent>
+                      </Card>
+                    )}
 
-          {/* Actividades Contextualizadas - Grid 2 columnas */}
-          {editedSession.actividadesContextualizadas && editedSession.actividadesContextualizadas.length > 0 && (
-            <Card className="glass-effect border-0 glow-secondary/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-secondary" />
-                  Actividades Contextualizadas
-                </CardTitle>
-                <CardDescription>Estrategias adaptadas al contexto local</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {editedSession.actividadesContextualizadas.map((actividad, index) => (
-                    <div key={safeKeyFromString(typeof actividad === 'string' ? actividad : (actividad as any)?.titulo) || `act-${index}`} className="glass-effect rounded-lg p-3 border-l-4 border-secondary flex items-start gap-3">
-                      <Zap className="h-4 w-4 text-secondary flex-shrink-0 mt-0.5" />
-                      <p className="text-sm text-foreground">{actividad}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                    {/* Problemas y Ejercicios (Corregido mapeo respuesta) */}
+                    {ra.problemasYEjercicios && ra.problemasYEjercicios.length > 0 && (
+                      <Card className="glass-effect border-0 glow-accent/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <CheckCircle className="h-5 w-5 text-accent" />
+                            Problemas y Ejercicios
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {ra.problemasYEjercicios.map((problema: any, idx: number) => (
+                              <details key={`problema-${idx}`} className="glass-effect rounded-lg p-3 border-l-4 border-accent">
+                                <summary className="font-semibold text-xs uppercase cursor-pointer">
+                                  {problema.nivel || `Problema ${idx + 1}`}
+                                </summary>
+                                <div className="mt-2 space-y-1 text-xs">
+                                  <p><strong>Problema:</strong> {problema.problema || problema.enunciado}</p>
+                                  <p className="text-muted-foreground"><strong>Respuesta:</strong> {problema.respuesta_esperada || problema.respuesta}</p>
+                                  {(problema.criterios || problema.criterio) && (
+                                    <p className="text-muted-foreground"><strong>Criterios:</strong> {problema.criterios || problema.criterio}</p>
+                                  )}
+                                </div>
+                              </details>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
 
-          {/* Recursos Adicionales - Sección expandida */}
-          {ra && (
-            <Card className="glass-effect border-0 glow-primary/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Package className="h-5 w-5 text-primary" />
-                  Recursos Adicionales
-                </CardTitle>
-                <CardDescription>Materiales complementarios para enriquecer la sesión</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                
-                {/* Fichas de Trabajo */}
-                {ra.fichasDeTrabajo && ra.fichasDeTrabajo.length > 0 && (
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-secondary flex items-center gap-2">
-                      <BookOpen className="h-4 w-4" />
-                      Fichas de Trabajo
-                    </h4>
-                    {ra.fichasDeTrabajo.map((ficha: any, idx: number) => (
-                      <details key={ficha.titulo || ficha.nombre || `ficha-${idx}`} className="glass-effect rounded-lg p-4 border-l-4 border-secondary">
-                        <summary className="font-semibold text-sm cursor-pointer hover:text-secondary transition-colors">
-                          {ficha.titulo}
-                        </summary>
-                        <div className="mt-3 space-y-2 text-sm">
-                          <p className="text-muted-foreground"><strong>Instrucciones:</strong> {ficha.instrucciones}</p>
+                    {/* Juego Didáctico */}
+                    {ra.juegoDidactico && (
+                      <Card className="glass-effect border-0 glow-primary/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Zap className="h-5 w-5 text-primary" />
+                            {ra.juegoDidactico.titulo || ra.juegoDidactico.nombre || "Juego Didáctico"}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            {ra.juegoDidactico.duracion && <div><strong>Duración:</strong> {ra.juegoDidactico.duracion}</div>}
+                            {ra.juegoDidactico.participantes && <div><strong>Participantes:</strong> {ra.juegoDidactico.participantes}</div>}
+                          </div>
+                          {ra.juegoDidactico.materiales && (
+                            <div>
+                              <strong className="text-sm">Materiales:</strong>
+                              <p className="text-xs text-muted-foreground">{ra.juegoDidactico.materiales}</p>
+                            </div>
+                          )}
                           <div>
-                            <strong className="text-foreground">Ejercicios:</strong>
-                            <ul className="list-disc list-inside space-y-1 mt-1 text-foreground/80">
-                              {ficha.ejercicios.map((ejercicio: any, i: number) => (
-                                <li key={safeKeyFromString(String(ejercicio)) || `ej-${i}`}>{ejercicio}</li>
+                            <strong className="text-sm">Instrucciones:</strong>
+                            <ol className="list-decimal list-inside space-y-1 mt-1 text-xs text-foreground/80">
+                              {juegoInstrucciones.map((instr: any, i: number) => (
+                                <li key={`instr-${i}`}>{instr}</li>
                               ))}
-                            </ul>
+                            </ol>
                           </div>
-                        </div>
-                      </details>
-                    ))}
-                  </div>
-                )}
-
-                {/* Problemas y Ejercicios */}
-                {ra.problemasYEjercicios && ra.problemasYEjercicios.length > 0 && (
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-accent flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4" />
-                      Problemas y Ejercicios
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {ra.problemasYEjercicios.map((problema: any, idx: number) => (
-                        <details key={problema.nivel || problema.enunciado?.slice(0,40) || problema.problema?.slice(0,40) || `problema-${idx}`} className="glass-effect rounded-lg p-3 border-l-4 border-accent">
-                          <summary className="font-semibold text-xs uppercase cursor-pointer">
-                            {problema.nivel || problema.enunciado?.slice(0, 40) || `Problema ${idx + 1}`}
-                          </summary>
-                          <div className="mt-2 space-y-1 text-xs">
-                            <p><strong>Problema:</strong> {problema.problema || problema.enunciado}</p>
-                            <p className="text-muted-foreground"><strong>Respuesta:</strong> {problema.respuesta}</p>
-                            <p className="text-muted-foreground"><strong>Criterios:</strong> {problema.criterios || problema.criterio}</p>
-                          </div>
-                        </details>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Juego Didáctico (compatible con distintas formas que envía el backend) */}
-                {ra.juegoDidactico && (
-                  <div className="glass-effect rounded-lg p-4 border-t-4 border-primary space-y-3">
-                    <h4 className="font-bold text-primary flex items-center gap-2">
-                      <Zap className="h-5 w-5" />
-                      {ra.juegoDidactico.titulo || ra.juegoDidactico.nombre}
-                      </h4>
-                      { (ra.juegoDidactico.descripcion || ra.juegoDidactico.resumen) && (
-                        <p className="text-sm text-muted-foreground">{ra.juegoDidactico.descripcion || ra.juegoDidactico.resumen}</p>
-                      ) }
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                      {ra.juegoDidactico.duracion && <div><strong>Duración:</strong> {ra.juegoDidactico.duracion}</div>}
-                      {ra.juegoDidactico.participantes && <div><strong>Participantes:</strong> {ra.juegoDidactico.participantes}</div>}
-                      {ra.juegoDidactico.materiales && <div><strong>Materiales:</strong> {ra.juegoDidactico.materiales}</div>}
-                    </div>
-                    <div>
-                      <strong className="text-sm">Instrucciones:</strong>
-                      <ol className="list-decimal list-inside space-y-1 mt-1 text-sm text-foreground/80">
-                        {juegoInstrucciones.length > 0 ? (
-                          juegoInstrucciones.map((instr: any, i: number) => (
-                            <li key={safeKeyFromString(String(instr)) || `instr-${i}`}>{instr}</li>
-                          ))
-                        ) : (
-                          <li>Instrucciones no disponibles</li>
-                        )}
-                      </ol>
-                    </div>
-                    {/* Mostrar niveles ya sea en objeto 'niveles' o en array 'nivelesDificultad' */}
-                    {ra.juegoDidactico.nivelesDificultad && (
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-2">
-                        {ra.juegoDidactico.nivelesDificultad.map((lvl: any, i: number) => (
-                          <div key={safeKeyFromString(String(lvl)) || `lvl-${i}`} className="glass-effect rounded p-2">
-                            <p className="text-xs font-semibold text-primary">Nivel {i + 1}</p>
-                            <p className="text-xs text-muted-foreground">{lvl}</p>
-                          </div>
-                        ))}
-                      </div>
+                        </CardContent>
+                      </Card>
                     )}
-                    {ra.juegoDidactico.niveles && (
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 pt-2">
-                        <div className="glass-effect rounded p-2">
-                          <p className="text-xs font-semibold text-primary">Básico</p>
-                          <p className="text-xs text-muted-foreground">{ra.juegoDidactico.niveles.basico}</p>
-                        </div>
-                        <div className="glass-effect rounded p-2">
-                          <p className="text-xs font-semibold text-secondary">Intermedio</p>
-                          <p className="text-xs text-muted-foreground">{ra.juegoDidactico.niveles.intermedio}</p>
-                        </div>
-                        <div className="glass-effect rounded p-2">
-                          <p className="text-xs font-semibold text-accent">Avanzado</p>
-                          <p className="text-xs text-muted-foreground">{ra.juegoDidactico.niveles.avanzado}</p>
-                        </div>
-                      </div>
-                    )}
-                    <p className="text-sm italic text-muted-foreground pt-2">{ra.juegoDidactico.reflexion}</p>
-                  </div>
-                )}
 
-                {/* Actividades de Activación */}
-                {ra.actividadDeActivacion && ra.actividadDeActivacion.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-secondary flex items-center gap-2">
-                      <Lightbulb className="h-4 w-4" />
-                      Actividades de Activación
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      {ra.actividadDeActivacion.map((act: any, idx: number) => (
-                        <div key={act.titulo || act.nombre || `act-${idx}`} className="glass-effect rounded-lg p-3 border-l-4 border-secondary">
-                          <p className="font-semibold text-sm">{act.titulo || act.nombre}</p>
-                          <p className="text-xs text-muted-foreground">Duración: {act.duracion ?? act.tiempo ?? '—'}</p>
-                          <p className="text-xs mt-1">{act.descripcion}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Evaluación Formativa */}
-                {ra.evaluacionFormativa && (
-                  <div className="glass-effect rounded-lg p-4 border-t-4 border-accent space-y-3">
-                    <h4 className="font-bold text-accent">{ra.evaluacionFormativa.titulo}</h4>
-                    <p className="text-xs"><strong>Duración:</strong> {ra.evaluacionFormativa.duracion}</p>
-                    <p className="text-sm text-muted-foreground">{ra.evaluacionFormativa.instrucciones}</p>
-                    <div className="space-y-2">
-                      {ra.evaluacionFormativa.preguntas.slice(0, 3).map((preg: any, idx: number) => (
-                        <details key={preg.pregunta || preg.enunciado || `preg-${idx}`} className="glass-effect rounded p-2 text-sm">
-                          <summary className="cursor-pointer font-medium">Pregunta {idx + 1}</summary>
-                          <div className="mt-2 space-y-1 text-xs">
-                            <p>{preg.pregunta || preg.enunciado}</p>
-                            {preg.opciones && (
-                              <ul className="list-disc list-inside pl-2">
-                                {preg.opciones.map((op: any, i: number) => (
-                                  <li key={safeKeyFromString(String(op)) || `op-${i}`}>{op}</li>
-                                ))}
-                              </ul>
+                    {/* Actividades Diferenciadas (Corregido a arrays de strings) */}
+                    {ra.actividadesDiferenciadas && (
+                      <Card className="glass-effect border-0 glow-secondary/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Target className="h-5 w-5 text-secondary" />
+                            Actividades Diferenciadas
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            {/* Refuerzo */}
+                            {ra.actividadesDiferenciadas.refuerzo && ra.actividadesDiferenciadas.refuerzo.length > 0 && (
+                              <div className="glass-effect rounded-lg p-3 border-t-4 border-primary space-y-2">
+                                <p className="font-semibold text-sm text-primary">Refuerzo</p>
+                                <ul className="list-disc list-inside space-y-1 mt-1 text-xs">
+                                  {ra.actividadesDiferenciadas.refuerzo.map((act: string, idx: number) => (
+                                    <li key={`ref-${idx}`}>{act}</li>
+                                  ))}
+                                </ul>
+                              </div>
                             )}
-                            <p className="text-primary"><strong>Respuesta:</strong> {preg.respuesta || preg.respuesta_correcta}</p>
-                            <p className="text-muted-foreground"><strong>Criterios:</strong> {preg.criterios || preg.criterio}</p>
+                            {/* Consolidación */}
+                            {ra.actividadesDiferenciadas.consolidacion && ra.actividadesDiferenciadas.consolidacion.length > 0 && (
+                              <div className="glass-effect rounded-lg p-3 border-t-4 border-secondary space-y-2">
+                                <p className="font-semibold text-sm text-secondary">Consolidación</p>
+                                <ul className="list-disc list-inside space-y-1 mt-1 text-xs">
+                                  {ra.actividadesDiferenciadas.consolidacion.map((act: string, idx: number) => (
+                                    <li key={`cons-${idx}`}>{act}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            {/* Profundización */}
+                            {ra.actividadesDiferenciadas.profundizacion && ra.actividadesDiferenciadas.profundizacion.length > 0 && (
+                              <div className="glass-effect rounded-lg p-3 border-t-4 border-accent space-y-2">
+                                <p className="font-semibold text-sm text-accent">Profundización</p>
+                                <ul className="list-disc list-inside space-y-1 mt-1 text-xs">
+                                  {ra.actividadesDiferenciadas.profundizacion.map((act: string, idx: number) => (
+                                    <li key={`prof-${idx}`}>{act}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
                           </div>
-                        </details>
-                      ))}
-                    </div>
-                    <p className="text-xs italic text-muted-foreground pt-2">{ra.evaluacionFormativa.rubrica}</p>
-                  </div>
-                )}
+                        </CardContent>
+                      </Card>
+                    )}
 
-                {/* Comunicado para Padres */}
-                {ra.comunicadoParaPadres && (
-                  <div className="glass-effect rounded-lg p-4 border-l-4 border-primary bg-gradient-to-r from-primary/5 to-transparent">
-                    <h4 className="font-semibold text-primary mb-2 flex items-center gap-2">
-                      <GraduationCap className="h-4 w-4" />
-                      Comunicado para Padres
-                    </h4>
-                    <pre className="text-xs text-foreground/80 leading-relaxed whitespace-pre-wrap font-sans">
-                      {ra.comunicadoParaPadres}
-                    </pre>
+                    {/* Comunicado para Padres */}
+                    {ra.comunicadoParaPadres && (
+                      <Card className="glass-effect border-0 glow-primary/10">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <GraduationCap className="h-5 w-5 text-primary" />
+                            Comunicado para Padres
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <pre className="text-xs text-foreground/80 leading-relaxed whitespace-pre-wrap font-sans">{ra.comunicadoParaPadres}</pre>
+                        </CardContent>
+                      </Card>
+                    )}
                   </div>
-                )}
-
-                {/* Actividades Diferenciadas */}
-                {ra.actividadesDiferenciadas && (
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-secondary flex items-center gap-2">
-                      <Target className="h-4 w-4" />
-                      Actividades Diferenciadas
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      {/* Refuerzo */}
-                      {ra.actividadesDiferenciadas.refuerzo && (
-                        <div className="glass-effect rounded-lg p-3 border-t-4 border-primary space-y-2">
-                          <p className="font-semibold text-sm text-primary">Refuerzo</p>
-                          {ra.actividadesDiferenciadas.refuerzo.map((act: any, idx: number) => (
-                            <div key={act.titulo || safeKeyFromString(act.descripcion) || `ref-${idx}`} className="text-xs space-y-1">
-                              <p className="font-medium">{act.titulo}</p>
-                              <p className="text-muted-foreground">{act.descripcion}</p>
-                              <p><strong>Tiempo:</strong> {act.tiempo}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {/* Consolidación */}
-                      {ra.actividadesDiferenciadas.consolidacion && (
-                        <div className="glass-effect rounded-lg p-3 border-t-4 border-secondary space-y-2">
-                          <p className="font-semibold text-sm text-secondary">Consolidación</p>
-                          {ra.actividadesDiferenciadas.consolidacion.map((act: any, idx: number) => (
-                            <div key={act.titulo || safeKeyFromString(act.descripcion) || `cons-${idx}`} className="text-xs space-y-1">
-                              <p className="font-medium">{act.titulo}</p>
-                              <p className="text-muted-foreground">{act.descripcion}</p>
-                              <p><strong>Tiempo:</strong> {act.tiempo}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {/* Profundización */}
-                      {ra.actividadesDiferenciadas.profundizacion && (
-                        <div className="glass-effect rounded-lg p-3 border-t-4 border-accent space-y-2">
-                          <p className="font-semibold text-sm text-accent">Profundización</p>
-                          {ra.actividadesDiferenciadas.profundizacion.map((act: any, idx: number) => (
-                            <div key={act.titulo || safeKeyFromString(act.descripcion) || `prof-${idx}`} className="text-xs space-y-1">
-                              <p className="font-medium">{act.titulo}</p>
-                              <p className="text-muted-foreground">{act.descripcion}</p>
-                              <p><strong>Tiempo:</strong> {act.tiempo}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+               )}
+             </div>
+          </div>
 
           {/* Botones de Acción */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-8 w-full">
             <Button
               onClick={onBack}
               variant="outline"

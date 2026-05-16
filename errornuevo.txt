@@ -1,0 +1,193 @@
+# Estructura real de respuesta del backend
+
+```ts
+interface SessionResponse {
+  datosGenerales: {
+    titulo: string
+    docente: string
+    fecha: string
+    grado: string
+    seccion: string
+  }
+
+  tema: string
+  ciclo: string
+  contexto: string
+  horasClase: number
+
+  competenciasSeleccionadas: string[]
+
+  capacidades: string[]
+
+  competenciaDescripcion: string
+
+  enfoqueTransversal: string
+
+  competenciaTransversal: string
+
+  propositoSesion: string
+
+  criteriosEvaluacion: string
+
+  evidenciasAprendizaje: string
+
+  distribucionHoras: string
+
+  materialesDisponibles: string
+
+  actividadesContextualizadas: string[]
+
+  procesosDidacticos: string[]
+
+  materialesDidacticosSugeridos: string[]
+
+  secuenciaMetodologica: {
+    inicio: string
+    desarrollo: string
+    cierre: string
+  }
+
+  evaluacionFormativa: {
+    preguntas: string[]
+    respuestas: string[]
+    criterios: string[]
+  }
+
+  actividadesDiferenciadas: {
+    refuerzo: string[]
+    consolidacion: string[]
+    profundizacion: string[]
+  }
+
+  recursosAdicionales: {
+    comunicadoParaPadres: string
+
+    actividadDeActivacion: string[]
+
+    fichasDeTrabajo: {
+      titulo: string
+      instrucciones: string
+      ejercicios: any[]
+    }[]
+
+    problemasYEjercicios: {
+      nivel: string
+      enunciado: string
+      respuesta_esperada: string
+    }[]
+
+    juegoDidactico: {
+      nombre: string
+      materiales: string[]
+      instrucciones: string[]
+    }
+  }
+}
+```
+
+# IMPORTANTE
+
+Muchos campos NO son objetos.
+Son arrays simples de strings.
+
+Ejemplo correcto:
+
+```json
+{
+  "preguntas": [
+    "Pregunta 1",
+    "Pregunta 2"
+  ]
+}
+```
+
+NO:
+
+```json
+{
+  "preguntas": [
+    {
+      "texto": "Pregunta 1"
+    }
+  ]
+}
+```
+
+---
+
+# Cómo mapear correctamente
+
+## Evaluación formativa
+
+```tsx
+{session.evaluacionFormativa.preguntas.map((pregunta, index) => (
+  <div key={index}>
+    <h3>Pregunta {index + 1}</h3>
+
+    <p>{pregunta}</p>
+
+    <p>
+      {session.evaluacionFormativa.respuestas[index]}
+    </p>
+
+    <p>
+      {session.evaluacionFormativa.criterios[index]}
+    </p>
+  </div>
+))}
+```
+
+---
+
+# Actividades diferenciadas
+
+## Refuerzo
+
+```tsx
+{session.actividadesDiferenciadas.refuerzo.map(
+  (item, index) => (
+    <li key={index}>{item}</li>
+  )
+)}
+```
+
+## Consolidación
+
+```tsx
+{session.actividadesDiferenciadas.consolidacion.map(
+  (item, index) => (
+    <li key={index}>{item}</li>
+  )
+)}
+```
+
+## Profundización
+
+```tsx
+{session.actividadesDiferenciadas.profundizacion.map(
+  (item, index) => (
+    <li key={index}>{item}</li>
+  )
+)}
+```
+
+---
+
+# ERROR actual del frontend
+
+El frontend probablemente espera:
+
+```ts
+{
+  descripcion: string
+  tiempo: string
+}
+```
+
+pero el backend envía:
+
+```ts
+string[]
+```
+
+Por eso aparecen campos vacíos.

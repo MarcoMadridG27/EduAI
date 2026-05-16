@@ -45,68 +45,32 @@ export type SessionData = {
 
   // Recursos Adicionales (nuevo)
   recursosAdicionales?: {
+    comunicadoParaPadres?: string
+    actividadDeActivacion?: string[]
+    evaluacionFormativa?: {
+      preguntas: string[]
+      respuestas: string[]
+      criterios: string[]
+    }
+    actividadesDiferenciadas?: {
+      refuerzo: string[]
+      consolidacion: string[]
+      profundizacion: string[]
+    }
     fichasDeTrabajo?: Array<{
       titulo: string
       instrucciones: string
-      ejercicios: string[]
+      ejercicios: any[]
     }>
     problemasYEjercicios?: Array<{
       nivel: string
-      problema: string
-      respuesta: string
-      criterio: string
+      enunciado: string
+      respuesta_esperada: string
     }>
     juegoDidactico?: {
-      titulo: string
-      duracion: string
-      participantes: string
-      materiales: string
+      nombre: string
+      materiales: string[]
       instrucciones: string[]
-      niveles: {
-        basico: string
-        intermedio: string
-        avanzado: string
-      }
-      reflexion: string
-    }
-    actividadDeActivacion?: Array<{
-      titulo: string
-      duracion: string
-      descripcion: string
-    }>
-    evaluacionFormativa?: {
-      titulo: string
-      duracion: string
-      instrucciones: string
-      preguntas: Array<{
-        tipo: string
-        pregunta: string
-        opciones?: string[]
-        respuesta_correcta: string
-        criterio: string
-      }>
-      rubrica: string
-    }
-    comunicadoParaPadres?: string
-    actividadesDiferenciadas?: {
-      refuerzo?: Array<{
-        titulo: string
-        descripcion: string
-        tiempo: string
-        objetivo: string
-      }>
-      consolidacion?: Array<{
-        titulo: string
-        descripcion: string
-        tiempo: string
-        objetivo: string
-      }>
-      profundizacion?: Array<{
-        titulo: string
-        descripcion: string
-        tiempo: string
-        objetivo: string
-      }>
     }
   }
 
