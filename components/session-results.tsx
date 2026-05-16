@@ -22,9 +22,11 @@ import {
   Loader2,
 } from "lucide-react"
 import type { SessionData } from "@/app/page"
+import { toast } from "sonner"
 
 interface SessionResultsProps {
   session: SessionData
+  isSavedSession?: boolean
   onBack: () => void
   onViewDashboard: () => void
   onEdit: () => void
@@ -45,10 +47,11 @@ function getJuegoInstrucciones(juego: any): string[] {
 }
 
 export function SessionResults(props: Readonly<SessionResultsProps>) {
-  const { session, onBack, onViewDashboard } = props
+  const { session, isSavedSession, onBack, onViewDashboard } = props
   const [isSaving, setIsSaving] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  const [isSaved, setIsSaved] = useState(isSavedSession || false)
   const [activeTab, setActiveTab] = useState<'secuencia'|'evaluacion'|'recursos'>('secuencia')
   const contentRef = useRef<HTMLDivElement>(null)
   const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || "https://eduai-auth-1.onrender.com"
@@ -151,6 +154,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
   }
 
   const handleSaveSession = async () => {
+    if (isSaved) return
     setIsSaving(true)
     try {
       const accessToken = localStorage.getItem("access_token")
@@ -177,14 +181,13 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
         body: JSON.stringify(payload),
       })
 
-      if (!res.ok) {
-        throw new Error("Error al guardar la sesión")
-      }
-
-      alert("¡Sesión guardada exitosamente!")
+      toast.success("¡Sesión guardada exitosamente!", {
+        description: "Puedes encontrarla en tu Dashboard Docente."
+      })
+      setIsSaved(true)
     } catch (err) {
       console.error("Error guardando sesión:", err)
-      alert(`Error: ${err instanceof Error ? err.message : "Error desconocido"}`)
+      toast.error(`Error al guardar: ${err instanceof Error ? err.message : "Error desconocido"}`)
     } finally {
       setIsSaving(false)
     }
@@ -871,13 +874,18 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
             </Button>
             <Button
               onClick={handleSaveSession}
-              disabled={isSaving}
-              className="bg-indigo-600 shadow-sm hover:scale-105 transition-all duration-300 h-12"
+              disabled={isSaving || isSaved}
+              className={`${isSaved ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white shadow-sm hover:scale-105 transition-all duration-300 h-12`}
             >
               {isSaving ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Guardando...
+                </>
+              ) : isSaved ? (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  ¡Sesión Guardada!
                 </>
               ) : (
                 <>

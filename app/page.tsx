@@ -94,6 +94,7 @@ export default function Home() {
   const [currentSession, setCurrentSession] = useState<SessionData | null>(null)
   const [sessions, setSessions] = useState<SessionData[]>([])
   const [editingSession, setEditingSession] = useState<SessionData | null>(null)
+  const [viewingSavedSession, setViewingSavedSession] = useState(false)
 
   // Restaurar sesión al cargar y verificar autenticación
   useEffect(() => {
@@ -133,6 +134,7 @@ export default function Home() {
     setSessions((prev) => [sessionData, ...prev])
     setCurrentView("results")
     setEditingSession(null)
+    setViewingSavedSession(false)
   }
 
   const handleBackToGenerator = () => {
@@ -155,6 +157,7 @@ export default function Home() {
 
   const handleOpenSavedSession = (sessionData: SessionData) => {
     setCurrentSession(sessionData)
+    setViewingSavedSession(true)
     setCurrentView("results")
   }
 
@@ -178,6 +181,7 @@ export default function Home() {
     return (
       <SessionResults
         session={currentSession}
+        isSavedSession={viewingSavedSession}
         onBack={handleBackToGenerator}
         onViewDashboard={handleViewDashboard}
         onEdit={() => handleEditSession(currentSession)}
