@@ -857,9 +857,10 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                )}
              </div>
           </div>
+        </div>
 
-          {/* Botones de Acción */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-8 w-full">
+        {/* Botones de Acción */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 pt-6 border-t border-border/20 w-full max-w-7xl mx-auto">
             <Button
               onClick={onBack}
               variant="outline"
@@ -903,7 +904,6 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
               )}
             </Button>
           </div>
-        </div>
       </div>
     </div>
   )
