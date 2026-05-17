@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea"
 import {
   Brain,
   ArrowLeft,
-  Download,
+  Eye,
   Edit3,
   Target,
   CheckCircle,
@@ -23,6 +23,7 @@ import {
 } from "lucide-react"
 import type { SessionData } from "@/app/page"
 import { toast } from "sonner"
+import { PdfPreview } from "@/components/pdf-preview"
 
 interface SessionResultsProps {
   session: SessionData
@@ -49,9 +50,9 @@ function getJuegoInstrucciones(juego: any): string[] {
 export function SessionResults(props: Readonly<SessionResultsProps>) {
   const { session, isSavedSession, onBack, onViewDashboard } = props
   const [isSaving, setIsSaving] = useState(false)
-  const [isExporting, setIsExporting] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [isSaved, setIsSaved] = useState(isSavedSession || false)
+  const [showPreview, setShowPreview] = useState(false)
   const [activeTab, setActiveTab] = useState<'secuencia'|'evaluacion'|'recursos'>('secuencia')
   const contentRef = useRef<HTMLDivElement>(null)
   const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || "https://eduai-auth-1.onrender.com"
@@ -86,72 +87,6 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
   // Precompute juego instrucciones list to simplify JSX
   const juegoInstrucciones = getJuegoInstrucciones(ra.juegoDidactico)
 
-  const handleExportPDF = async () => {
-    setIsExporting(true)
-    try {
-      const pdfEndpoint = process.env.NEXT_PUBLIC_PDF_URL || "https://pdf-render-hfzf.onrender.com/generate-pdf"
-      
-      // Preparar los datos en el formato esperado (usando la sesión editada)
-      const payload = {
-        data: {
-          datosGenerales: editedSession.datosGenerales,
-          tema: editedSession.tema,
-          ciclo: editedSession.ciclo,
-          contexto: editedSession.contexto,
-          horasClase: editedSession.horasClase,
-          competenciasSeleccionadas: editedSession.competenciasSeleccionadas,
-          capacidades: editedSession.capacidades,
-          materialesDisponibles: editedSession.materialesDisponibles,
-          enfoqueTransversal: editedSession.enfoqueTransversal,
-          competenciaTransversal: editedSession.competenciaTransversal,
-          competenciaDescripcion: editedSession.competenciaDescripcion,
-          propositoSesion: editedSession.propositoSesion,
-          criteriosEvaluacion: editedSession.criteriosEvaluacion,
-          evidenciasAprendizaje: editedSession.evidenciasAprendizaje,
-          secuenciaMetodologica: editedSession.secuenciaMetodologica,
-          procesosDidacticos: editedSession.procesosDidacticos,
-          actividadesContextualizadas: editedSession.actividadesContextualizadas,
-          distribucionHoras: editedSession.distribucionHoras,
-          materialesDidacticosSugeridos: editedSession.materialesDidacticosSugeridos,
-          recursosAdicionales: editedSession.recursosAdicionales,
-        }
-      }
-
-      console.log('Enviando datos al generador de PDF:', payload)
-
-      const response = await fetch(pdfEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Error del servidor: ${response.status} ${response.statusText}`)
-      }
-
-      // Obtener el blob del PDF
-      const blob = await response.blob()
-      
-      // Crear un objeto URL para descargar
-      const url = globalThis.URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `sesion-${editedSession.tema?.substring(0, 20)}-${new Date().toISOString().split("T")[0]}.pdf`
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-      globalThis.URL.revokeObjectURL(url)
-
-      alert('¡PDF descargado exitosamente!')
-    } catch (err) {
-      console.error('Error exportando PDF:', err)
-      alert('Error al generar PDF. Intenta de nuevo.')
-    } finally {
-      setIsExporting(false)
-    }
-  }
 
   const handleSaveSession = async () => {
     if (isSaved) return
@@ -194,6 +129,10 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
   }
 
   return (
+    <>
+    {showPreview && (
+      <PdfPreview session={editedSession} onClose={() => setShowPreview(false)} />
+    )}
     <div className="min-h-screen bg-slate-50 text-slate-900 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -895,24 +834,15 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
               )}
             </Button>
             <Button
-              onClick={handleExportPDF}
-              disabled={isExporting}
-              className="bg-blue-600 shadow-sm hover:scale-105 transition-all duration-300 h-12"
+              onClick={() => setShowPreview(true)}
+              className="bg-blue-600 hover:bg-blue-700 shadow-sm hover:scale-105 transition-all duration-300 h-12 text-white"
             >
-              {isExporting ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Generando PDF...
-                </>
-              ) : (
-                <>
-                  <Download className="h-4 w-4 mr-2" />
-                  Descargar PDF
-                </>
-              )}
+              <Eye className="h-4 w-4 mr-2" />
+              Vista Previa PDF
             </Button>
           </div>
       </div>
     </div>
+    </>
   )
 }
