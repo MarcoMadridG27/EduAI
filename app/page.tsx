@@ -6,6 +6,7 @@ import { LoginScreen } from "@/components/login-screen"
 import { SessionGenerator } from "@/components/session-generator"
 import { SessionResults } from "@/components/session-results"
 import { TeacherDashboard } from "@/components/teacher-dashboard"
+import { LandingPage } from "@/components/landing-page"
 
 export type SessionData = {
   // Datos Generales
@@ -79,6 +80,11 @@ export type SessionData = {
   // Metadata
   createdAt?: Date
 
+  // Repositorio Público (nuevo)
+  is_public?: boolean
+  author_name?: string
+  likes?: number
+
   // Legacy fields for backward compatibility (deprecated)
   grado?: string
   recursos?: string[]
@@ -97,6 +103,7 @@ export default function Home() {
   const [sessions, setSessions] = useState<SessionData[]>([])
   const [editingSession, setEditingSession] = useState<SessionData | null>(null)
   const [viewingSavedSession, setViewingSavedSession] = useState(false)
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
 
   // Restaurar sesión al cargar y verificar autenticación
   useEffect(() => {
@@ -109,12 +116,10 @@ export default function Home() {
         setUser(userData)
       } catch (e) {
         console.error("Error restaurando sesión:", e)
-        router.push("/auth")
       }
-    } else {
-      router.push("/auth")
     }
-  }, [router])
+    setIsCheckingAuth(false)
+  }, [])
 
   const handleLogin = (userData: { name: string; email: string }) => {
     setUser(userData)
@@ -128,7 +133,7 @@ export default function Home() {
     setCurrentSession(null)
     setSessions([])
     setEditingSession(null)
-    router.push("/auth")
+    router.push("/")
   }
 
   const handleSessionGenerated = (sessionData: SessionData) => {
@@ -163,8 +168,16 @@ export default function Home() {
     setCurrentView("results")
   }
 
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
   if (!user) {
-    return null // Loading, será redirigido por useEffect
+    return <LandingPage />
   }
 
   if (currentView === "generator") {
