@@ -20,6 +20,8 @@ import {
   Package,
   Lightbulb,
   Loader2,
+  Share2,
+  X,
 } from "lucide-react"
 import type { SessionData } from "@/app/page"
 import { toast } from "sonner"
@@ -52,7 +54,11 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
   const [isSaving, setIsSaving] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [isSaved, setIsSaved] = useState(isSavedSession || false)
+  const [isPublished, setIsPublished] = useState(session.is_public || false)
   const [showPreview, setShowPreview] = useState(false)
+  const [showPublishModal, setShowPublishModal] = useState(false)
+  const [hasInteracted, setHasInteracted] = useState(false)
+  const [publishConfirmed, setPublishConfirmed] = useState(false)
   const [activeTab, setActiveTab] = useState<'secuencia'|'evaluacion'|'recursos'>('secuencia')
   const contentRef = useRef<HTMLDivElement>(null)
   const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || "https://eduai-auth-1.onrender.com"
@@ -88,8 +94,9 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
   const juegoInstrucciones = getJuegoInstrucciones(ra.juegoDidactico)
 
 
-  const handleSaveSession = async () => {
-    if (isSaved) return
+  const handleSaveSession = async (isPublic = false) => {
+    if (isPublic && isPublished) return
+    if (!isPublic && isSaved) return
     setIsSaving(true)
     try {
       const accessToken = localStorage.getItem("access_token")
@@ -101,10 +108,17 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
       }
 
       const userData = JSON.parse(user)
+      
+      const payloadData = { ...editedSession }
+      if (isPublic) {
+        payloadData.is_public = true
+        payloadData.author_name = userData.name || "Docente Anónimo"
+        payloadData.likes = 0
+      }
 
       const payload = {
         user_id: userData.email,
-        session_data: editedSession,
+        session_data: payloadData,
       }
 
       const res = await fetch(`${AUTH_URL}/save-session`, {
@@ -116,10 +130,17 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
         body: JSON.stringify(payload),
       })
 
-      toast.success("¡Sesión guardada exitosamente!", {
-        description: "Puedes encontrarla en tu Dashboard Docente."
-      })
-      setIsSaved(true)
+      if (isPublic) {
+        toast.success("¡Sesión publicada exitosamente!", {
+          description: "Ahora es visible en el Repositorio Global para otros docentes."
+        })
+        setIsPublished(true)
+      } else {
+        toast.success("¡Sesión guardada exitosamente!", {
+          description: "Puedes encontrarla en tu Dashboard Docente."
+        })
+        setIsSaved(true)
+      }
     } catch (err) {
       console.error("Error guardando sesión:", err)
       toast.error(`Error al guardar: ${err instanceof Error ? err.message : "Error desconocido"}`)
@@ -133,6 +154,63 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
     {showPreview && (
       <PdfPreview session={editedSession} onClose={() => setShowPreview(false)} />
     )}
+    
+    {showPublishModal && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl relative animate-in fade-in zoom-in duration-200">
+          <button 
+            onClick={() => setShowPublishModal(false)}
+            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          
+          <div className="flex justify-center mb-4">
+            <div className="bg-blue-100 p-3 rounded-full text-blue-600">
+              <Share2 className="h-8 w-8" />
+            </div>
+          </div>
+          
+          <h3 className="text-xl font-bold text-slate-800 text-center mb-2">Publicar en el Repositorio</h3>
+          <p className="text-sm text-slate-500 text-center mb-6">
+            Para mantener la calidad de nuestra comunidad, requerimos que los docentes validen el contenido generado por la IA antes de compartirlo.
+          </p>
+
+          {!hasInteracted && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3 rounded-lg mb-4 flex gap-2">
+              <Lightbulb className="h-5 w-5 flex-shrink-0" />
+              <p><strong>Sugerencia:</strong> Notamos que aún no has editado la sesión ni generado una vista previa en PDF. Te recomendamos revisarla antes de hacerla pública.</p>
+            </div>
+          )}
+
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6 hover:bg-slate-100 transition-colors">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input 
+                type="checkbox" 
+                checked={publishConfirmed}
+                onChange={(e) => setPublishConfirmed(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+              />
+              <span className="text-sm text-slate-700 font-medium">
+                Certifico que he revisado pedagógicamente el contenido de esta sesión, realizando los ajustes necesarios para asegurar su calidad.
+              </span>
+            </label>
+          </div>
+
+          <Button 
+            onClick={() => {
+              setShowPublishModal(false);
+              handleSaveSession(true);
+            }}
+            disabled={!publishConfirmed || isSaving}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12"
+          >
+            Confirmar y Publicar
+          </Button>
+        </div>
+      </div>
+    )}
+
     <div className="min-h-screen bg-slate-50 text-slate-900 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -149,9 +227,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
               Volver
             </Button>
             <div className="flex items-center gap-3">
-              <div className="bg-blue-600 rounded-2xl p-2 shadow-sm">
-                <Brain className="h-6 w-6 text-white" />
-              </div>
+              <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
               <div>
                 <h1 className="font-bold text-lg text-blue-800 font-bold">
                   Sesión Generada
@@ -171,7 +247,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
             </Button>
             <Button
               variant="outline"
-              onClick={() => setIsEditing(!isEditing)}
+              onClick={() => { setIsEditing(!isEditing); setHasInteracted(true); }}
               className={`bg-white border border-slate-200 shadow-sm border-emerald-500/30 hover:shadow-sm bg-transparent ${isEditing ? 'shadow-sm' : ''}`}
             >
               <Edit3 className="h-4 w-4 mr-2" />
@@ -802,7 +878,9 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
         </div>
 
         {/* Botones de Acción */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 pt-6 border-t border-slate-200 border-b w-full max-w-7xl mx-auto">
+        <div className="flex flex-col items-center mt-8 pt-6 border-t border-slate-200 w-full max-w-7xl mx-auto">
+          <img src="/pinguinos/pinguino_like.png" alt="Pingüino" className="w-24 h-24 object-contain mb-4" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full">
             <Button
               onClick={onBack}
               variant="outline"
@@ -812,7 +890,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
               Nueva Sesión
             </Button>
             <Button
-              onClick={handleSaveSession}
+              onClick={() => handleSaveSession(false)}
               disabled={isSaving || isSaved}
               className={`${isSaved ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white shadow-sm hover:scale-105 transition-all duration-300 h-12`}
             >
@@ -829,18 +907,36 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
               ) : (
                 <>
                   <CheckCircle className="h-4 w-4 mr-2" />
-                  Guardar Sesión
+                  Guardar en Personal
                 </>
               )}
             </Button>
             <Button
-              onClick={() => setShowPreview(true)}
+              onClick={() => setShowPublishModal(true)}
+              disabled={isSaving || isPublished}
+              className={`${isPublished ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-blue-600 hover:bg-blue-700'} text-white shadow-sm hover:scale-105 transition-all duration-300 h-12`}
+            >
+              {isPublished ? (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Publicado
+                </>
+              ) : (
+                <>
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Publicar en Comunidad
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={() => { setShowPreview(true); setHasInteracted(true); }}
               className="bg-blue-600 hover:bg-blue-700 shadow-sm hover:scale-105 transition-all duration-300 h-12 text-white"
             >
               <Eye className="h-4 w-4 mr-2" />
               Vista Previa PDF
             </Button>
           </div>
+        </div>
       </div>
     </div>
     </>

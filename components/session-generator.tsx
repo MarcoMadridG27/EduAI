@@ -358,9 +358,7 @@ Nota: La IA debe generar automáticamente:
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
         <div className="container mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="bg-blue-600 rounded-lg p-2 shadow-md shadow-blue-600/20">
-              <Brain className="h-6 w-6 text-white" />
-            </div>
+            <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
             <div>
               <h1 className="font-bold text-xl md:text-2xl text-slate-800 flex items-center gap-2">
                 Genera tu Sesión de Aprendizaje
@@ -405,9 +403,11 @@ Nota: La IA debe generar automáticamente:
           <Card className="bg-white border border-slate-200 shadow-2xl max-w-md w-full rounded-2xl">
             <CardHeader className="text-center pb-6">
               <div className="flex justify-center mb-4">
-                <div className="bg-blue-600 rounded-full p-4 shadow-lg shadow-blue-600/30 animate-pulse">
-                  <Brain className="h-10 w-10 text-white" />
-                </div>
+                <img 
+                  src="/pinguinos/pinguino_pensando.png" 
+                  alt="Pingüino pensando" 
+                  className="w-24 h-24 object-contain animate-bounce" 
+                />
               </div>
               <CardTitle className="text-2xl text-slate-800 font-bold">
                 Diseñando tu Sesión

@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Clock, Calendar, BookOpen, Users, Target, Brain, Sparkles, TrendingUp, Loader2, BarChart3, PieChart as PieChartIcon, LayoutDashboard, Filter } from "lucide-react"
+import { ArrowLeft, Clock, Calendar, BookOpen, Users, Target, Brain, Sparkles, TrendingUp, Loader2, BarChart3, PieChart as PieChartIcon, LayoutDashboard, Filter, Share2, ThumbsUp, Heart } from "lucide-react"
 import type { SessionData } from "@/app/page"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 
@@ -57,6 +57,9 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
   const timesSaved = totalSessions * 45 // 45 minutos por sesión
   const competenciasUsadas = [...new Set(savedSessions.flatMap((s) => s.session_data?.competenciasSeleccionadas || []))].length
   const contextsUsed = [...new Set(savedSessions.map((s) => s.session_data?.contexto).filter(Boolean))].length
+  
+  const sesionesPublicadas = savedSessions.filter(s => s.session_data?.is_public).length
+  const totalLikes = savedSessions.reduce((acc, s) => acc + (s.session_data?.likes || 0), 0)
 
   // Stats para Gráficos
   const sessionsByMonth = useMemo(() => {
@@ -180,9 +183,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
               Volver
             </Button>
             <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
-              <div className="bg-blue-600 rounded-lg p-2 shadow-md shadow-blue-600/20">
-                <LayoutDashboard className="h-6 w-6 text-white" />
-              </div>
+              <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
               <div>
                 <h1 className="font-bold text-xl text-slate-800">
                   Dashboard de {user.name.split(' ')[0]}
@@ -192,10 +193,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Badge className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm py-1">
-              <TrendingUp className="h-3 w-3 mr-1" />
-              IA Activa
-            </Badge>
+
           </div>
         </div>
       </header>
@@ -284,6 +282,45 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
                     <p className="text-xs text-slate-500 font-medium mt-1">Situaciones significativas</p>
                   </CardContent>
                 </Card>
+              </div>
+
+              {/* IMPACTO EN LA COMUNIDAD */}
+              <div className="mt-8">
+                <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                  <Share2 className="h-5 w-5 text-blue-600" />
+                  Tu Impacto en la Comunidad
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-bold text-blue-800">Aportes al Repositorio</CardTitle>
+                      <div className="bg-white rounded-full p-2 shadow-sm">
+                        <BookOpen className="h-4 w-4 text-blue-600" />
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-4">
+                      <div className="text-3xl font-black text-blue-900">
+                        {sesionesPublicadas}
+                      </div>
+                      <p className="text-xs text-blue-600/80 font-medium mt-1">Sesiones compartidas globalmente</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-bold text-emerald-800">Docentes Ayudados</CardTitle>
+                      <div className="bg-white rounded-full p-2 shadow-sm">
+                        <Heart className="h-4 w-4 text-emerald-600 fill-emerald-100" />
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-4">
+                      <div className="text-3xl font-black text-emerald-900">
+                        {totalLikes}
+                      </div>
+                      <p className="text-xs text-emerald-600/80 font-medium mt-1">Valoraciones ("Me gusta") recibidas</p>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
 
               {/* CHARTS */}
@@ -422,14 +459,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
                   >
                     Por Bimestre
                   </Button>
-                  <Button 
-                    variant={groupBy === 'curso' ? 'default' : 'outline'}
-                    size="sm"
-                    className={groupBy === 'curso' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:text-emerald-600 border-slate-200'}
-                    onClick={() => setGroupBy('curso')}
-                  >
-                    Por Área
-                  </Button>
+
                 </div>
               </div>
 
@@ -441,8 +471,8 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
                 </div>
               ) : Object.keys(groupedSessions).length === 0 || savedSessions.length === 0 ? (
                 <div className="text-center py-16 px-4 bg-white rounded-xl border border-slate-200 shadow-sm">
-                  <div className="bg-slate-50 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center border border-slate-100">
-                    <BookOpen className="h-10 w-10 text-slate-400" />
+                  <div className="mx-auto mb-6 flex items-center justify-center">
+                    <img src="/pinguinos/pinguino_chill.png" alt="Pingüino" className="w-32 h-32 object-contain opacity-80" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-800 mb-2">
                     Aún no tienes sesiones guardadas

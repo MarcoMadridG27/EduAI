@@ -2,9 +2,11 @@
 
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
-import { Button } from "@/components/ui/button"
+import { motion } from "framer-motion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BookOpen, Brain, Users, Sparkles, ArrowRight, Zap, Target, Layers } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Sparkles, ArrowLeft } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface LoginScreenProps {
   onLogin: (userData: { name: string; email: string }) => void
@@ -12,8 +14,8 @@ interface LoginScreenProps {
 
 export function LoginScreen({ onLogin }: LoginScreenProps) {
   const [googleReady, setGoogleReady] = useState(false)
-  const [showLogin, setShowLogin] = useState(false)
   const googleButtonRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || "https://eduai-auth-1.onrender.com"
   const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
@@ -46,9 +48,9 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
     }
   }
 
-  // Cargar Google Identity al montar o al mostrar login
+  // Cargar Google Identity
   useEffect(() => {
-    if (!CLIENT_ID || typeof window === "undefined" || !showLogin || !googleButtonRef.current) return
+    if (!CLIENT_ID || typeof window === "undefined" || !googleButtonRef.current) return
 
     const initGoogle = () => {
       try {
@@ -81,151 +83,106 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
     } else {
       initGoogle()
     }
-  }, [CLIENT_ID, showLogin])
+  }, [CLIENT_ID])
 
 
   return (
-    <div className="min-h-screen bg-slate-50 relative overflow-hidden flex items-center justify-center p-4 lg:p-8 font-sans">
+    <div className="min-h-screen bg-background relative overflow-hidden flex items-center justify-center p-4 lg:p-8 font-sans selection:bg-primary selection:text-primary-foreground">
       
+      {/* Back Button */}
+      <motion.div 
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.3 }}
+        className="absolute top-6 left-6 z-50"
+      >
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => router.push("/")}
+          className="text-muted-foreground hover:text-foreground font-semibold flex items-center gap-2 rounded-full px-4"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Volver al Inicio
+        </Button>
+      </motion.div>
+
       {/* Background Animated Blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[20%] -right-[10%] w-[500px] h-[500px] bg-blue-200 rounded-full blur-[100px] opacity-60 animate-pulse"></div>
-        <div className="absolute -bottom-[20%] -left-[10%] w-[600px] h-[600px] bg-indigo-200 rounded-full blur-[100px] opacity-50 animate-pulse delay-1000"></div>
-        <div className="absolute top-[20%] left-[30%] w-[400px] h-[400px] bg-emerald-200 rounded-full blur-[100px] opacity-40 animate-pulse delay-500"></div>
+        <div className="absolute -top-[20%] -right-[10%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] opacity-60 animate-pulse"></div>
+        <div className="absolute -bottom-[20%] -left-[10%] w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[100px] opacity-50 animate-pulse delay-1000"></div>
       </div>
 
-      <div className="w-full max-w-6xl z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="w-full max-w-md z-10 relative">
         
-        {/* Left Column - Landing Presentation */}
-        <div className="space-y-8 animate-in slide-in-from-left-8 duration-1000 fade-in">
-          <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 font-semibold text-sm shadow-sm border border-blue-200">
-              <Sparkles className="h-4 w-4" />
-              <span>Plataforma Docente Inteligente</span>
-            </div>
+        {/* Animated Mascot */}
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: "spring", bounce: 0.5, duration: 1, delay: 0.2 }}
+          className="absolute -top-24 -right-8 z-20 pointer-events-none"
+        >
+          <motion.img 
+            animate={{ rotate: [-5, 5, -5], y: [0, -10, 0] }}
+            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+            src="/pinguinos/pinguino_celebrando.png" 
+            className="w-40 h-40 object-contain drop-shadow-xl"
+            alt="Pingüino saludando"
+          />
+        </motion.div>
+
+        {/* Login Card */}
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", bounce: 0.4, duration: 0.8 }}
+        >
+          <Card className="bg-card/90 backdrop-blur-xl border-border shadow-2xl rounded-3xl overflow-hidden relative z-10">
+            <div className="absolute top-0 w-full h-2 bg-gradient-to-r from-primary via-secondary to-accent"></div>
             
-            <h1 className="text-5xl lg:text-7xl font-extrabold text-slate-900 tracking-tight leading-tight">
-              Diseña con <br/>
-              <span className="text-blue-600">Sesión </span>
-              <span className="bg-indigo-600 text-white px-3 py-1 rounded-2xl shadow-lg shadow-indigo-600/30">+</span>
-            </h1>
-            
-            <p className="text-xl text-slate-600 max-w-lg leading-relaxed">
-              Genera sesiones de aprendizaje de Matemática alineadas al CNEB en segundos. Adapta contextos, criterios y secuencias didácticas con Inteligencia Artificial.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-            <div className="flex gap-4 items-start p-4 bg-white rounded-2xl shadow-sm border border-slate-200 hover:-translate-y-1 transition-transform duration-300">
-              <div className="bg-blue-100 p-3 rounded-xl text-blue-600">
-                <BookOpen className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-bold text-slate-800">CNEB Integrado</h3>
-                <p className="text-sm text-slate-500 mt-1">Competencias y capacidades oficiales pre-cargadas.</p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 items-start p-4 bg-white rounded-2xl shadow-sm border border-slate-200 hover:-translate-y-1 transition-transform duration-300">
-              <div className="bg-emerald-100 p-3 rounded-xl text-emerald-600">
-                <Target className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-bold text-slate-800">Contexto Local</h3>
-                <p className="text-sm text-slate-500 mt-1">Adaptación automática a la realidad de tus estudiantes.</p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 items-start p-4 bg-white rounded-2xl shadow-sm border border-slate-200 hover:-translate-y-1 transition-transform duration-300">
-              <div className="bg-indigo-100 p-3 rounded-xl text-indigo-600">
-                <Brain className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-bold text-slate-800">IA Generativa</h3>
-                <p className="text-sm text-slate-500 mt-1">Estructura, secuencias y rúbricas creadas en segundos.</p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 items-start p-4 bg-white rounded-2xl shadow-sm border border-slate-200 hover:-translate-y-1 transition-transform duration-300">
-              <div className="bg-purple-100 p-3 rounded-xl text-purple-600">
-                <Layers className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-bold text-slate-800">Todo en Uno</h3>
-                <p className="text-sm text-slate-500 mt-1">Exporta tus sesiones e historial en un solo lugar.</p>
-              </div>
-            </div>
-          </div>
-          
-          {!showLogin && (
-            <div className="pt-4">
-              <Button 
-                onClick={() => setShowLogin(true)}
-                size="lg" 
-                className="bg-blue-600 hover:bg-blue-700 text-white h-14 px-8 rounded-xl text-lg font-bold shadow-xl hover:-translate-y-1 transition-all duration-300 group"
+            <CardHeader className="text-center pt-10 pb-6">
+              <motion.div 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", bounce: 0.6, delay: 0.4 }}
+                className="mx-auto flex items-center justify-center mb-6"
               >
-                Comenzar ahora
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* Right Column - Login Card */}
-        <div className="relative flex justify-center lg:justify-end">
-          {showLogin ? (
-            <div className="w-full max-w-md animate-in slide-in-from-right-8 fade-in duration-700">
-              <Card className="bg-white/80 backdrop-blur-xl border-slate-200 shadow-2xl rounded-3xl overflow-hidden relative">
-                <div className="absolute top-0 w-full h-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500"></div>
-                <CardHeader className="text-center pt-10 pb-6">
-                  <div className="mx-auto bg-blue-50 w-20 h-20 flex items-center justify-center rounded-full mb-4 shadow-inner border border-blue-100">
-                    <Brain className="h-10 w-10 text-blue-600" />
-                  </div>
-                  <CardTitle className="text-3xl font-extrabold text-slate-800">Acceso Docente</CardTitle>
-                  <CardDescription className="text-base text-slate-500 mt-2">
-                    Inicia sesión de forma segura para guardar y gestionar tus sesiones
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6 px-8 pb-10">
-                  <div
-                    ref={googleButtonRef}
-                    className="flex justify-center min-h-[50px]"
-                  />
-
-                  {!googleReady && CLIENT_ID && (
-                    <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
-                      <div className="w-4 h-4 rounded-full border-2 border-blue-600 border-t-transparent animate-spin"></div>
-                      Conectando con Google...
-                    </div>
-                  )}
-                  
-                  {!CLIENT_ID && (
-                    <p className="text-xs text-red-600 text-center font-medium bg-red-50 p-3 rounded-lg">
-                      ⚠️ NEXT_PUBLIC_GOOGLE_CLIENT_ID no configurado
-                    </p>
-                  )}
-                </CardContent>
-                <div className="bg-slate-50 py-4 text-center border-t border-slate-100">
-                  <p className="text-xs text-slate-400 font-semibold">
-                    Protegido por Google Identity Services
-                  </p>
-                </div>
-              </Card>
-            </div>
-          ) : (
-            <div className="hidden lg:flex justify-center w-full max-w-md relative animate-in fade-in slide-in-from-bottom-8 duration-1000">
-              <div className="relative w-full aspect-[4/5] bg-gradient-to-br from-blue-100 to-indigo-50 rounded-3xl border-8 border-white shadow-2xl overflow-hidden flex flex-col items-center justify-center p-8 text-center">
-                <Zap className="h-24 w-24 text-blue-500 mb-6 drop-shadow-md" />
-                <h3 className="text-2xl font-bold text-slate-800 mb-2">Tu tiempo es valioso</h3>
-                <p className="text-slate-600">Automatiza la planificación y concéntrate en enseñar. Haz clic en "Comenzar ahora" para acceder.</p>
+                <img src="/sesion_+.png" alt="Sesión + Logo" className="h-40 w-auto object-contain drop-shadow-sm" />
+              </motion.div>
+              
+              <CardTitle className="text-3xl font-extrabold text-foreground">¡Hola de nuevo!</CardTitle>
+              <CardDescription className="text-base text-muted-foreground mt-2">
+                Inicia sesión de forma segura para continuar donde lo dejaste.
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="space-y-6 px-8 pb-10">
+              <div className="flex justify-center min-h-[50px] relative">
+                <div ref={googleButtonRef} className="z-10" />
                 
-                <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-emerald-400 rounded-full blur-2xl opacity-40"></div>
-                <div className="absolute -top-6 -left-6 w-32 h-32 bg-blue-500 rounded-full blur-2xl opacity-40"></div>
+                {!googleReady && CLIENT_ID && (
+                  <div className="absolute inset-0 flex items-center justify-center gap-2 text-sm text-muted-foreground z-0">
+                    <div className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+                    Conectando...
+                  </div>
+                )}
               </div>
+              
+              {!CLIENT_ID && (
+                <p className="text-xs text-destructive text-center font-medium bg-destructive/10 p-3 rounded-lg">
+                  ⚠️ NEXT_PUBLIC_GOOGLE_CLIENT_ID no configurado
+                </p>
+              )}
+            </CardContent>
+            
+            <div className="bg-muted/50 py-4 text-center border-t border-border flex items-center justify-center gap-2">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <p className="text-xs text-muted-foreground font-semibold">
+                Protegido por Google Identity Services
+              </p>
             </div>
-          )}
-        </div>
-
+          </Card>
+        </motion.div>
       </div>
     </div>
   )
