@@ -145,7 +145,7 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, on
   useEffect(() => {
     if (editingSession) {
       setTema(editingSession.tema || "")
-      setTituloSesion(editingSession.tituloSesion || editingSession.tema || "")
+      setTituloSesion(editingSession.tituloSesion || editingSession.titulo || editingSession.tema || "")
       setCompetenciasSeleccionadas(Array.isArray(editingSession.competenciasSeleccionadas) ? editingSession.competenciasSeleccionadas : [])
       setContexto(editingSession.contexto || "")
       setHorasClase(editingSession.horasClase || 1)
@@ -251,9 +251,10 @@ Nota: La IA debe generar automáticamente:
 - Recursos y materiales estructurados`
 
       const sessionId = user.email || user.name || "frontend"
-      const wsUrl = (process.env.NEXT_PUBLIC_WEBHOOK_URL || "http://localhost:10000/webhook")
-        .replace("http", "ws")
-        .replace("https", "wss")
+      const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL || "http://localhost:10000/webhook"
+      const wsUrl = webhookUrl
+        .replace(/^https:\/\//, "wss://")
+        .replace(/^http:\/\//, "ws://")
         .replace("/webhook", "/ws/generate")
 
       const ws = new WebSocket(wsUrl)
@@ -418,7 +419,9 @@ Nota: La IA debe generar automáticamente:
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Progress value={progress} className="h-2.5 bg-slate-100" indicatorClassName="bg-blue-600" />
+                <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div className="h-full bg-blue-600 transition-all" style={{ width: `${progress}%` }} />
+                </div>
                 <div className="flex justify-between text-xs text-slate-500 font-medium px-1">
                   <span>{progress}% completado</span>
                   <span>~{Math.max(1, Math.ceil((100 - progress) / 15))}s restantes</span>
@@ -481,7 +484,9 @@ Nota: La IA debe generar automáticamente:
                     <span className="font-semibold text-slate-600">Progreso general</span>
                     <span className="text-blue-600 font-bold">{Math.round(calculateFormProgress())}%</span>
                   </div>
-                  <Progress value={calculateFormProgress()} className="h-2 bg-slate-100" indicatorClassName="bg-emerald-500" />
+                  <div className="relative h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div className="h-full bg-emerald-500 transition-all" style={{ width: `${calculateFormProgress()}%` }} />
+                  </div>
                 </div>
               </CardContent>
             </Card>

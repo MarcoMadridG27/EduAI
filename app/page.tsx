@@ -8,7 +8,7 @@ import { SessionResults } from "@/components/session-results"
 import { TeacherDashboard } from "@/components/teacher-dashboard"
 
 export type SessionData = {
-  // Datos Generales (nuevos campos)
+  // Datos Generales
   datosGenerales?: {
     titulo: string
     docente: string
@@ -19,31 +19,33 @@ export type SessionData = {
 
   // Inputs del formulario
   tema: string
+  titulo?: string // Título de la sesión - kept for compatibility
+  tituloSesion?: string // Legacy field
   competenciasSeleccionadas: string[]
   capacidades?: string[] // Capacidades seleccionadas
   ciclo: string
   contexto: string
   horasClase: number
-  materialesDisponibles: string
+  materialesDisponibles?: string
   enfoqueTransversal?: string
   competenciaTransversal?: string
 
   // Outputs generados por IA
-  competenciaDescripcion: string // Competencia + descripción del nivel esperado según ciclo
-  criteriosEvaluacion?: string // Criterios de evaluación (generado por IA)
-  evidenciasAprendizaje?: string // Evidencias de aprendizaje (generado por IA)
-  propositoSesion?: string // Propósito de la sesión (generado por IA)
-  secuenciaMetodologica: {
+  competenciaDescripcion?: string
+  criteriosEvaluacion?: string
+  evidenciasAprendizaje?: string
+  propositoSesion?: string
+  secuenciaMetodologica?: {
     inicio: string
     desarrollo: string
     cierre: string
   }
-  procesosDidacticos: string[] // Los 5 procesos didácticos específicos de matemática
-  actividadesContextualizadas: string[] // Actividades del entorno social elegido
-  distribucionHoras: string // Cómo se reparte la secuencia en el tiempo
-  materialesDidacticosSugeridos: string[]
+  procesosDidacticos?: string[]
+  actividadesContextualizadas?: string[]
+  distribucionHoras?: string
+  materialesDidacticosSugeridos?: string[]
 
-  // Recursos Adicionales (nuevo)
+  // Recursos Adicionales
   recursosAdicionales?: {
     comunicadoParaPadres?: string
     actividadDeActivacion?: string[]
@@ -75,7 +77,7 @@ export type SessionData = {
   }
 
   // Metadata
-  createdAt: Date
+  createdAt?: Date
 
   // Legacy fields for backward compatibility (deprecated)
   grado?: string
