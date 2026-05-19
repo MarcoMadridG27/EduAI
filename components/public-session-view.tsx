@@ -14,22 +14,55 @@ export function PublicSessionView({ id }: { id: string }) {
   const [copied, setCopied] = useState(false)
   const [showPdf, setShowPdf] = useState(false)
   const [newComment, setNewComment] = useState("")
-  const [comments, setComments] = useState([
-    { id: 1, author: "Docente Perú", text: "¡Excelente material colega! Me sirvió mucho para mi clase de hoy.", time: "Hace 2 horas" },
-    { id: 2, author: "Prof. Ramírez", text: "Muy buena estructura, me encanta cómo planteaste la secuencia didáctica.", time: "Hace 1 día" }
-  ])
+  const [comments, setComments] = useState<any[]>([])
+  const [likes, setLikes] = useState(0)
+  const [liked, setLiked] = useState(false)
 
-  const handleAddComment = () => {
-    if (!newComment.trim()) return
-    const comment = {
-      id: Date.now(),
-      author: "Tú",
-      text: newComment,
-      time: "Ahora mismo"
+  const user = typeof window !== "undefined" && localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user") || "null")
+    : null
+
+  const API_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || "http://localhost:10000"
+
+  const handleAddComment = async () => {
+    if (!user) {
+      toast.error("Debes iniciar sesión para comentar.")
+      return
     }
-    setComments([comment, ...comments])
-    setNewComment("")
-    toast.success("Comentario publicado")
+    if (!newComment.trim()) return
+
+    try {
+      const res = await fetch(`${API_URL}/api/sessions/${session.id}/comment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ author: user?.name || "Anónimo", text: newComment })
+      })
+      if (!res.ok) throw new Error("Error")
+      const r = await res.json()
+      setComments([r.comment, ...comments])
+      setNewComment("")
+      toast.success("Comentario publicado")
+    } catch {
+      toast.error("Error al publicar comentario")
+    }
+  }
+
+  const handleLike = async () => {
+    if (!user) {
+      toast.error("Debes iniciar sesión para valorar.")
+      return
+    }
+    if (liked) return
+    try {
+      const res = await fetch(`${API_URL}/api/sessions/${session.id}/like`, { method: "POST" })
+      if (!res.ok) throw new Error("Error")
+      const r = await res.json()
+      setLikes(r.likes)
+      setLiked(true)
+      toast.success("¡Gracias por tu valoración!")
+    } catch {
+      toast.error("Error al valorar")
+    }
   }
 
   useEffect(() => {
@@ -44,6 +77,8 @@ export function PublicSessionView({ id }: { id: string }) {
 
         if (found) {
           setSession(found)
+          setLikes(found.session_data?.likes || 0)
+          setComments(found.session_data?.comments || [])
         } else {
           setSession(null)
         }
@@ -55,7 +90,14 @@ export function PublicSessionView({ id }: { id: string }) {
     }
 
     fetchSession()
-  }, [id])
+  }, [id, API_URL])
+
+  const handleEditOwner = () => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("session_to_edit", JSON.stringify(session.session_data))
+      window.location.href = "/" // Go to home to pick up editing
+    }
+  }
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href)
@@ -138,10 +180,18 @@ export function PublicSessionView({ id }: { id: string }) {
                     <div className="bg-slate-100 p-2 rounded-full"><User className="h-4 w-4 text-slate-500" /></div>
                     <span className="font-semibold text-slate-700">{s.author_name || "Docente"}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-500">
-                    <ThumbsUp className="h-4 w-4" /> {s.likes || 0} valoraciones
-                  </div>
+                  <button onClick={handleLike} className={`flex items-center gap-2 transition-colors ${liked ? "text-blue-600" : "text-slate-500 hover:text-blue-500"}`}>
+                    <ThumbsUp className={`h-4 w-4 ${liked ? "fill-current" : ""}`} /> {likes} valoraciones
+                  </button>
                 </div>
+
+                {user?.email === session.user_id && (
+                  <div className="mt-6">
+                    <Button onClick={handleEditOwner} variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                      Editar Sesión (Creador)
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {/* Contenido (Simulando una vista de lectura inmersiva) */}

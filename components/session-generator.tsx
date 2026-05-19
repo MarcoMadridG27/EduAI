@@ -9,9 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
 import { Progress } from "@/components/ui/progress"
-import { 
-  Brain, User, BarChart3, Loader2, Sparkles, Target, Clock, Package, 
-  Calendar, Award, CheckCircle2, X, Calculator, LineChart, Ruler, BarChart, 
+import {
+  Brain, User, BarChart3, Loader2, Sparkles, Target, Clock, Package,
+  Calendar, Award, CheckCircle2, X, Calculator, LineChart, Ruler, BarChart,
   ChevronDown, ChevronUp, Info, FileText, BookOpen, GraduationCap
 } from "lucide-react"
 import type { SessionData } from "@/app/page"
@@ -112,31 +112,31 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, on
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
   const [grado, setGrado] = useState("")
   const [seccion, setSeccion] = useState("")
-  
+
   const ciclo = useMemo(() => {
     if (["1", "2"].includes(grado)) return "VI"
     if (["3", "4", "5"].includes(grado)) return "VII"
     return ""
   }, [grado])
-  
+
   const [competenciasSeleccionadas, setCompetenciasSeleccionadas] = useState<string[]>([])
   const [capacidadesSeleccionadas, setCapacidadesSeleccionadas] = useState<string[]>([])
   const [competenciaExpandida, setCompetenciaExpandida] = useState<string | null>(null)
-  
+
   const [tema, setTema] = useState("")
   const [tituloSesion, setTituloSesion] = useState("")
-  
+
   const [enfoqueTransversal, setEnfoqueTransversal] = useState("")
   const [competenciaTransversal, setCompetenciaTransversal] = useState("")
-  
+
   const [contexto, setContexto] = useState("")
   const [horasClase, setHorasClase] = useState<number>(1)
-  
+
   const [materialesSeleccionados, setMaterialesSeleccionados] = useState<string[]>([])
   const [materialesNoEstructurados, setMaterialesNoEstructurados] = useState("")
 
   const [instrumentoEvaluacion, setInstrumentoEvaluacion] = useState(instrumentosEvaluacion[0])
-  
+
   const [isGenerating, setIsGenerating] = useState(false)
   const [progress, setProgress] = useState(0)
   const [currentStep, setCurrentStep] = useState("")
@@ -195,8 +195,8 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, on
   }
 
   const toggleMaterial = (material: string) => {
-    setMaterialesSeleccionados((prev) => 
-      prev.includes(material) 
+    setMaterialesSeleccionados((prev) =>
+      prev.includes(material)
         ? prev.filter(m => m !== material)
         : [...prev, material]
     )
@@ -267,7 +267,7 @@ Nota: La IA debe generar automáticamente:
         "Ajustando al contexto social...",
         "Casi listo..."
       ]
-      
+
       let messageIndex = 0
       const messageInterval = setInterval(() => {
         if (currentProgress < 90) {
@@ -286,7 +286,7 @@ Nota: La IA debe generar automáticamente:
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data)
-          
+
           if (data.status === 'progress') {
             if (data.step) setCurrentStep(data.step)
             if (data.progress) {
@@ -300,13 +300,14 @@ Nota: La IA debe generar automáticamente:
             clearInterval(messageInterval)
             setProgress(100)
             setCurrentStep("¡Sesión generada exitosamente!")
-            
+
             if (!data.data || typeof data.data !== 'object') {
               throw new Error("La sesión generada no tiene el formato correcto")
             }
-            
+
             setTimeout(() => {
-              onSessionGenerated(data.data)
+              const sessionData = { ...data.data, session_id: sessionId }
+              onSessionGenerated(sessionData)
               ws.close()
             }, 1000)
           } else if (data.status === 'error') {
@@ -354,7 +355,7 @@ Nota: La IA debe generar automáticamente:
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 relative font-sans">
-      
+
       {/* HEADER LUMINOSO Y LIMPIO */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
         <div className="container mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -404,10 +405,10 @@ Nota: La IA debe generar automáticamente:
           <Card className="bg-white border border-slate-200 shadow-2xl max-w-md w-full rounded-2xl">
             <CardHeader className="text-center pb-6">
               <div className="flex justify-center mb-4">
-                <img 
-                  src="/pinguinos/pinguino_pensando.png" 
-                  alt="Pingüino pensando" 
-                  className="w-24 h-24 object-contain animate-bounce" 
+                <img
+                  src="/pinguinos/pinguino_pensando.png"
+                  alt="Pingüino pensando"
+                  className="w-24 h-24 object-contain animate-bounce"
                 />
               </div>
               <CardTitle className="text-2xl text-slate-800 font-bold">
@@ -435,14 +436,14 @@ Nota: La IA debe generar automáticamente:
       {/* CONTENIDO PRINCIPAL A 2 COLUMNAS */}
       <div className="max-w-7xl mx-auto px-4 py-8 relative z-10 pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
+
           {/* SIDEBAR - RESUMEN (Pegajoso en Desktop) */}
           <div className="hidden lg:block lg:col-span-4 sticky top-24 space-y-6">
             <div className="mb-2">
               <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Nueva Sesión</h2>
               <p className="text-slate-500 mt-1">Completa el formulario para generar tu clase con Inteligencia Artificial.</p>
             </div>
-            
+
             <Card className="bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden">
               <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2 text-slate-700">
@@ -455,14 +456,14 @@ Nota: La IA debe generar automáticamente:
                   <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Docente</p>
                   <p className="text-sm font-medium text-slate-800">{nombreDocente || <span className="text-slate-300 italic">No especificado</span>}</p>
                 </div>
-                
+
                 <div className="space-y-1">
                   <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Grado y Ciclo</p>
                   <p className="text-sm font-medium text-slate-800">
                     {grado ? `${grado}º Secundaria ${ciclo ? `(Ciclo ${ciclo})` : ''}` : <span className="text-slate-300 italic">No especificado</span>}
                   </p>
                 </div>
-                
+
                 <div className="space-y-1">
                   <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Tema Central</p>
                   <p className="text-sm font-medium text-slate-800 line-clamp-2">{tema || <span className="text-slate-300 italic">No especificado</span>}</p>
@@ -501,7 +502,7 @@ Nota: La IA debe generar automáticamente:
 
           {/* FORMULARIO PRINCIPAL */}
           <div className="col-span-1 lg:col-span-8 space-y-6">
-            
+
             {/* Título en Móvil */}
             <div className="lg:hidden mb-6">
               <h2 className="text-2xl font-bold text-slate-800">Nueva Sesión</h2>
@@ -510,7 +511,7 @@ Nota: La IA debe generar automáticamente:
 
             <Card className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden">
               <CardContent className="p-6 sm:p-8 space-y-10">
-                
+
                 {/* 1. DATOS GENERALES */}
                 <section className="space-y-5 animate-in fade-in">
                   <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
@@ -519,7 +520,7 @@ Nota: La IA debe generar automáticamente:
                     </div>
                     <h3 className="text-lg font-bold text-slate-800">1. Datos Generales</h3>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div className="space-y-2">
                       <Label htmlFor="nombreDocente" className="text-sm font-semibold text-slate-700">
@@ -563,7 +564,7 @@ Nota: La IA debe generar automáticamente:
                         </SelectContent>
                       </Select>
                       {showErrors && !grado && <p className="text-xs text-red-500 font-medium">Selecciona un grado</p>}
-                      
+
                       {ciclo && (
                         <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold animate-in fade-in duration-300">
                           <BookOpen className="h-3 w-3" />
@@ -600,23 +601,22 @@ Nota: La IA debe generar automáticamente:
                     <Label className="text-sm font-semibold text-slate-700">
                       Competencias del CNEB <span className="text-red-500">*</span>
                     </Label>
-                    
+
                     <div className="grid grid-cols-1 gap-3">
                       {competenciasData.map((comp) => {
                         const Icon = comp.icon
                         const isSelected = competenciasSeleccionadas.includes(comp.name)
                         const isExpanded = competenciaExpandida === comp.name
                         const capacidades = capacidadesPorCompetencia[comp.name] || []
-                        
+
                         return (
                           <div key={comp.name} className="flex flex-col">
                             {/* Tarjeta de Competencia */}
-                            <div 
-                              className={`flex items-center p-4 rounded-xl border transition-all duration-200 cursor-pointer shadow-sm ${
-                                isSelected 
-                                  ? "bg-blue-50 border-blue-500 ring-1 ring-blue-500" 
+                            <div
+                              className={`flex items-center p-4 rounded-xl border transition-all duration-200 cursor-pointer shadow-sm ${isSelected
+                                  ? "bg-blue-50 border-blue-500 ring-1 ring-blue-500"
                                   : "bg-white border-slate-200 hover:border-blue-300 hover:bg-slate-50"
-                              }`}
+                                }`}
                               onClick={() => {
                                 if (!isSelected) {
                                   handleCompetenciaChange(comp.name, true)
@@ -633,7 +633,7 @@ Nota: La IA debe generar automáticamente:
                               </div>
                               <div className="flex items-center gap-3">
                                 {isSelected && (
-                                  <button 
+                                  <button
                                     onClick={(e) => { e.stopPropagation(); toggleAccordion(comp.name) }}
                                     className="text-slate-400 hover:text-blue-600 p-1 bg-white rounded-md border border-slate-200"
                                   >
@@ -659,13 +659,12 @@ Nota: La IA debe generar automáticamente:
                                   {capacidades.map((capacidad) => {
                                     const isCapSelected = capacidadesSeleccionadas.includes(capacidad)
                                     return (
-                                      <div 
+                                      <div
                                         key={capacidad}
-                                        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                                          isCapSelected 
-                                            ? "bg-white border-blue-200 shadow-sm" 
+                                        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${isCapSelected
+                                            ? "bg-white border-blue-200 shadow-sm"
                                             : "bg-transparent border-transparent hover:bg-slate-100"
-                                        }`}
+                                          }`}
                                         onClick={() => handleCapacidadChange(capacidad, !isCapSelected)}
                                       >
                                         <Checkbox
@@ -859,11 +858,10 @@ Nota: La IA debe generar automáticamente:
                               variant="outline"
                               size="sm"
                               onClick={() => toggleMaterial(material)}
-                              className={`h-9 rounded-full transition-all border shadow-sm ${
-                                isSelected
+                              className={`h-9 rounded-full transition-all border shadow-sm ${isSelected
                                   ? "bg-violet-50 border-violet-300 text-violet-700 hover:bg-violet-100"
                                   : "bg-white border-slate-300 text-slate-600 hover:border-slate-400 hover:bg-slate-50"
-                              }`}
+                                }`}
                             >
                               {isSelected ? <CheckCircle2 className="h-3.5 w-3.5 mr-1.5 text-violet-600" /> : null}
                               {material}
@@ -920,11 +918,10 @@ Nota: La IA debe generar automáticamente:
               <Button
                 onClick={generateSession}
                 disabled={isGenerating}
-                className={`w-full h-14 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 ${
-                  isGenerating 
-                    ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200 shadow-none" 
+                className={`w-full h-14 rounded-xl font-bold text-lg shadow-lg transition-all duration-300 ${isGenerating
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200 shadow-none"
                     : "bg-blue-600 hover:bg-blue-700 text-white hover:shadow-blue-600/30 hover:-translate-y-0.5"
-                }`}
+                  }`}
               >
                 {isGenerating ? (
                   <>
@@ -938,7 +935,7 @@ Nota: La IA debe generar automáticamente:
                   </>
                 )}
               </Button>
-              
+
               {showErrors && !isValid && (
                 <div className="mt-4 text-center p-3 rounded-lg bg-red-50 border border-red-100">
                   <p className="text-sm font-semibold text-red-600 flex items-center justify-center gap-2">

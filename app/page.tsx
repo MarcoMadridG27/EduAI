@@ -83,12 +83,14 @@ export type SessionData = {
   }
 
   // Metadata
+  session_id?: string
   createdAt?: Date
 
   // Repositorio Público (nuevo)
   is_public?: boolean
   author_name?: string
   likes?: number
+  comments?: any[]
 
   // Legacy fields for backward compatibility (deprecated)
   grado?: string
@@ -114,11 +116,19 @@ export default function Home() {
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
     const accessToken = localStorage.getItem("access_token")
-    
+
     if (storedUser && accessToken) {
       try {
         const userData = JSON.parse(storedUser)
         setUser(userData)
+
+        const sessionToEdit = localStorage.getItem("session_to_edit")
+        if (sessionToEdit) {
+          const editData = JSON.parse(sessionToEdit)
+          setEditingSession(editData)
+          setCurrentView("generator")
+          localStorage.removeItem("session_to_edit")
+        }
       } catch (e) {
         console.error("Error restaurando sesión:", e)
       }

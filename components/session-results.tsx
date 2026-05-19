@@ -110,6 +110,10 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
       const userData = JSON.parse(user)
 
       const payloadData = { ...editedSession }
+      // Ensure session_id is included so the backend updates the existing record
+      if (!payloadData.session_id) {
+        payloadData.session_id = `session_${Date.now()}`
+      }
       if (isPublic) {
         payloadData.is_public = true
         payloadData.author_name = userData.name || "Docente Anónimo"
