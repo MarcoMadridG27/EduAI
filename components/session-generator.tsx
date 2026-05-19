@@ -17,11 +17,13 @@ import {
 import type { SessionData } from "@/app/page"
 
 interface SessionGeneratorProps {
-  user: { name: string; email: string }
+  user?: { name: string; email: string } | null
   onSessionGenerated: (session: SessionData) => void
   onViewDashboard: () => void
   onLogout: () => void
   editingSession?: SessionData | null
+  guestMode?: boolean
+  onLoginRequired?: () => void
 }
 
 const competenciasData = [
@@ -107,7 +109,7 @@ const materialesPorContexto: Record<string, string[]> = {
   "Comunidad": ["Pizarra", "Tizas", "Materiales de la comunidad", "Elementos naturales", "Telares"]
 }
 
-export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, onLogout, editingSession }: SessionGeneratorProps) {
+export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, onLogout, editingSession, guestMode = false, onLoginRequired }: SessionGeneratorProps) {
   const [nombreDocente, setNombreDocente] = useState("")
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
   const [grado, setGrado] = useState("")
@@ -209,6 +211,11 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, on
   const isValid = nombreDocente && tema && tituloSesion && competenciasSeleccionadas.length > 0 && grado && contexto && horasClase
 
   const generateSession = async () => {
+    if (guestMode) {
+      onLoginRequired?.()
+      return
+    }
+
     if (!isValid) {
       setShowErrors(true)
       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -250,12 +257,17 @@ Nota: La IA debe generar automáticamente:
 - Desarrollo de la sesión (Inicio, Desarrollo, Cierre)
 - Recursos y materiales estructurados`
 
-      const sessionId = user.email || user.name || "frontend"
-      const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL || "http://localhost:10000/webhook"
-      const wsUrl = webhookUrl
+      const sessionId = user?.email || user?.name || "guest"
+      const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL || ""
+      let wsUrl = webhookUrl
         .replace(/^https:\/\//, "wss://")
         .replace(/^http:\/\//, "ws://")
-        .replace("/webhook", "/ws/generate")
+
+      if (wsUrl.includes("/webhook")) {
+        wsUrl = wsUrl.replace("/webhook", "/ws/generate")
+      } else {
+        wsUrl = wsUrl.replace(/\/$/, "") + "/ws/generate"
+      }
 
       const ws = new WebSocket(wsUrl)
       let currentProgress = 0
@@ -374,27 +386,44 @@ Nota: La IA debe generar automáticamente:
           <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
             <Button
               variant="outline"
-              onClick={onViewDashboard}
+              onClick={() => {
+                if (guestMode) {
+                  onLoginRequired?.()
+                } else {
+                  onViewDashboard()
+                }
+              }}
               className="bg-white border-slate-300 hover:bg-slate-50 text-slate-700 transition-all h-9 text-sm font-medium shadow-sm"
             >
               <BarChart3 className="h-4 w-4 mr-2 text-slate-500" />
               <span className="hidden sm:inline">Dashboard</span>
             </Button>
-            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
-              <div className="bg-blue-100 p-1 rounded-full">
-                <User className="h-3 w-3 text-blue-600" />
-              </div>
-              <span className="text-sm font-medium text-slate-700 truncate max-w-[100px] sm:max-w-[150px]">{user.name}</span>
-            </div>
-            <Button
-              variant="ghost"
-              onClick={onLogout}
-              className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-2 sm:px-3 font-medium"
-              title="Cerrar Sesión"
-            >
-              <X className="h-4 w-4 sm:mr-1" />
-              <span className="hidden sm:inline">Salir</span>
-            </Button>
+            {guestMode ? (
+              <Button
+                onClick={onLoginRequired}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-9 px-4 rounded-full text-sm shadow-sm transition-all hover:scale-105 active:scale-95"
+              >
+                Iniciar Sesión
+              </Button>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
+                  <div className="bg-blue-100 p-1 rounded-full">
+                    <User className="h-3 w-3 text-blue-600" />
+                  </div>
+                  <span className="text-sm font-medium text-slate-700 truncate max-w-[100px] sm:max-w-[150px]">{user?.name}</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  onClick={onLogout}
+                  className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-2 sm:px-3 font-medium"
+                  title="Cerrar Sesión"
+                >
+                  <X className="h-4 w-4 sm:mr-1" />
+                  <span className="hidden sm:inline">Salir</span>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </header>

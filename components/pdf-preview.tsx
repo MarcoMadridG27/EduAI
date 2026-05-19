@@ -40,7 +40,7 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
   async function handleGeneratePDF() {
     setIsExporting(true)
     try {
-      const url = process.env.NEXT_PUBLIC_PDF_URL || "https://pdf-render-hfzf.onrender.com/generate-pdf"
+      const url = process.env.NEXT_PUBLIC_PDF_URL || ""
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

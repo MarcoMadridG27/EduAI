@@ -23,7 +23,8 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
   const [activeTab, setActiveTab] = useState<'overview' | 'sessions'>('overview')
   const [groupBy, setGroupBy] = useState<'recientes' | 'bimestre' | 'curso'>('recientes')
 
-  const API_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || "http://localhost:10000"
+  const API_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || ""
+  const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || ""
 
   // Cargar sesiones guardadas del backend
   useEffect(() => {
@@ -32,7 +33,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
         const accessToken = localStorage.getItem("access_token")
         if (!accessToken) return
 
-        const res = await fetch(`${API_URL}/api/sessions`, {
+        const res = await fetch(`${AUTH_URL}/sessions?user_id=${user.email}`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -40,9 +41,18 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
 
         if (res.ok) {
           const data = await res.json()
-          // Filter out sessions by user_id. We fetch all from /api/sessions and filter locally.
-          const userSessions = data.filter((s: any) => s.user_id === user.email || !s.user_id)
-          setSavedSessions(userSessions)
+          // Extract session data from SessionOut structure { id, user_id, session_data }
+          const formattedSessions = data.map((s: any) => ({
+            id: s.id,
+            session_data: {
+              ...s.session_data,
+              id: s.id,
+              session_id: s.session_data?.session_id || s.id,
+              created_at: s.created_at
+            },
+            created_at: s.created_at
+          }))
+          setSavedSessions(formattedSessions)
         }
       } catch (err) {
         console.error("Error cargando sesiones:", err)

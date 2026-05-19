@@ -7,17 +7,61 @@ import { BookOpen, ThumbsUp, GraduationCap, Clock, Search, Share2, Eye, User, Fi
 import Link from "next/link"
 import { toast } from "sonner"
 
-export function PublicRepository() {
+interface PublicRepositoryProps {
+  user?: { name: string; email: string } | null
+  guestMode?: boolean
+  onLoginRequired?: () => void
+  onNavigateToGenerator?: () => void
+  onViewDashboard?: () => void
+  onLogout?: () => void
+}
+
+export function PublicRepository({
+  user: propUser,
+  guestMode: propGuestMode,
+  onLoginRequired,
+  onNavigateToGenerator,
+  onViewDashboard,
+  onLogout
+}: PublicRepositoryProps = {}) {
   const [sessions, setSessions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null)
+  const [guestMode, setGuestMode] = useState<boolean>(true)
+
+  useEffect(() => {
+    if (propUser !== undefined) {
+      setUser(propUser)
+    } else {
+      const storedUser = localStorage.getItem("user")
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser))
+        } catch (e) {
+          console.error("Error parsing stored user", e)
+        }
+      }
+    }
+  }, [propUser])
+
+  useEffect(() => {
+    if (propGuestMode !== undefined) {
+      setGuestMode(propGuestMode)
+    } else {
+      const accessToken = localStorage.getItem("access_token")
+      const storedUser = localStorage.getItem("user")
+      setGuestMode(!(accessToken && storedUser))
+    }
+  }, [propGuestMode])
+
   useEffect(() => {
     async function fetchPublicSessions() {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || "http://localhost:10000"
-        const res = await fetch(`${API_URL}/api/sessions`)
+        const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || ""
+        const res = await fetch(`${AUTH_URL}/sessions`)
         if (!res.ok) throw new Error("Error fetching sessions")
         const data = await res.json()
 
@@ -70,12 +114,83 @@ export function PublicRepository() {
             />
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <Link href="/">
-            <Button className="rounded-full bg-blue-600 text-white hover:bg-blue-700 font-bold px-6 text-sm shadow-md transition-all">
-              Crear Sesion
+        <div className="flex items-center gap-3">
+          {/* Dashboard Button */}
+          <Button
+            variant="ghost"
+            onClick={() => {
+              if (guestMode) {
+                if (onLoginRequired) {
+                  onLoginRequired()
+                } else {
+                  window.location.href = "/auth"
+                }
+              } else {
+                if (onViewDashboard) {
+                  onViewDashboard()
+                } else {
+                  window.location.href = "/" // Fallback to root dashboard
+                }
+              }
+            }}
+            className="text-slate-600 hover:text-slate-900 font-bold text-sm h-9 px-3"
+          >
+            Mi Dashboard
+          </Button>
+
+          {/* Crear Sesion Button */}
+          <Button
+            onClick={() => {
+              if (onNavigateToGenerator) {
+                onNavigateToGenerator()
+              } else {
+                window.location.href = "/" // Fallback to root generator
+              }
+            }}
+            className="rounded-full bg-blue-600 text-white hover:bg-blue-700 font-bold px-4 text-xs sm:text-sm h-9 shadow-sm transition-all"
+          >
+            Crear Sesión
+          </Button>
+
+          {/* User / Authentication Badge & Button */}
+          {guestMode ? (
+            <Button
+              onClick={() => {
+                if (onLoginRequired) {
+                  onLoginRequired()
+                } else {
+                  window.location.href = "/auth"
+                }
+              }}
+              className="rounded-full bg-slate-900 text-white hover:bg-slate-800 font-bold px-4 text-xs sm:text-sm h-9 shadow-sm transition-all"
+            >
+              Iniciar Sesión
             </Button>
-          </Link>
+          ) : (
+            <>
+              <div className="hidden sm:flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
+                <div className="bg-blue-100 p-1 rounded-full">
+                  <User className="h-3 w-3 text-blue-600" />
+                </div>
+                <span className="text-xs font-semibold text-slate-700 truncate max-w-[100px]">{user?.name}</span>
+              </div>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  if (onLogout) {
+                    onLogout()
+                  } else {
+                    localStorage.removeItem("user")
+                    localStorage.removeItem("access_token")
+                    window.location.href = "/"
+                  }
+                }}
+                className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-2 font-bold text-sm"
+              >
+                Salir
+              </Button>
+            </>
+          )}
         </div>
       </header>
 
@@ -129,7 +244,7 @@ export function PublicRepository() {
                 <div className="aspect-[3/4] bg-slate-50 border-b border-slate-100 relative p-6 flex flex-col">
                   <div className="absolute top-4 right-4 bg-white shadow-sm border border-slate-100 px-2 py-1 rounded-md flex items-center gap-1">
                     <ThumbsUp className="h-3 w-3 text-emerald-500" />
-                    <span className="text-xs font-bold text-slate-600">{s.session_data?.likes || Math.floor(Math.random() * 200)}</span>
+                    <span className="text-xs font-bold text-slate-600">{s.session_data?.likes || 0}</span>
                   </div>
 
                   <div className="flex-1 flex flex-col justify-center">

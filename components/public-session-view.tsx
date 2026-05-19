@@ -22,17 +22,23 @@ export function PublicSessionView({ id }: { id: string }) {
     ? JSON.parse(localStorage.getItem("user") || "null")
     : null
 
-  const API_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || "http://localhost:10000"
+  const API_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || ""
+  const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || ""
 
   const handleAddComment = async () => {
     if (!user) {
-      toast.error("Debes iniciar sesión para comentar.")
+      toast.error("Debes iniciar sesión para comentar.", {
+        action: {
+          label: "Iniciar Sesión",
+          onClick: () => window.location.href = "/auth"
+        }
+      })
       return
     }
     if (!newComment.trim()) return
 
     try {
-      const res = await fetch(`${API_URL}/api/sessions/${session.id}/comment`, {
+      const res = await fetch(`${AUTH_URL}/api/sessions/${session.id}/comment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ author: user?.name || "Anónimo", text: newComment })
@@ -49,12 +55,17 @@ export function PublicSessionView({ id }: { id: string }) {
 
   const handleLike = async () => {
     if (!user) {
-      toast.error("Debes iniciar sesión para valorar.")
+      toast.error("Debes iniciar sesión para valorar.", {
+        action: {
+          label: "Iniciar Sesión",
+          onClick: () => window.location.href = "/auth"
+        }
+      })
       return
     }
     if (liked) return
     try {
-      const res = await fetch(`${API_URL}/api/sessions/${session.id}/like`, { method: "POST" })
+      const res = await fetch(`${AUTH_URL}/api/sessions/${session.id}/like`, { method: "POST" })
       if (!res.ok) throw new Error("Error")
       const r = await res.json()
       setLikes(r.likes)
@@ -68,8 +79,7 @@ export function PublicSessionView({ id }: { id: string }) {
   useEffect(() => {
     async function fetchSession() {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || "http://localhost:10000"
-        const res = await fetch(`${API_URL}/api/sessions`)
+        const res = await fetch(`${AUTH_URL}/sessions`)
         if (!res.ok) throw new Error("Error fetching sessions")
         const data = await res.json()
 
@@ -90,7 +100,7 @@ export function PublicSessionView({ id }: { id: string }) {
     }
 
     fetchSession()
-  }, [id, API_URL])
+  }, [id, AUTH_URL])
 
   const handleEditOwner = () => {
     if (typeof window !== "undefined") {
@@ -153,7 +163,18 @@ export function PublicSessionView({ id }: { id: string }) {
               {copied ? <Check className="h-4 w-4 text-emerald-500 mr-2" /> : <LinkIcon className="h-4 w-4 mr-2" />}
               Compartir
             </Button>
-            <Button onClick={() => setShowPdf(true)} className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
+            <Button onClick={() => {
+              if (!user) {
+                toast.error("Debes iniciar sesión para descargar o ver el PDF.", {
+                  action: {
+                    label: "Iniciar Sesión",
+                    onClick: () => window.location.href = "/auth"
+                  }
+                })
+                return
+              }
+              setShowPdf(true)
+            }} className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
               <Download className="h-4 w-4 mr-2" />
               Ver y Descargar PDF
             </Button>
@@ -180,8 +201,16 @@ export function PublicSessionView({ id }: { id: string }) {
                     <div className="bg-slate-100 p-2 rounded-full"><User className="h-4 w-4 text-slate-500" /></div>
                     <span className="font-semibold text-slate-700">{s.author_name || "Docente"}</span>
                   </div>
-                  <button onClick={handleLike} className={`flex items-center gap-2 transition-colors ${liked ? "text-blue-600" : "text-slate-500 hover:text-blue-500"}`}>
-                    <ThumbsUp className={`h-4 w-4 ${liked ? "fill-current" : ""}`} /> {likes} valoraciones
+                  <button 
+                    onClick={handleLike} 
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-bold transition-all hover:scale-105 active:scale-95 ${
+                      liked 
+                        ? "bg-blue-50 border-blue-200 text-blue-600 shadow-sm" 
+                        : "bg-white border-slate-200 text-slate-500 hover:text-blue-500 hover:border-blue-200 shadow-sm"
+                    }`}
+                  >
+                    <ThumbsUp className={`h-3.5 w-3.5 ${liked ? "fill-current text-blue-600 animate-pulse" : ""}`} /> 
+                    <span>{likes} {likes === 1 ? "valoración" : "valoraciones"}</span>
                   </button>
                 </div>
 
@@ -327,7 +356,18 @@ export function PublicSessionView({ id }: { id: string }) {
                 <FileText className="w-16 h-16 text-blue-500 mx-auto mb-4" />
                 <h3 className="font-bold text-slate-800 text-lg mb-2">Obtener documento</h3>
                 <p className="text-sm text-slate-500 mb-6">Descarga esta sesión en formato oficial del MINEDU (PDF) para editar o imprimir.</p>
-                <Button onClick={() => setShowPdf(true)} className="w-full bg-blue-600 hover:bg-blue-700 shadow-md">
+                <Button onClick={() => {
+                  if (!user) {
+                    toast.error("Debes iniciar sesión para descargar o ver el PDF.", {
+                      action: {
+                        label: "Iniciar Sesión",
+                        onClick: () => window.location.href = "/auth"
+                      }
+                    })
+                    return
+                  }
+                  setShowPdf(true)
+                }} className="w-full bg-blue-600 hover:bg-blue-700 shadow-md">
                   <Download className="h-4 w-4 mr-2" />
                   Descargar PDF
                 </Button>

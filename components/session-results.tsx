@@ -61,7 +61,8 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
   const [publishConfirmed, setPublishConfirmed] = useState(false)
   const [activeTab, setActiveTab] = useState<'secuencia' | 'evaluacion' | 'recursos'>('secuencia')
   const contentRef = useRef<HTMLDivElement>(null)
-  const API_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || "http://localhost:10000"
+  const API_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || ""
+  const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || ""
 
   // Estados editables
   const [editedSession, setEditedSession] = useState<SessionData>(session)
@@ -125,7 +126,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
         session_data: payloadData,
       }
 
-      const res = await fetch(`${API_URL}/api/sessions/save`, {
+      const res = await fetch(`${AUTH_URL}/save-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

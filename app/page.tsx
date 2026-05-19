@@ -7,6 +7,9 @@ import { SessionGenerator } from "@/components/session-generator"
 import { SessionResults } from "@/components/session-results"
 import { TeacherDashboard } from "@/components/teacher-dashboard"
 import { LandingPage } from "@/components/landing-page"
+import { PublicRepository } from "@/components/public-repository"
+import { Button } from "@/components/ui/button"
+import { X } from "lucide-react"
 
 export type SessionData = {
   // Datos Generales
@@ -104,8 +107,10 @@ export type SessionData = {
 
 export default function Home() {
   const router = useRouter()
-  const [currentView, setCurrentView] = useState<"generator" | "results" | "dashboard">("generator")
+  const [currentView, setCurrentView] = useState<"landing" | "repository" | "generator" | "results" | "dashboard">("landing")
   const [user, setUser] = useState<{ name: string; email: string } | null>(null)
+  const [guestMode, setGuestMode] = useState<boolean>(false)
+  const [showLoginModal, setShowLoginModal] = useState<boolean>(false)
   const [currentSession, setCurrentSession] = useState<SessionData | null>(null)
   const [sessions, setSessions] = useState<SessionData[]>([])
   const [editingSession, setEditingSession] = useState<SessionData | null>(null)
@@ -121,6 +126,7 @@ export default function Home() {
       try {
         const userData = JSON.parse(storedUser)
         setUser(userData)
+        setGuestMode(false)
 
         const sessionToEdit = localStorage.getItem("session_to_edit")
         if (sessionToEdit) {
@@ -128,26 +134,33 @@ export default function Home() {
           setEditingSession(editData)
           setCurrentView("generator")
           localStorage.removeItem("session_to_edit")
+        } else {
+          setCurrentView("repository")
         }
       } catch (e) {
         console.error("Error restaurando sesión:", e)
       }
+    } else {
+      setCurrentView("landing")
     }
     setIsCheckingAuth(false)
   }, [])
 
   const handleLogin = (userData: { name: string; email: string }) => {
     setUser(userData)
-    setCurrentView("generator")
+    setGuestMode(false)
+    setCurrentView("repository")
   }
 
   const handleLogout = () => {
     setUser(null)
+    setGuestMode(false)
     localStorage.removeItem("user")
     localStorage.removeItem("access_token")
     setCurrentSession(null)
     setSessions([])
     setEditingSession(null)
+    setCurrentView("landing")
     router.push("/")
   }
 
@@ -165,11 +178,15 @@ export default function Home() {
   }
 
   const handleViewDashboard = () => {
-    setCurrentView("dashboard")
+    if (guestMode) {
+      triggerLoginModal()
+    } else {
+      setCurrentView("dashboard")
+    }
   }
 
   const handleBackFromDashboard = () => {
-    setCurrentView("generator")
+    setCurrentView("repository")
   }
 
   const handleEditSession = (session: SessionData) => {
@@ -183,6 +200,10 @@ export default function Home() {
     setCurrentView("results")
   }
 
+  const triggerLoginModal = () => {
+    setShowLoginModal(true)
+  }
+
   if (isCheckingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -191,37 +212,110 @@ export default function Home() {
     )
   }
 
-  if (!user) {
-    return <LandingPage />
-  }
-
-  if (currentView === "generator") {
+  if (!user && !guestMode) {
     return (
-      <SessionGenerator
-        user={user!}
-        onSessionGenerated={handleSessionGenerated}
-        onViewDashboard={handleViewDashboard}
-        onLogout={handleLogout}
-        editingSession={editingSession}
+      <LandingPage
+        onEnterGeneratorPreview={() => {
+          setGuestMode(true)
+          setCurrentView("generator")
+        }}
+        onEnterRepositoryPreview={() => {
+          setGuestMode(true)
+          setCurrentView("repository")
+        }}
+        onLogin={() => router.push("/auth")}
       />
     )
   }
 
-  if (currentView === "results" && currentSession) {
-    return (
-      <SessionResults
-        session={currentSession}
-        isSavedSession={viewingSavedSession}
-        onBack={handleBackToGenerator}
-        onViewDashboard={handleViewDashboard}
-        onEdit={() => handleEditSession(currentSession)}
-      />
-    )
-  }
+  return (
+    <>
+      {currentView === "repository" && (
+        <PublicRepository
+          user={user}
+          guestMode={guestMode}
+          onLoginRequired={triggerLoginModal}
+          onNavigateToGenerator={() => setCurrentView("generator")}
+          onViewDashboard={handleViewDashboard}
+          onLogout={handleLogout}
+        />
+      )}
 
-  if (currentView === "dashboard") {
-    return <TeacherDashboard user={user!} sessions={sessions} onBack={handleBackFromDashboard} onOpenSession={handleOpenSavedSession} />
-  }
+      {currentView === "generator" && (
+        <SessionGenerator
+          user={user}
+          guestMode={guestMode}
+          onLoginRequired={triggerLoginModal}
+          onSessionGenerated={handleSessionGenerated}
+          onViewDashboard={handleViewDashboard}
+          onLogout={handleLogout}
+          editingSession={editingSession}
+        />
+      )}
 
-  return null
+      {currentView === "results" && currentSession && (
+        <SessionResults
+          session={currentSession}
+          isSavedSession={viewingSavedSession}
+          onBack={handleBackToGenerator}
+          onViewDashboard={handleViewDashboard}
+          onEdit={() => handleEditSession(currentSession)}
+        />
+      )}
+
+      {currentView === "dashboard" && (
+        <TeacherDashboard
+          user={user!}
+          sessions={sessions}
+          onBack={handleBackFromDashboard}
+          onOpenSession={handleOpenSavedSession}
+        />
+      )}
+
+      {/* Sleek Visual Login Gate Modal for Guests */}
+      {showLoginModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="bg-white border border-slate-200 shadow-2xl max-w-sm w-full rounded-[2rem] p-8 flex flex-col items-center text-center relative animate-in zoom-in-95 duration-300">
+            <button 
+              onClick={() => setShowLoginModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors p-1"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <div className="mb-4">
+              <img
+                src="/pinguinos/pinguino_chill.png"
+                alt="Pingüino Chill"
+                className="w-28 h-28 object-contain animate-bounce"
+              />
+            </div>
+            <h3 className="text-2xl font-black text-slate-800 mb-2 leading-tight">
+              ¡Planifica sin límites!
+            </h3>
+            <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+              Inicia sesión de forma gratuita para generar sesiones de aprendizaje estructuradas con IA, descargar tus PDFs oficiales del MINEDU y guardar tus materiales preferidos en el repositorio.
+            </p>
+            <div className="flex flex-col gap-3 w-full">
+              <Button
+                onClick={() => {
+                  setShowLoginModal(false)
+                  router.push("/auth")
+                }}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl text-sm shadow-md transition-all hover:scale-102 active:scale-98"
+              >
+                Iniciar Sesión gratis
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setShowLoginModal(false)}
+                className="w-full text-slate-500 hover:text-slate-800 font-semibold h-10 text-sm"
+              >
+                Continuar explorando
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
 }
