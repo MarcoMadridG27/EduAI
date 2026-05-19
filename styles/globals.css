@@ -4,16 +4,36 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* Custom palette provided by user */
+  --molten-lava: #780000ff;
+  --brick-red: #c1121fff;
+  --papaya-whip: #fdf0d5ff;
+  --deep-space-blue: #003049ff;
+  --steel-blue: #669bbcff;
+
+  /* Map app semantic colors to the palette (light mode)
+     - primary: steel blue (main)
+     - secondary: deep space blue (complement)
+     - accent: molten lava / brick for highlights when needed
+  */
+  --primary: var(--steel-blue);
+  --primary-foreground: var(--papaya-whip);
+  --secondary: var(--deep-space-blue);
+  --secondary-foreground: var(--papaya-whip);
+  --accent: var(--brick-red);
+  --accent-foreground: var(--papaya-whip);
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
+  /* Ensure semantic tokens point to the palette */
+  --primary: var(--steel-blue);
+  --primary-foreground: var(--papaya-whip);
+  --secondary: var(--deep-space-blue);
+  --secondary-foreground: var(--papaya-whip);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.97 0 0);
@@ -40,16 +60,31 @@
 }
 
 .dark {
+  /* Dark theme mappings using the palette */
+  --molten-lava: #780000ff;
+  --brick-red: #c1121fff;
+  --papaya-whip: #fdf0d5ff;
+  --deep-space-blue: #003049ff;
+  --steel-blue: #669bbcff;
+
+  --primary: var(--deep-space-blue);
+  --primary-foreground: var(--papaya-whip);
+  --secondary: var(--steel-blue);
+  --secondary-foreground: var(--papaya-whip);
+  --accent: var(--molten-lava);
+  --accent-foreground: var(--papaya-whip);
+
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.145 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.145 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
+  /* Dark theme semantic tokens map to palette */
+  --primary: var(--deep-space-blue);
+  --primary-foreground: var(--papaya-whip);
+  --secondary: var(--steel-blue);
+  --secondary-foreground: var(--papaya-whip);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);

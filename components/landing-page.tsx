@@ -66,16 +66,9 @@ export function LandingPage() {
         <div className="flex items-center">
           <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
         </div>
-        
-        {/* Hidden on mobile, flex on desktop */}
-        <nav className="hidden md:flex gap-8 text-sm font-semibold text-muted-foreground">
-          <a href="#" className="hover:text-foreground transition-colors">Inicio</a>
-          <a href="#" className="hover:text-foreground transition-colors">Generador</a>
-          <a href="#" className="hover:text-foreground transition-colors">Repositorio</a>
-        </nav>
 
         <div className="flex items-center gap-4">
-          <Button onClick={handleLogin} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-8 py-5 shadow-lg transition-all hover:scale-105 active:scale-95">
+          <Button onClick={handleLogin} className="rounded-full text-primary-foreground hover:bg-primary/90 font-bold px-8 py-5 shadow-lg transition-all hover:scale-105 active:scale-95" style={{ color: '#003049' }}>
             Iniciar Sesión
           </Button>
         </div>
@@ -84,68 +77,53 @@ export function LandingPage() {
       {/* Hero Section */}
       <section className="px-4 lg:px-8 pb-12 pt-6">
         <motion.div 
-          initial={{ opacity: 0, y: 50, scale: 0.98 }}
+          initial={{ opacity: 0, y: 70, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1, type: "spring" }}
           className="relative w-full h-[70vh] min-h-[550px] rounded-[3rem] overflow-hidden flex flex-col items-center justify-center text-center shadow-xl border border-border bg-card"
+          style={{
+            backgroundImage: "url('/blu.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
         >
           {/* Background Gradient/Pattern instead of travel photo */}
           <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10 opacity-50"></div>
           
           <div className="relative z-10 px-4 max-w-4xl mx-auto flex flex-col items-center mt-10">
-            <motion.div 
-               initial={{ opacity: 0, y: 20 }}
-               animate={{ opacity: 1, y: 0 }}
-               transition={{ delay: 0.2 }}
-               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold mb-6 border border-primary/20"
-            >
-              <Sparkles className="h-4 w-4" /> La revolución en la educación
-            </motion.div>
-            
             <motion.h1 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, type: "spring", bounce: 0.5 }}
-              className="text-5xl md:text-7xl font-black text-foreground tracking-tighter mb-6 leading-tight"
+              className="text-4xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-6 leading-tight font-serif"
+              style={{ color: '#003049' }}
             >
-              Potencia tus clases con <br className="hidden md:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Inteligencia Artificial</span>
+              Sesion+ <br className="hidden md:block" />
             </motion.h1>
             
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl font-medium"
-            >
+            <text className="text-lg md:text-xl mb-8 max-w-2xl">
               Genera sesiones de aprendizaje estructuradas en segundos. Alineadas al currículo nacional, con procesos didácticos exactos y adaptadas a tu entorno.
-            </motion.p>
-            
+            </text>
+
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <Button onClick={handleLogin} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-8 py-6 text-lg shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95">
+              <Button
+                onClick={handleLogin}
+                className="rounded-full font-bold px-8 py-6 text-lg shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95"
+                style={{ backgroundColor: '#2A5D78', color: 'var(--papaya-whip)' }}
+              >
                 Comenzar ahora
               </Button>
-              <Button onClick={handleLogin} variant="outline" className="rounded-full border-2 font-bold px-8 py-6 text-lg transition-all hover:scale-105 active:scale-95 bg-background">
+              <Button onClick={handleLogin} variant="outline" className="rounded-full border-2 font-bold px-8 py-6 text-lg transition-all hover:scale-105 active:scale-90" style={{ backgroundColor: 'var(--papaya-whip)', color: 'var(--deep-space-blue)', borderColor: 'var(--border)' }}>
                 Explorar Repositorio
               </Button>
             </motion.div>
           </div>
-
-          {/* Mascot (Pinguino) */}
-          <motion.img
-             initial={{ opacity: 0, scale: 0, rotate: -20 }}
-             animate={{ opacity: 1, scale: 1, rotate: 0 }}
-             transition={{ delay: 1, type: "spring", bounce: 0.6, duration: 1.5 }}
-             whileHover={{ scale: 1.1, rotate: 5 }}
-             src="/pinguinos/pinguino_celebrando.png"
-             alt="Mascota celebrando"
-             className="absolute bottom-10 right-10 w-32 h-32 md:w-48 md:h-48 drop-shadow-xl z-20 cursor-pointer object-contain"
-          />
         </motion.div>
       </section>
 
@@ -213,14 +191,14 @@ export function LandingPage() {
                 <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider leading-tight mt-1">Docentes<br/>Activos</span>
               </div>
               <div className="flex flex-col items-center text-center">
-                <div className="w-14 h-14 rounded-full bg-secondary/10 text-secondary flex items-center justify-center mb-3">
+                <div className="w-14 h-14 rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: 'var(--papaya-whip)', color: 'var(--deep-space-blue)' }}>
                   <Layers className="w-6 h-6" />
                 </div>
                 <span className="text-xl font-black text-foreground">50k+</span>
                 <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider leading-tight mt-1">Sesiones<br/>Generadas</span>
               </div>
               <div className="flex flex-col items-center text-center">
-                <div className="w-14 h-14 rounded-full bg-accent/10 text-accent flex items-center justify-center mb-3">
+                <div className="w-14 h-14 rounded-full p-4 shrink-0" style={{ backgroundColor: 'var(--brick-red)', color: 'var(--papaya-whip)' }}>
                   <Target className="w-6 h-6" />
                 </div>
                 <span className="text-xl font-black text-foreground">100%</span>
@@ -242,8 +220,8 @@ export function LandingPage() {
               whileHover={{ scale: 1.03, x: -10 }}
               className="bg-card border border-border rounded-[2rem] p-6 flex items-center gap-6 shadow-md cursor-pointer transition-all"
             >
-              <div className="bg-primary/10 p-4 rounded-2xl shrink-0">
-                <BrainCircuit className="w-8 h-8 text-primary" />
+              <div className="p-4 rounded-2xl shrink-0" style={{ backgroundColor: 'var(--brick-red)', color: 'var(--papaya-whip)' }}>
+                <BrainCircuit className="w-8 h-8" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-foreground mb-1">Generador Inteligente</h3>
@@ -340,14 +318,14 @@ export function LandingPage() {
                 
                 <div className="p-5 flex-1 relative z-10 flex flex-col justify-between">
                   <div>
-                    <div className="inline-block bg-background/80 backdrop-blur-md px-3 py-1 rounded-full text-foreground text-[10px] font-bold tracking-wide mb-3 border border-border shadow-sm">
+                    <div className="inline-block backdrop-blur-md px-3 py-1 rounded-full text-foreground text-[10px] font-bold tracking-wide mb-3 border border-border shadow-sm" style={i === 0 ? { backgroundColor: 'var(--papaya-whip)', color: 'var(--deep-space-blue)' } : undefined}>
                       {item.area}
                     </div>
                     <h4 className="text-xl font-bold mb-1 text-foreground leading-tight group-hover:text-primary transition-colors">{item.title}</h4>
                     <p className="text-xs text-muted-foreground font-medium mb-2">{item.sub}</p>
                   </div>
                   
-                  <div className="flex items-center gap-1 text-xs font-bold text-yellow-500">
+                  <div className="flex items-center gap-1 text-xs font-bold" style={{ color: 'var(--brick-red)' }}>
                     ★ {item.rating}
                   </div>
                 </div>
