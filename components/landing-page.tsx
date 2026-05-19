@@ -60,15 +60,15 @@ export function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground pb-20 pt-[88px] overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground pb-20 pt-12 overflow-x-hidden">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 w-full bg-background/80 backdrop-blur-md py-4 px-6 lg:px-12 flex items-center justify-between z-50 border-b border-border">
+      <header className="fixed top-0 left-0 right-0 w-full bg-background/80 backdrop-blur-md pb-6 px-6 lg:px-12 h-12 md:h-14 lg:h-16 flex items-center justify-between z-50 border-b border-border">
         <div className="flex items-center">
-          <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
+          <img src="/sesion_+.png" alt="Sesión+" className="h-20 md:h-24 lg:h-28 w-auto object-contain drop-shadow-sm translate-y-2 md:translate-y-3 lg:translate-y-4" />
         </div>
 
         <div className="flex items-center gap-4">
-          <Button onClick={handleLogin} className="rounded-full text-primary-foreground hover:bg-primary/90 font-bold px-8 py-5 shadow-lg transition-all hover:scale-105 active:scale-95" style={{ color: '#003049' }}>
+          <Button onClick={handleLogin} className="rounded-full text-primary-foreground hover:bg-primary/90 font-bold pt-8 px-8 py-5  shadow-lg transition-all hover:scale-105 active:scale-95" style={{ color: '#003049' }}>
             Iniciar Sesión
           </Button>
         </div>

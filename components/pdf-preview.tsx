@@ -278,22 +278,22 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
                   <thead>
                     <tr className="bg-[#1976D2] text-white">
                       <th className="py-1.5 px-2 font-semibold text-center border-r border-[#1565C0] text-[8pt]">CRITERIOS / ÍTEMS A EVALUAR</th>
-                      {data.recursosAdicionales.instrumentoEvaluacionGenerado.escalas_o_niveles.map(e => (
-                        <th key={e} className="py-1.5 px-2 font-semibold text-center border-r border-[#1565C0] last:border-r-0 text-[8pt]">{e}</th>
-                      ))}
+                      {(data.recursosAdicionales!.instrumentoEvaluacionGenerado?.escalas_o_niveles || []).map((e: string) => (
+                          <th key={e} className="py-1.5 px-2 font-semibold text-center border-r border-[#1565C0] last:border-r-0 text-[8pt]">{e}</th>
+                        ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {data.recursosAdicionales.instrumentoEvaluacionGenerado.criterios_o_items.map((c, i) => (
+                    {(data.recursosAdicionales!.instrumentoEvaluacionGenerado?.criterios_o_items || []).map((c: string, i: number) => (
                       <tr key={i} className="bg-[#E3F2FD] align-top border border-[#90A4AE]">
                         <td className="py-2 px-2 border-r border-[#90A4AE]">
                           <EF value={c} onChange={v => {
-                            const newCrits = [...data.recursosAdicionales!.instrumentoEvaluacionGenerado.criterios_o_items];
+                            const newCrits = [...(data.recursosAdicionales!.instrumentoEvaluacionGenerado?.criterios_o_items || [])];
                             newCrits[i] = v;
                             setData(p => ({...p, recursosAdicionales: {...p.recursosAdicionales!, instrumentoEvaluacionGenerado: {...p.recursosAdicionales!.instrumentoEvaluacionGenerado, criterios_o_items: newCrits}}}));
                           }} multiline />
                         </td>
-                        {data.recursosAdicionales!.instrumentoEvaluacionGenerado.escalas_o_niveles.map((_, j) => (
+                        {(data.recursosAdicionales!.instrumentoEvaluacionGenerado?.escalas_o_niveles || []).map((_, j: number) => (
                           <td key={j} className="border-r border-[#90A4AE] last:border-r-0 bg-white min-w-[30px]"></td>
                         ))}
                       </tr>

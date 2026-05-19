@@ -459,9 +459,9 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                                 <span className="bg-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">1</span> INICIO
                               </h4>
                               {isEditing ? (
-                                <Textarea value={editedSession.secuenciaMetodologica.inicio} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: {...editedSession.secuenciaMetodologica, inicio: e.target.value}})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
+                                <Textarea value={editedSession.secuenciaMetodologica?.inicio ?? ""} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: { ...(editedSession.secuenciaMetodologica || {}), inicio: e.target.value }})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                               ) : (
-                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{__html: editedSession.secuenciaMetodologica.inicio.replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-blue-600'>$1</strong>").replaceAll("\n", "<br>")}} />
+                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{__html: (editedSession.secuenciaMetodologica?.inicio ?? "").replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-blue-600'>$1</strong>").replaceAll("\n", "<br>")}} />
                               )}
                             </div>
                             {/* DESARROLLO */}
@@ -470,9 +470,9 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                                 <span className="bg-indigo-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">2</span> DESARROLLO
                               </h4>
                               {isEditing ? (
-                                <Textarea value={editedSession.secuenciaMetodologica.desarrollo} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: {...editedSession.secuenciaMetodologica, desarrollo: e.target.value}})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
+                                <Textarea value={editedSession.secuenciaMetodologica?.desarrollo ?? ""} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: { ...(editedSession.secuenciaMetodologica || {}), desarrollo: e.target.value }})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                               ) : (
-                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{__html: editedSession.secuenciaMetodologica.desarrollo.replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-indigo-600'>$1</strong>").replaceAll("\n", "<br>")}} />
+                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{__html: (editedSession.secuenciaMetodologica?.desarrollo ?? "").replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-indigo-600'>$1</strong>").replaceAll("\n", "<br>")}} />
                               )}
                             </div>
                             {/* CIERRE */}
@@ -481,9 +481,9 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                                 <span className="bg-emerald-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">3</span> CIERRE
                               </h4>
                               {isEditing ? (
-                                <Textarea value={editedSession.secuenciaMetodologica.cierre} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: {...editedSession.secuenciaMetodologica, cierre: e.target.value}})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
+                                <Textarea value={editedSession.secuenciaMetodologica?.cierre ?? ""} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: { ...(editedSession.secuenciaMetodologica || {}), cierre: e.target.value }})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                               ) : (
-                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{__html: editedSession.secuenciaMetodologica.cierre.replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-emerald-600'>$1</strong>").replaceAll("\n", "<br>")}} />
+                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{__html: (editedSession.secuenciaMetodologica?.cierre ?? "").replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-emerald-600'>$1</strong>").replaceAll("\n", "<br>")}} />
                               )}
                             </div>
                           </div>

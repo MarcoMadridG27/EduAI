@@ -11,11 +11,11 @@ import { LandingPage } from "@/components/landing-page"
 export type SessionData = {
   // Datos Generales
   datosGenerales?: {
-    titulo: string
-    docente: string
-    fecha: string
-    grado: string
-    seccion: string
+    titulo?: string
+    docente?: string
+    fecha?: string
+    grado?: string
+    seccion?: string
   }
 
   // Inputs del formulario
@@ -37,9 +37,9 @@ export type SessionData = {
   evidenciasAprendizaje?: string
   propositoSesion?: string
   secuenciaMetodologica?: {
-    inicio: string
-    desarrollo: string
-    cierre: string
+    inicio?: string
+    desarrollo?: string
+    cierre?: string
   }
   procesosDidacticos?: string[]
   actividadesContextualizadas?: string[]
@@ -74,6 +74,11 @@ export type SessionData = {
       nombre: string
       materiales: string[]
       instrucciones: string[]
+    }
+    instrumentoEvaluacionGenerado?: {
+      tipo_instrumento?: string
+      escalas_o_niveles?: string[]
+      criterios_o_items?: string[]
     }
   }
 

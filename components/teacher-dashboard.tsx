@@ -66,7 +66,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     // Inicializar los últimos 6 meses para que el gráfico no esté vacío
     const currentMonth = new Date().getMonth();
-    const data = [];
+    const data: { name: string; sesiones: number }[] = [];
     for(let i = 5; i >= 0; i--) {
         const mIndex = (currentMonth - i + 12) % 12;
         data.push({ name: months[mIndex], sesiones: 0 });
