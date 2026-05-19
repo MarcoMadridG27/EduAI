@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { LoginScreen } from "@/components/login-screen"
 import { SessionGenerator } from "@/components/session-generator"
 import { SessionResults } from "@/components/session-results"
 import { TeacherDashboard } from "@/components/teacher-dashboard"
@@ -19,6 +18,14 @@ export type SessionData = {
     fecha?: string
     grado?: string
     seccion?: string
+    area?: string
+    unidad?: string
+    sesion_num?: string
+    ie?: string
+    ugel?: string
+    lugar?: string
+    duracion?: string
+    ciclo?: string
   }
 
   // Inputs del formulario
@@ -48,6 +55,14 @@ export type SessionData = {
   actividadesContextualizadas?: string[]
   distribucionHoras?: string
   materialesDidacticosSugeridos?: string[]
+
+  // Preview & Contextual editable fields
+  actividades_previas?: string
+  actitudes_observables?: string
+  duracion_inicio?: string
+  duracion_desarrollo?: string
+  duracion_cierre?: string
+  extension?: string
 
   // Recursos Adicionales
   recursosAdicionales?: {
@@ -146,11 +161,6 @@ export default function Home() {
     setIsCheckingAuth(false)
   }, [])
 
-  const handleLogin = (userData: { name: string; email: string }) => {
-    setUser(userData)
-    setGuestMode(false)
-    setCurrentView("repository")
-  }
 
   const handleLogout = () => {
     setUser(null)

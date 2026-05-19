@@ -4,26 +4,25 @@ import { useEffect, useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Clock, Calendar, BookOpen, Users, Target, Brain, Sparkles, TrendingUp, Loader2, BarChart3, PieChart as PieChartIcon, LayoutDashboard, Filter, Share2, ThumbsUp, Heart } from "lucide-react"
+import { ArrowLeft, Clock, BookOpen, Users, Target, Brain, Sparkles, Loader2, BarChart3, PieChart as PieChartIcon, Filter, Share2, Heart } from "lucide-react"
 import type { SessionData } from "@/app/page"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 
 interface TeacherDashboardProps {
-  user: { name: string; email: string }
-  sessions: SessionData[]
-  onBack: () => void
-  onOpenSession: (session: SessionData) => void
+  readonly user: { readonly name: string; readonly email: string }
+  readonly sessions: readonly SessionData[]
+  readonly onBack: () => void
+  readonly onOpenSession: (session: SessionData) => void
 }
 
 const COLORS = ['#2563eb', '#4f46e5', '#10b981', '#8b5cf6', '#ec4899', '#f97316'];
 
-export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: TeacherDashboardProps) {
+export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Readonly<TeacherDashboardProps>) {
   const [savedSessions, setSavedSessions] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'overview' | 'sessions'>('overview')
   const [groupBy, setGroupBy] = useState<'recientes' | 'bimestre' | 'curso'>('recientes')
 
-  const API_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || ""
   const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || ""
 
   // Cargar sesiones guardadas del backend
@@ -62,13 +61,13 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
     }
 
     loadSessions()
-  }, [user.email, API_URL])
+  }, [user.email, AUTH_URL])
 
   // KPIs
   const totalSessions = savedSessions.length
   const timesSaved = totalSessions * 45 // 45 minutos por sesión
-  const competenciasUsadas = [...new Set(savedSessions.flatMap((s) => s.session_data?.competenciasSeleccionadas || []))].length
-  const contextsUsed = [...new Set(savedSessions.map((s) => s.session_data?.contexto).filter(Boolean))].length
+  const competenciasUsadas = new Set(savedSessions.flatMap((s) => s.session_data?.competenciasSeleccionadas || [])).size
+  const contextsUsed = new Set(savedSessions.map((s) => s.session_data?.contexto).filter(Boolean)).size
 
   const sesionesPublicadas = savedSessions.filter(s => s.session_data?.is_public).length
   const totalLikes = savedSessions.reduce((acc, s) => acc + (s.session_data?.likes || 0), 0)
@@ -92,7 +91,9 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
         if (entry) {
           entry.sesiones += 1;
         }
-      } catch (e) { }
+      } catch (e) {
+        console.warn("Error parsing session created_at date:", e);
+      }
     });
     return data;
   }, [savedSessions]);
@@ -108,19 +109,18 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
 
   const topCompetencies = useMemo(() => {
     const counts: Record<string, number> = {};
-    savedSessions.forEach(item => {
-      const comps = item.session_data?.competenciasSeleccionadas || [];
-      comps.forEach((c: string) => {
-        // Acortar nombre para el gráfico
-        let shortName = c;
-        if (c.includes("Resuelve problemas de cantidad")) shortName = "Cantidad";
-        else if (c.includes("regularidad, equivalencia y cambio")) shortName = "Regularidad y Cambio";
-        else if (c.includes("forma, movimiento y localización")) shortName = "Forma y Movimiento";
-        else if (c.includes("gestión de datos e incertidumbre")) shortName = "Datos e Incertidumbre";
-        else shortName = c.substring(0, 20) + "...";
+    const compsList = savedSessions.flatMap(item => item.session_data?.competenciasSeleccionadas || []);
+    
+    compsList.forEach((c: string) => {
+      // Acortar nombre para el gráfico
+      let shortName: string;
+      if (c.includes("Resuelve problemas de cantidad")) shortName = "Cantidad";
+      else if (c.includes("regularidad, equivalencia y cambio")) shortName = "Regularidad y Cambio";
+      else if (c.includes("forma, movimiento y localización")) shortName = "Forma y Movimiento";
+      else if (c.includes("gestión de datos e incertidumbre")) shortName = "Datos e Incertidumbre";
+      else shortName = c.substring(0, 20) + "...";
 
-        counts[shortName] = (counts[shortName] || 0) + 1;
-      });
+      counts[shortName] = (counts[shortName] || 0) + 1;
     });
     return Object.entries(counts).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value).slice(0, 5);
   }, [savedSessions]);
@@ -163,6 +163,99 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
 
     return { 'Sesiones': savedSessions };
   }, [savedSessions, groupBy]);
+
+  const renderSessionCard = (item: any, index: number) => {
+    const session = item.session_data
+    return (
+      <button
+        key={item.id}
+        onClick={() => onOpenSession(session)}
+        className="w-full text-left p-5 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all duration-200 border-l-4 group"
+        style={{ borderLeftColor: COLORS[index % COLORS.length] }}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-3">
+          <div>
+            <h4 className="font-bold text-lg text-slate-800 group-hover:text-blue-700 transition-colors">
+              {session.tema}
+            </h4>
+            <p className="text-sm text-slate-500 font-medium mt-1">
+              Ciclo {session.ciclo} • {formatDate(item.created_at)}
+            </p>
+          </div>
+          <Badge className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 shadow-sm shrink-0">
+            <Brain className="h-3 w-3 mr-1" />
+            IA + Currículo
+          </Badge>
+        </div>
+
+        <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed bg-slate-50 rounded p-2 mb-3">
+          {session.competenciaDescripcion || "Sesión generada con inteligencia artificial."}
+        </p>
+
+        <div className="flex flex-wrap gap-2 items-center text-xs text-slate-500">
+          <span className="flex items-center">
+            <Clock className="h-3 w-3 mr-1" /> {session.horasClase} h
+          </span>
+          <span className="text-slate-300">•</span>
+          <span className="flex items-center line-clamp-1 max-w-[200px]">
+            <Users className="h-3 w-3 mr-1 shrink-0" /> {session.contexto}
+          </span>
+        </div>
+      </button>
+    )
+  }
+
+  const renderSessionList = () => {
+    if (isLoading) {
+      return (
+        <div className="text-center py-12 bg-white rounded-xl border border-slate-200 shadow-sm">
+          <Loader2 className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-spin" />
+          <p className="text-slate-500 font-medium">Cargando repositorio...</p>
+        </div>
+      )
+    }
+    if (Object.keys(groupedSessions).length === 0 || savedSessions.length === 0) {
+      return (
+        <div className="text-center py-16 px-4 bg-white rounded-xl border border-slate-200 shadow-sm">
+          <div className="mx-auto mb-6 flex items-center justify-center">
+            <img src="/pinguinos/pinguino_chill.png" alt="Pingüino" className="w-32 h-32 object-contain opacity-80" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">
+            Aún no tienes sesiones guardadas
+          </h3>
+          <p className="text-slate-500 mb-8 max-w-md mx-auto">
+            Genera y guarda sesiones de aprendizaje personalizadas con Inteligencia Artificial basadas en el CNEB.
+          </p>
+          <Button
+            onClick={onBack}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md rounded-xl h-12 px-6"
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Crear Primera Sesión
+          </Button>
+        </div>
+      )
+    }
+    return (
+      <div className="space-y-8">
+        {Object.entries(groupedSessions).map(([groupName, groupSessions]) => (
+          <div key={groupName} className="space-y-4">
+            <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+              {groupName}
+              <span className="text-sm font-normal text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full ml-2">
+                {groupSessions.length}
+              </span>
+            </h3>
+
+            <div className="grid grid-cols-1 gap-3">
+              {groupSessions.map((item, index) => renderSessionCard(item, index))}
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   const formatDate = (dateString: string) => {
     try {
@@ -392,7 +485,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
                               dataKey="value"
                             >
                               {activityByCycle.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                <Cell key={`cell-${entry.name}`} fill={COLORS[index % COLORS.length]} />
                               ))}
                             </Pie>
                             <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
@@ -428,7 +521,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
                             <Tooltip cursor={{ fill: '#f1f5f9' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
                             <Bar dataKey="value" fill="#10b981" radius={[0, 4, 4, 0]} barSize={24}>
                               {topCompetencies.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+                                <Cell key={`cell-${entry.name}`} fill={COLORS[(index + 2) % COLORS.length]} />
                               ))}
                             </Bar>
                           </BarChart>
@@ -476,88 +569,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
               </div>
 
               {/* Lista de Sesiones */}
-              {isLoading ? (
-                <div className="text-center py-12 bg-white rounded-xl border border-slate-200 shadow-sm">
-                  <Loader2 className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-spin" />
-                  <p className="text-slate-500 font-medium">Cargando repositorio...</p>
-                </div>
-              ) : Object.keys(groupedSessions).length === 0 || savedSessions.length === 0 ? (
-                <div className="text-center py-16 px-4 bg-white rounded-xl border border-slate-200 shadow-sm">
-                  <div className="mx-auto mb-6 flex items-center justify-center">
-                    <img src="/pinguinos/pinguino_chill.png" alt="Pingüino" className="w-32 h-32 object-contain opacity-80" />
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-800 mb-2">
-                    Aún no tienes sesiones guardadas
-                  </h3>
-                  <p className="text-slate-500 mb-8 max-w-md mx-auto">
-                    Genera y guarda sesiones de aprendizaje personalizadas con Inteligencia Artificial basadas en el CNEB.
-                  </p>
-                  <Button
-                    onClick={onBack}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md rounded-xl h-12 px-6"
-                  >
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Crear Primera Sesión
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-8">
-                  {Object.entries(groupedSessions).map(([groupName, groupSessions]) => (
-                    <div key={groupName} className="space-y-4">
-                      <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2">
-                        <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                        {groupName}
-                        <span className="text-sm font-normal text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full ml-2">
-                          {groupSessions.length}
-                        </span>
-                      </h3>
-
-                      <div className="grid grid-cols-1 gap-3">
-                        {groupSessions.map((item, index) => {
-                          const session = item.session_data
-                          return (
-                            <button
-                              key={index}
-                              onClick={() => onOpenSession(session)}
-                              className="w-full text-left p-5 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all duration-200 border-l-4 group"
-                              style={{ borderLeftColor: COLORS[index % COLORS.length] }}
-                            >
-                              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-3">
-                                <div>
-                                  <h4 className="font-bold text-lg text-slate-800 group-hover:text-blue-700 transition-colors">
-                                    {session.tema}
-                                  </h4>
-                                  <p className="text-sm text-slate-500 font-medium mt-1">
-                                    Ciclo {session.ciclo} • {formatDate(item.created_at)}
-                                  </p>
-                                </div>
-                                <Badge className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 shadow-sm shrink-0">
-                                  <Brain className="h-3 w-3 mr-1" />
-                                  IA + Currículo
-                                </Badge>
-                              </div>
-
-                              <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed bg-slate-50 rounded p-2 mb-3">
-                                {session.competenciaDescripcion || "Sesión generada con inteligencia artificial."}
-                              </p>
-
-                              <div className="flex flex-wrap gap-2 items-center text-xs text-slate-500">
-                                <span className="flex items-center">
-                                  <Clock className="h-3 w-3 mr-1" /> {session.horasClase} h
-                                </span>
-                                <span className="text-slate-300">•</span>
-                                <span className="flex items-center line-clamp-1 max-w-[200px]">
-                                  <Users className="h-3 w-3 mr-1 shrink-0" /> {session.contexto}
-                                </span>
-                              </div>
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              {renderSessionList()}
             </div>
           )}
 

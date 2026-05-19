@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { ArrowLeft, Download, Share2, ThumbsUp, User, BookOpen, Check, Link as LinkIcon, FileText, MessageSquare, Send } from "lucide-react"
+import { ArrowLeft, Download, ThumbsUp, User, BookOpen, Check, Link as LinkIcon, FileText, MessageSquare, Send } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { PdfPreview } from "@/components/pdf-preview"
 
-export function PublicSessionView({ id }: { id: string }) {
+export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
   const [session, setSession] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
@@ -18,11 +18,10 @@ export function PublicSessionView({ id }: { id: string }) {
   const [likes, setLikes] = useState(0)
   const [liked, setLiked] = useState(false)
 
-  const user = typeof window !== "undefined" && localStorage.getItem("user")
+  const user = globalThis.window !== undefined && localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user") || "null")
     : null
 
-  const API_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || ""
   const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || ""
 
   const handleAddComment = async () => {
@@ -30,7 +29,7 @@ export function PublicSessionView({ id }: { id: string }) {
       toast.error("Debes iniciar sesión para comentar.", {
         action: {
           label: "Iniciar Sesión",
-          onClick: () => window.location.href = "/auth"
+          onClick: () => globalThis.location.href = "/auth"
         }
       })
       return
@@ -58,7 +57,7 @@ export function PublicSessionView({ id }: { id: string }) {
       toast.error("Debes iniciar sesión para valorar.", {
         action: {
           label: "Iniciar Sesión",
-          onClick: () => window.location.href = "/auth"
+          onClick: () => globalThis.location.href = "/auth"
         }
       })
       return
@@ -103,14 +102,14 @@ export function PublicSessionView({ id }: { id: string }) {
   }, [id, AUTH_URL])
 
   const handleEditOwner = () => {
-    if (typeof window !== "undefined") {
+    if (globalThis.window !== undefined) {
       localStorage.setItem("session_to_edit", JSON.stringify(session.session_data))
-      window.location.href = "/" // Go to home to pick up editing
+      globalThis.location.href = "/" // Go to home to pick up editing
     }
   }
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href)
+    navigator.clipboard.writeText(globalThis.location.href)
     setCopied(true)
     toast.success("Enlace copiado", { description: "Listo para compartir con tus colegas." })
     setTimeout(() => setCopied(false), 3000)
@@ -168,7 +167,7 @@ export function PublicSessionView({ id }: { id: string }) {
                 toast.error("Debes iniciar sesión para descargar o ver el PDF.", {
                   action: {
                     label: "Iniciar Sesión",
-                    onClick: () => window.location.href = "/auth"
+                    onClick: () => globalThis.location.href = "/auth"
                   }
                 })
                 return
@@ -253,30 +252,30 @@ export function PublicSessionView({ id }: { id: string }) {
                       {s.secuenciaMetodologica.inicio && (
                         <div className="bg-slate-50 p-6 rounded-xl border border-slate-100">
                           <h3 className="font-bold text-slate-800 mb-3 text-lg flex items-center gap-2">
-                            <span className="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                            <span className="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>{" "}
                             Inicio
                           </h3>
-                          <div className="text-slate-600 text-sm md:text-base leading-relaxed whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: s.secuenciaMetodologica.inicio.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }}></div>
+                          <div className="text-slate-600 text-sm md:text-base leading-relaxed whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: s.secuenciaMetodologica.inicio.replaceAll(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }}></div>
                         </div>
                       )}
 
                       {s.secuenciaMetodologica.desarrollo && (
                         <div className="bg-slate-50 p-6 rounded-xl border border-slate-100">
                           <h3 className="font-bold text-slate-800 mb-3 text-lg flex items-center gap-2">
-                            <span className="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                            <span className="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>{" "}
                             Desarrollo
                           </h3>
-                          <div className="text-slate-600 text-sm md:text-base leading-relaxed whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: s.secuenciaMetodologica.desarrollo.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }}></div>
+                          <div className="text-slate-600 text-sm md:text-base leading-relaxed whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: s.secuenciaMetodologica.desarrollo.replaceAll(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }}></div>
                         </div>
                       )}
 
                       {s.secuenciaMetodologica.cierre && (
                         <div className="bg-slate-50 p-6 rounded-xl border border-slate-100">
                           <h3 className="font-bold text-slate-800 mb-3 text-lg flex items-center gap-2">
-                            <span className="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                            <span className="bg-slate-200 text-slate-600 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>{" "}
                             Cierre
                           </h3>
-                          <div className="text-slate-600 text-sm md:text-base leading-relaxed whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: s.secuenciaMetodologica.cierre.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }}></div>
+                          <div className="text-slate-600 text-sm md:text-base leading-relaxed whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: s.secuenciaMetodologica.cierre.replaceAll(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }}></div>
                         </div>
                       )}
                     </div>
@@ -361,7 +360,7 @@ export function PublicSessionView({ id }: { id: string }) {
                     toast.error("Debes iniciar sesión para descargar o ver el PDF.", {
                       action: {
                         label: "Iniciar Sesión",
-                        onClick: () => window.location.href = "/auth"
+                        onClick: () => globalThis.location.href = "/auth"
                       }
                     })
                     return

@@ -7,12 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Sparkles, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
+import Script from "next/script"
 
 interface LoginScreenProps {
-  onLogin: (userData: { name: string; email: string }) => void
+  readonly onLogin: (userData: { readonly name: string; readonly email: string }) => void
 }
 
-export function LoginScreen({ onLogin }: LoginScreenProps) {
+export function LoginScreen({ onLogin }: Readonly<LoginScreenProps>) {
   const [googleReady, setGoogleReady] = useState(false)
   const googleButtonRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
@@ -48,39 +49,31 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
     }
   }
 
-  // Cargar Google Identity
-  useEffect(() => {
-    if (!CLIENT_ID || typeof window === "undefined" || !googleButtonRef.current) return
-
-    const initGoogle = () => {
-      try {
-        ;(window as any).google.accounts.id.initialize({
-          client_id: CLIENT_ID,
-          callback: handleCredentialResponse,
-          auto_select: false,
-        })
-        
-        ;(window as any).google.accounts.id.renderButton(googleButtonRef.current, {
-          width: 320,
-          type: "standard",
-          theme: "outline",
-          size: "large",
-        })
-        
-        setGoogleReady(true)
-      } catch (e) {
-        console.error("Google Identity init failed:", e)
-      }
+  const initGoogle = () => {
+    if (!CLIENT_ID || !googleButtonRef.current) return
+    try {
+      ;(globalThis as any).google.accounts.id.initialize({
+        client_id: CLIENT_ID,
+        callback: handleCredentialResponse,
+        auto_select: false,
+      })
+      
+      ;(globalThis as any).google.accounts.id.renderButton(googleButtonRef.current, {
+        width: 320,
+        type: "standard",
+        theme: "outline",
+        size: "large",
+      })
+      
+      setGoogleReady(true)
+    } catch (e) {
+      console.error("Google Identity init failed:", e)
     }
+  }
 
-    if (!(window as any).google) {
-      const script = document.createElement("script")
-      script.src = "https://accounts.google.com/gsi/client"
-      script.async = true
-      script.defer = true
-      script.onload = initGoogle
-      document.head.appendChild(script)
-    } else {
+  // Cargar Google Identity si ya está disponible globalmente
+  useEffect(() => {
+    if (CLIENT_ID && googleButtonRef.current && (globalThis as any).google) {
       initGoogle()
     }
   }, [CLIENT_ID])
@@ -88,6 +81,10 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden flex items-center justify-center p-4 lg:p-8 font-sans selection:bg-primary selection:text-primary-foreground">
+      <Script
+        src="https://accounts.google.com/gsi/client"
+        onLoad={initGoogle}
+      />
       
       {/* Back Button */}
       <motion.div 

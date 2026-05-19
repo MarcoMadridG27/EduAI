@@ -1,18 +1,28 @@
 "use client"
 import { useState, useRef } from "react"
-import { Edit3, Check, X, ImagePlus, Type, GripVertical, Trash2 } from "lucide-react"
+import { Edit3, Check, ImagePlus, Type, Trash2 } from "lucide-react"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type Block =
   | { id: string; type: "text"; title: string; content: string }
   | { id: string; type: "image"; title: string; src: string }
 
-export function makeId() { return Math.random().toString(36).slice(2, 8) }
+export function makeId() {
+  if (globalThis.window !== undefined && globalThis.crypto) {
+    if (globalThis.crypto.randomUUID) {
+      return globalThis.crypto.randomUUID().slice(0, 8)
+    }
+    const array = new Uint32Array(1)
+    globalThis.crypto.getRandomValues(array)
+    return array[0].toString(36).slice(0, 8)
+  }
+  return Date.now().toString(36).slice(-8)
+}
 
 // ── Editable inline field ─────────────────────────────────────────────────────
-export function EF({
+export function EditableField({
   value, onChange, multiline = false, cls = "", placeholder = "—vacío—",
-}: { value: string; onChange: (v: string) => void; multiline?: boolean; cls?: string; placeholder?: string }) {
+}: Readonly<{ value: string; onChange: (v: string) => void; multiline?: boolean; cls?: string; placeholder?: string }>) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(value)
   const confirm = () => { onChange(draft); setEditing(false) }
@@ -21,24 +31,36 @@ export function EF({
       <span className="inline-flex items-start gap-1 w-full">
         {multiline
           ? <textarea autoFocus rows={4} className={`border border-blue-400 rounded px-1 text-inherit font-inherit w-full resize-y bg-blue-50 outline-none ${cls}`} value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={e => e.key === "Escape" && setEditing(false)} />
-          : <input autoFocus className={`border border-blue-400 rounded px-1 text-inherit font-inherit w-full bg-blue-50 outline-none ${cls}`} value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={e => { if (e.key === "Enter") confirm(); if (e.key === "Escape") setEditing(false) }} />}
+          : <input autoFocus className={`border border-blue-400 rounded px-1 text-inherit font-inherit w-full bg-blue-50 outline-none ${cls}`} value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={e => {
+              if (e.key === "Enter") {
+                confirm();
+              }
+              if (e.key === "Escape") {
+                setEditing(false);
+              }
+            }} />}
         <button onClick={confirm} className="flex-shrink-0 mt-0.5 text-emerald-600 hover:text-emerald-800"><Check className="h-4 w-4" /></button>
       </span>
     )
   return (
-    <span className={`group relative cursor-pointer hover:bg-blue-50 hover:outline hover:outline-1 hover:outline-blue-300 rounded px-0.5 transition-all ${cls}`} onClick={() => { setDraft(value); setEditing(true) }} title="Clic para editar">
+    <button
+      type="button"
+      className={`group relative cursor-pointer hover:bg-blue-50 hover:outline hover:outline-1 hover:outline-blue-300 rounded px-0.5 transition-all text-left bg-transparent border-0 p-0 font-inherit ${cls}`}
+      onClick={() => { setDraft(value); setEditing(true) }}
+      title="Clic para editar"
+    >
       {value || <span className="text-slate-300 italic text-xs">{placeholder}</span>}
       <Edit3 className="absolute -top-1 -right-1 h-3 w-3 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-    </span>
+    </button>
   )
 }
 
 // ── Dynamic block renderer (app style) ───────────────────────────────────────
-export function BlockCard({ block, onUpdate, onRemove }: {
+export function BlockCard({ block, onUpdate, onRemove }: Readonly<{
   block: Block
   onUpdate: (b: Block) => void
   onRemove: () => void
-}) {
+}>) {
   const fileRef = useRef<HTMLInputElement>(null)
 
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,12 +87,12 @@ export function BlockCard({ block, onUpdate, onRemove }: {
         {/* Title */}
         <h4 className="font-bold text-blue-700 text-sm mb-2 flex items-center gap-2">
           <span className="w-1 h-4 bg-blue-600 rounded-full inline-block flex-shrink-0" />
-          <EF value={block.title} onChange={v => onUpdate({ ...block, title: v })} placeholder="Título del bloque" cls="font-bold text-blue-700" />
+          <EditableField value={block.title} onChange={v => onUpdate({ ...block, title: v })} placeholder="Título del bloque" cls="font-bold text-blue-700" />
         </h4>
 
         {block.type === "text" && (
           <p className="text-sm text-slate-700 leading-relaxed">
-            <EF value={block.content} onChange={v => onUpdate({ ...block, content: v } as Block)} multiline placeholder="Escribe el contenido aquí..." />
+            <EditableField value={block.content} onChange={v => onUpdate({ ...block, content: v })} multiline placeholder="Escribe el contenido aquí..." />
           </p>
         )}
 
@@ -99,7 +121,7 @@ export function BlockCard({ block, onUpdate, onRemove }: {
 }
 
 // ── Add block toolbar ─────────────────────────────────────────────────────────
-export function AddBlockBar({ onAdd }: { onAdd: (b: Block) => void }) {
+export function AddBlockBar({ onAdd }: Readonly<{ onAdd: (b: Block) => void }>) {
   return (
     <div className="flex items-center gap-2 mt-4 pt-3 border-t border-dashed border-slate-300">
       <span className="text-xs text-slate-400 font-medium uppercase tracking-wide">Añadir bloque:</span>

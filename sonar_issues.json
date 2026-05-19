@@ -1,0 +1,562 @@
+﻿[
+    {
+        "key":  "fe4ddb18-7f3c-4964-b2ea-9ce37b11cc1b",
+        "rule":  "typescript:S7741",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/public-session-view.tsx",
+        "line":  21,
+        "message":  "Compare with `undefined` directly instead of using `typeof`."
+    },
+    {
+        "key":  "901cafd7-3230-4dab-ada3-462f4b01ca62",
+        "rule":  "typescript:S7741",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/public-session-view.tsx",
+        "line":  105,
+        "message":  "Compare with `undefined` directly instead of using `typeof`."
+    },
+    {
+        "key":  "40f8d07f-e4ea-4aa5-be7e-3fac26ae1140",
+        "rule":  "typescript:S6819",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/session-generator.tsx",
+        "line":  649,
+        "message":  "Use \u003cinput type=\"button\"\u003e, \u003cinput type=\"image\"\u003e, \u003cinput type=\"reset\"\u003e, \u003cinput type=\"submit\"\u003e, or \u003cbutton\u003e instead of the \"button\" role to ensure accessibility across all devices."
+    },
+    {
+        "key":  "56e224dd-6064-466e-b19e-8c5a07d171d0",
+        "rule":  "typescript:S6819",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/session-generator.tsx",
+        "line":  714,
+        "message":  "Use \u003cinput type=\"button\"\u003e, \u003cinput type=\"image\"\u003e, \u003cinput type=\"reset\"\u003e, \u003cinput type=\"submit\"\u003e, or \u003cbutton\u003e instead of the \"button\" role to ensure accessibility across all devices."
+    },
+    {
+        "key":  "829130ba-e13d-402f-a505-5e1fd2cbffe4",
+        "rule":  "typescript:S3776",
+        "severity":  "CRITICAL",
+        "component":  "eduai_front:components/session-generator.tsx",
+        "line":  111,
+        "message":  "Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed."
+    },
+    {
+        "key":  "d8a18fed-1b00-4bf1-af6a-7bbab903378a",
+        "rule":  "typescript:S4325",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  281,
+        "message":  "This assertion is unnecessary since it does not change the type of the expression."
+    },
+    {
+        "key":  "507de646-546f-43d3-8f07-9287191aa1e6",
+        "rule":  "typescript:S4325",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  287,
+        "message":  "This assertion is unnecessary since it does not change the type of the expression."
+    },
+    {
+        "key":  "d09c3623-5daa-4a69-8ade-20dbd72d3436",
+        "rule":  "typescript:S6479",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  288,
+        "message":  "Do not use Array index in keys"
+    },
+    {
+        "key":  "800ca294-96fb-470c-b4e6-c3281fb3e85e",
+        "rule":  "typescript:S6479",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  297,
+        "message":  "Do not use Array index in keys"
+    },
+    {
+        "key":  "0b5dd487-4a99-41ed-9c36-16ed0049b9c9",
+        "rule":  "typescript:S6759",
+        "severity":  "MINOR",
+        "component":  "eduai_front:app/repositorio/[id]/page.tsx",
+        "line":  8,
+        "message":  "Mark the props of the component as read-only."
+    },
+    {
+        "key":  "878d25ce-6b7e-4ef8-a84b-05b14db46c7c",
+        "rule":  "typescript:S6479",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/landing-page.tsx",
+        "line":  311,
+        "message":  "Do not use Array index in keys"
+    },
+    {
+        "key":  "0177a473-26e9-4880-9f84-95500fd97493",
+        "rule":  "typescript:S7764",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/login-screen.tsx",
+        "line":  53,
+        "message":  "Prefer `globalThis.window` over `window`."
+    },
+    {
+        "key":  "54841c8a-2dbe-4a7f-bb4c-2c194ef22f2b",
+        "rule":  "typescript:S6582",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/public-repository.tsx",
+        "line":  68,
+        "message":  "Prefer using an optional chain expression instead, as it\u0027s more concise and easier to read."
+    },
+    {
+        "key":  "06892665-3ad1-4f55-96cb-884e229e9524",
+        "rule":  "typescript:S6759",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/public-session-view.tsx",
+        "line":  11,
+        "message":  "Mark the props of the component as read-only."
+    },
+    {
+        "key":  "2c87e4aa-acb4-498d-a52f-f0a3ae306e9d",
+        "rule":  "typescript:S6772",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/public-session-view.tsx",
+        "line":  255,
+        "message":  "Ambiguous spacing after previous element span"
+    },
+    {
+        "key":  "611d4a3a-a415-4ad4-b151-178a2287ca9d",
+        "rule":  "typescript:S6772",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/public-session-view.tsx",
+        "line":  265,
+        "message":  "Ambiguous spacing after previous element span"
+    },
+    {
+        "key":  "780f6f27-0128-4713-aaa5-32408161fb4d",
+        "rule":  "typescript:S6772",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/public-session-view.tsx",
+        "line":  275,
+        "message":  "Ambiguous spacing after previous element span"
+    },
+    {
+        "key":  "95b1fec0-0c93-496c-a273-ec9205f46c74",
+        "rule":  "typescript:S3776",
+        "severity":  "CRITICAL",
+        "component":  "eduai_front:components/session-results.tsx",
+        "line":  52,
+        "message":  "Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed."
+    },
+    {
+        "key":  "538f5683-af5b-4703-922c-477040c11093",
+        "rule":  "typescript:S3358",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/session-results.tsx",
+        "line":  906,
+        "message":  "Extract this nested ternary operation into an independent statement."
+    },
+    {
+        "key":  "21fe2d60-0dab-481d-bf36-100c69c745fe",
+        "rule":  "typescript:S1128",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/teacher-dashboard.tsx",
+        "line":  7,
+        "message":  "Remove this unused import of \u0027TrendingUp\u0027."
+    },
+    {
+        "key":  "5d9fc81a-ec5e-4246-b2fb-f6ced3ee3c0d",
+        "rule":  "typescript:S1128",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/teacher-dashboard.tsx",
+        "line":  7,
+        "message":  "Remove this unused import of \u0027Calendar\u0027."
+    },
+    {
+        "key":  "aba09a2e-e20f-4802-8a11-a86276d669c2",
+        "rule":  "typescript:S1128",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/teacher-dashboard.tsx",
+        "line":  7,
+        "message":  "Remove this unused import of \u0027ThumbsUp\u0027."
+    },
+    {
+        "key":  "b4f8f06e-cf90-40f3-a612-5e2882c74d38",
+        "rule":  "typescript:S1128",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/teacher-dashboard.tsx",
+        "line":  7,
+        "message":  "Remove this unused import of \u0027LayoutDashboard\u0027."
+    },
+    {
+        "key":  "4cc8de88-be68-429c-a59f-4f4f710ea1ec",
+        "rule":  "typescript:S3358",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/teacher-dashboard.tsx",
+        "line":  484,
+        "message":  "Extract this nested ternary operation into an independent statement."
+    },
+    {
+        "key":  "a06fe023-6155-4b30-9580-a7c1efa76e2f",
+        "rule":  "typescript:S1128",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview-blocks.tsx",
+        "line":  3,
+        "message":  "Remove this unused import of \u0027GripVertical\u0027."
+    },
+    {
+        "key":  "da7a01c7-0582-4799-a478-529fe47b7a04",
+        "rule":  "typescript:S1128",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview-blocks.tsx",
+        "line":  3,
+        "message":  "Remove this unused import of \u0027X\u0027."
+    },
+    {
+        "key":  "258d0292-0af3-446c-a0e8-dab01d949d81",
+        "rule":  "typescript:S6759",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview-blocks.tsx",
+        "line":  13,
+        "message":  "Mark the props of the component as read-only."
+    },
+    {
+        "key":  "6a2594a0-d1ee-456c-a7d7-fbcd9d975256",
+        "rule":  "typescript:S2681",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/pdf-preview-blocks.tsx",
+        "line":  24,
+        "message":  "This statement will not be executed conditionally; only the first statement will be. The rest will execute unconditionally."
+    },
+    {
+        "key":  "4db67eb9-5629-4c68-9acb-ade93cbb69b7",
+        "rule":  "typescript:S6848",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/pdf-preview-blocks.tsx",
+        "line":  29,
+        "message":  "Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element."
+    },
+    {
+        "key":  "50aa0c31-a75b-4b02-81f3-e6f9c76073a2",
+        "rule":  "typescript:S1082",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview-blocks.tsx",
+        "line":  29,
+        "message":  "Visible, non-interactive elements with click handlers must have at least one keyboard listener."
+    },
+    {
+        "key":  "4a5069e9-9190-4c0d-a50e-a9caa4119435",
+        "rule":  "typescript:S6759",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview-blocks.tsx",
+        "line":  37,
+        "message":  "Mark the props of the component as read-only."
+    },
+    {
+        "key":  "247ea3b4-bac2-4da6-ab6b-cffd5d9e6fbd",
+        "rule":  "typescript:S6759",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview-blocks.tsx",
+        "line":  102,
+        "message":  "Mark the props of the component as read-only."
+    },
+    {
+        "key":  "1df9723c-fba7-4f51-9938-2f35ec5f0134",
+        "rule":  "typescript:S3358",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  76,
+        "message":  "Extract this nested ternary operation into an independent statement."
+    },
+    {
+        "key":  "a764ef32-0253-484d-832a-e2c324b8f3fc",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  120,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "673d3727-090e-4774-aa85-f88c0c87b042",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  121,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "8a7c40c3-6fa1-410f-8d69-b25a50dc6916",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  122,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "e610aafd-9928-46ea-9889-c3fe0890b6a4",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  132,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "f00d7796-5d32-47ec-9968-8d98f597bca2",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  132,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "3c0b9216-4518-44ad-bac3-a7db0ea8099c",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  133,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "78885f6e-bab4-4963-8023-f8bd7f4782de",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  133,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "36b9822c-323b-4df4-9759-88cc71e4a2ae",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  134,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "66ca6177-865e-4028-9789-4f09a22719ac",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  134,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "7a83d91b-ea66-4ed7-ba5e-0a64665b6796",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  134,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "348989aa-2b16-46d8-83f2-8c9f1cbc2ec2",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  135,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "b42712b3-d7d0-4b6a-bbe2-a6e79f73471b",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  135,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "924d5a34-a0ae-415f-a3b2-82367fc6d811",
+        "rule":  "typescript:S6479",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  137,
+        "message":  "Do not use Array index in keys"
+    },
+    {
+        "key":  "d9852a13-2be4-42a9-8909-335c845a109d",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  152,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "99a0a450-9504-45f8-a162-e4942712aa75",
+        "rule":  "typescript:S6479",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  159,
+        "message":  "Do not use Array index in keys"
+    },
+    {
+        "key":  "68bc141e-7e12-4483-8109-85ec0ba90993",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  160,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "f503356e-eb4e-44f5-89a7-04ec1551b67d",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  169,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "d1c47b91-3660-404f-9e6a-f3d6e9f6a9e3",
+        "rule":  "typescript:S6770",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  174,
+        "message":  "Imported JSX component EF must be in PascalCase"
+    },
+    {
+        "key":  "e1c5206e-389c-436b-984b-44f5bd15c360",
+        "rule":  "typescript:S6479",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/pdf-preview.tsx",
+        "line":  191,
+        "message":  "Do not use Array index in keys"
+    },
+    {
+        "key":  "db66730d-fea1-4cbd-832d-c85183c21919",
+        "rule":  "typescript:S2486",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/teacher-dashboard.tsx",
+        "line":  95,
+        "message":  "Handle this exception or don\u0027t catch it at all."
+    },
+    {
+        "key":  "ae621260-5222-4fa3-a118-9a1d478c4700",
+        "rule":  "typescript:S1854",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/teacher-dashboard.tsx",
+        "line":  115,
+        "message":  "Remove this useless assignment to variable \"shortName\"."
+    },
+    {
+        "key":  "c90c1e01-5a07-44e1-938d-443f14b97dc9",
+        "rule":  "typescript:S6479",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/teacher-dashboard.tsx",
+        "line":  395,
+        "message":  "Do not use Array index in keys"
+    },
+    {
+        "key":  "b1ed6033-6768-4184-a280-573c3369f00a",
+        "rule":  "typescript:S6479",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/teacher-dashboard.tsx",
+        "line":  431,
+        "message":  "Do not use Array index in keys"
+    },
+    {
+        "key":  "c7d7fc63-acdb-4243-a67e-0228313bbf3a",
+        "rule":  "typescript:S6582",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/session-results.tsx",
+        "line":  648,
+        "message":  "Prefer using an optional chain expression instead, as it\u0027s more concise and easier to read."
+    },
+    {
+        "key":  "354bc8fc-9b97-4ae1-8853-0a6f2526de94",
+        "rule":  "typescript:S6582",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/session-results.tsx",
+        "line":  741,
+        "message":  "Prefer using an optional chain expression instead, as it\u0027s more concise and easier to read."
+    },
+    {
+        "key":  "30d41a25-099a-47bc-90c0-c80ed270732e",
+        "rule":  "typescript:S7764",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/login-screen.tsx",
+        "line":  57,
+        "message":  "Prefer `globalThis` over `window`."
+    },
+    {
+        "key":  "f9e85fa3-ce1f-49e7-9944-cf83138b646e",
+        "rule":  "typescript:S7764",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/login-screen.tsx",
+        "line":  63,
+        "message":  "Prefer `globalThis` over `window`."
+    },
+    {
+        "key":  "0015d461-9e44-4636-add3-009364074f58",
+        "rule":  "typescript:S7735",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/login-screen.tsx",
+        "line":  76,
+        "message":  "Unexpected negated condition."
+    },
+    {
+        "key":  "3a1441fb-e25a-41b5-bf65-42a3868193f6",
+        "rule":  "typescript:S7764",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/login-screen.tsx",
+        "line":  76,
+        "message":  "Prefer `globalThis` over `window`."
+    },
+    {
+        "key":  "a612e866-4b94-4920-accf-4397a8fdf132",
+        "rule":  "typescript:S6759",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/teacher-dashboard.tsx",
+        "line":  20,
+        "message":  "Mark the props of the component as read-only."
+    },
+    {
+        "key":  "75c6bf47-9633-4371-9879-2ad3e5693737",
+        "rule":  "typescript:S7777",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/teacher-dashboard.tsx",
+        "line":  70,
+        "message":  "Prefer using `Set#size` instead of `Array#length`."
+    },
+    {
+        "key":  "bb31a50b-1023-45ca-963a-e8c7c5af0158",
+        "rule":  "typescript:S7777",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/teacher-dashboard.tsx",
+        "line":  71,
+        "message":  "Prefer using `Set#size` instead of `Array#length`."
+    },
+    {
+        "key":  "949ff211-59b4-439c-a5ed-ae6fe597927a",
+        "rule":  "typescript:S1128",
+        "severity":  "MINOR",
+        "component":  "eduai_front:app/page.tsx",
+        "line":  5,
+        "message":  "Remove this unused import of \u0027LoginScreen\u0027."
+    },
+    {
+        "key":  "6732a21a-d17d-41f0-b58f-a95bb9dfa4dd",
+        "rule":  "typescript:S1854",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:app/page.tsx",
+        "line":  149,
+        "message":  "Remove this useless assignment to variable \"handleLogin\"."
+    },
+    {
+        "key":  "aec4ea8c-d0dc-4a98-9b27-7c0f59461090",
+        "rule":  "typescript:S6759",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/login-screen.tsx",
+        "line":  15,
+        "message":  "Mark the props of the component as read-only."
+    },
+    {
+        "key":  "7a267b41-2753-4a9d-aaef-88c89694733d",
+        "rule":  "typescript:S6479",
+        "severity":  "MAJOR",
+        "component":  "eduai_front:components/teacher-dashboard.tsx",
+        "line":  520,
+        "message":  "Do not use Array index in keys"
+    },
+    {
+        "key":  "45847824-85d9-4f9f-b830-c8f592c465e6",
+        "rule":  "typescript:S6759",
+        "severity":  "MINOR",
+        "component":  "eduai_front:components/ui/select.tsx",
+        "line":  9,
+        "message":  "Mark the props of the component as read-only."
+    }
+]

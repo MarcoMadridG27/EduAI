@@ -1,19 +1,19 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { BookOpen, ThumbsUp, GraduationCap, Clock, Search, Share2, Eye, User, FileText, ArrowRight, Download, Link as LinkIcon, Check } from "lucide-react"
+import { BookOpen, ThumbsUp, Search, User, FileText, ArrowRight, Link as LinkIcon, Check } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 
 interface PublicRepositoryProps {
-  user?: { name: string; email: string } | null
-  guestMode?: boolean
-  onLoginRequired?: () => void
-  onNavigateToGenerator?: () => void
-  onViewDashboard?: () => void
-  onLogout?: () => void
+  readonly user?: { readonly name: string; readonly email: string } | null
+  readonly guestMode?: boolean
+  readonly onLoginRequired?: () => void
+  readonly onNavigateToGenerator?: () => void
+  readonly onViewDashboard?: () => void
+  readonly onLogout?: () => void
 }
 
 export function PublicRepository({
@@ -33,9 +33,7 @@ export function PublicRepository({
   const [guestMode, setGuestMode] = useState<boolean>(true)
 
   useEffect(() => {
-    if (propUser !== undefined) {
-      setUser(propUser)
-    } else {
+    if (propUser === undefined) {
       const storedUser = localStorage.getItem("user")
       if (storedUser) {
         try {
@@ -44,16 +42,18 @@ export function PublicRepository({
           console.error("Error parsing stored user", e)
         }
       }
+    } else {
+      setUser(propUser)
     }
   }, [propUser])
 
   useEffect(() => {
-    if (propGuestMode !== undefined) {
-      setGuestMode(propGuestMode)
-    } else {
+    if (propGuestMode === undefined) {
       const accessToken = localStorage.getItem("access_token")
       const storedUser = localStorage.getItem("user")
       setGuestMode(!(accessToken && storedUser))
+    } else {
+      setGuestMode(propGuestMode)
     }
   }, [propGuestMode])
 
@@ -65,7 +65,7 @@ export function PublicRepository({
         if (!res.ok) throw new Error("Error fetching sessions")
         const data = await res.json()
 
-        let publicSessions = data.filter((s: any) => s.session_data && s.session_data.is_public)
+        let publicSessions = data.filter((s: any) => s.session_data?.is_public)
 
         // If no public sessions are found, just use the empty array.
         setSessions(publicSessions)
@@ -85,7 +85,7 @@ export function PublicRepository({
   )
 
   const handleCopyLink = (id: string) => {
-    const link = `${window.location.origin}/repositorio/${id}`
+    const link = `${globalThis.location?.origin || ""}/repositorio/${id}`
     navigator.clipboard.writeText(link)
     setCopiedId(id)
     toast.success("¡Enlace copiado al portapapeles!", {
@@ -119,18 +119,14 @@ export function PublicRepository({
           <Button
             variant="ghost"
             onClick={() => {
-              if (guestMode) {
-                if (onLoginRequired) {
-                  onLoginRequired()
-                } else {
-                  window.location.href = "/auth"
-                }
+              if (guestMode && onLoginRequired) {
+                onLoginRequired()
+              } else if (guestMode) {
+                globalThis.location.href = "/auth"
+              } else if (onViewDashboard) {
+                onViewDashboard()
               } else {
-                if (onViewDashboard) {
-                  onViewDashboard()
-                } else {
-                  window.location.href = "/" // Fallback to root dashboard
-                }
+                globalThis.location.href = "/" // Fallback to root dashboard
               }
             }}
             className="text-slate-600 hover:text-slate-900 font-bold text-sm h-9 px-3"
@@ -144,7 +140,7 @@ export function PublicRepository({
               if (onNavigateToGenerator) {
                 onNavigateToGenerator()
               } else {
-                window.location.href = "/" // Fallback to root generator
+                globalThis.location.href = "/" // Fallback to root generator
               }
             }}
             className="rounded-full bg-blue-600 text-white hover:bg-blue-700 font-bold px-4 text-xs sm:text-sm h-9 shadow-sm transition-all"
@@ -159,7 +155,7 @@ export function PublicRepository({
                 if (onLoginRequired) {
                   onLoginRequired()
                 } else {
-                  window.location.href = "/auth"
+                  globalThis.location.href = "/auth"
                 }
               }}
               className="rounded-full bg-slate-900 text-white hover:bg-slate-800 font-bold px-4 text-xs sm:text-sm h-9 shadow-sm transition-all"
@@ -182,7 +178,7 @@ export function PublicRepository({
                   } else {
                     localStorage.removeItem("user")
                     localStorage.removeItem("access_token")
-                    window.location.href = "/"
+                    globalThis.location.href = "/"
                   }
                 }}
                 className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-2 font-bold text-sm"
@@ -231,15 +227,17 @@ export function PublicRepository({
           <h2 className="text-xl font-bold text-slate-800">Documentos Populares</h2>
         </div>
 
-        {loading ? (
+        {loading && (
           <div className="flex flex-col items-center justify-center py-20">
             <img src="/pinguinos/pinguino_pensando.png" alt="Cargando" className="w-24 h-24 object-contain animate-bounce mb-4" />
             <p className="text-slate-500 font-medium">Cargando biblioteca...</p>
           </div>
-        ) : filteredSessions.length > 0 ? (
+        )}
+
+        {!loading && filteredSessions.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredSessions.map((s, idx) => (
-              <Card key={idx} className="bg-white border-0 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 rounded-2xl overflow-hidden flex flex-col group cursor-pointer hover:-translate-y-1">
+            {filteredSessions.map((s) => (
+              <Card key={s.id} className="bg-white border-0 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 rounded-2xl overflow-hidden flex flex-col group cursor-pointer hover:-translate-y-1">
                 {/* Portada del Documento (Simulada) */}
                 <div className="aspect-[3/4] bg-slate-50 border-b border-slate-100 relative p-6 flex flex-col">
                   <div className="absolute top-4 right-4 bg-white shadow-sm border border-slate-100 px-2 py-1 rounded-md flex items-center gap-1">
@@ -295,7 +293,9 @@ export function PublicRepository({
               </Card>
             ))}
           </div>
-        ) : (
+        )}
+
+        {!loading && filteredSessions.length === 0 && (
           <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
             <img src="/pinguinos/pinguino_chill.png" alt="No hay resultados" className="w-32 h-32 object-contain mx-auto mb-4 opacity-50" />
             <h3 className="text-xl font-bold text-slate-700">No encontramos documentos</h3>

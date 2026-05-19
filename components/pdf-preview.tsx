@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { X, Download, Loader2 } from "lucide-react"
 import type { SessionData } from "@/app/page"
 import { toast } from "sonner"
-import { EF, BlockCard, AddBlockBar, type Block } from "@/components/pdf-preview-blocks"
+import { EditableField, BlockCard, AddBlockBar, type Block } from "@/components/pdf-preview-blocks"
 
 interface PdfPreviewProps {
   session: SessionData
@@ -26,7 +26,7 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
   const [page1Blocks, setPage1Blocks] = useState<Block[]>([])
   const [page2Blocks, setPage2Blocks] = useState<Block[]>([])
 
-  const dg = (data.datosGenerales || {}) as Record<string, string>
+  const dg = data.datosGenerales || {}
   const sm = data.secuenciaMetodologica || { inicio: "", desarrollo: "", cierre: "" }
   const setDg = (k: string, v: string) => setData(p => ({ ...p, datosGenerales: { ...p.datosGenerales, [k]: v } }))
   const setSm = (k: "inicio" | "desarrollo" | "cierre", v: string) =>
@@ -36,6 +36,25 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
     setList(list.map(b => b.id === id ? updated : b))
   const removeBlock = (list: Block[], setList: (b: Block[]) => void, id: string) =>
     setList(list.filter(b => b.id !== id))
+
+  const updateCriterio = (i: number, v: string, currentCriterios: string[]) => {
+    const newCrits = [...currentCriterios]
+    newCrits[i] = v
+    setData(p => {
+      const ra = p.recursosAdicionales
+      if (!ra?.instrumentoEvaluacionGenerado) return p
+      return {
+        ...p,
+        recursosAdicionales: {
+          ...ra,
+          instrumentoEvaluacionGenerado: {
+            ...ra.instrumentoEvaluacionGenerado,
+            criterios_o_items: newCrits
+          }
+        }
+      }
+    })
+  }
 
   async function handleGeneratePDF() {
     setIsExporting(true)
@@ -71,9 +90,13 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
     } finally { setIsExporting(false) }
   }
 
-  const mats: string[] = Array.isArray(data.materialesDidacticosSugeridos)
-    ? data.materialesDidacticosSugeridos
-    : data.materialesDidacticosSugeridos ? [data.materialesDidacticosSugeridos as unknown as string] : []
+  let mats: string[] = []
+  if (Array.isArray(data.materialesDidacticosSugeridos)) {
+    mats = data.materialesDidacticosSugeridos
+  } else if (data.materialesDidacticosSugeridos) {
+    mats = [String(data.materialesDidacticosSugeridos)]
+  }
+  
   const comps: string[] = Array.isArray(data.competenciasSeleccionadas) ? data.competenciasSeleccionadas : []
   const caps: string[] = Array.isArray(data.capacidades) ? data.capacidades : []
 
@@ -117,9 +140,9 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
               <div className="text-center flex-1 px-4">
                 <div className="text-[#1565C0] font-bold text-[12pt]">SESIÓN DE APRENDIZAJE</div>
                 <div className="text-[#1976D2] text-[8.5pt]">
-                  Área: <EF value={dg.area || data.tema || "Matemática"} onChange={v => setDg("area", v)} />
-                  &nbsp;·&nbsp;Unidad: <EF value={dg.unidad || ""} onChange={v => setDg("unidad", v)} />
-                  &nbsp;·&nbsp;<EF value={dg.sesion_num || ""} onChange={v => setDg("sesion_num", v)} />
+                  Área: <EditableField value={dg.area || data.tema || "Matemática"} onChange={v => setDg("area", v)} />
+                  &nbsp;·&nbsp;Unidad: <EditableField value={dg.unidad || ""} onChange={v => setDg("unidad", v)} />
+                  &nbsp;·&nbsp;<EditableField value={dg.sesion_num || ""} onChange={v => setDg("sesion_num", v)} />
                 </div>
               </div>
               <div className="text-transparent">Sesión+</div>
@@ -129,12 +152,12 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
             <div className={BAR}>I.&nbsp;&nbsp;DATOS DE LA SESIÓN</div>
             <table className="w-full border-collapse text-[8.5pt]">
               {[
-                ["I.E.:", <EF key="ie" value={dg.ie||""} onChange={v=>setDg("ie",v)}/>, "UGEL:", <EF key="ugel" value={dg.ugel||""} onChange={v=>setDg("ugel",v)}/>],
-                ["DOCENTE:", <EF key="doc" value={dg.docente||""} onChange={v=>setDg("docente",v)}/>, "FECHA:", <EF key="fecha" value={dg.fecha||""} onChange={v=>setDg("fecha",v)}/>],
-                ["GRADO/CICLO:", <span key="gc"><EF value={dg.grado||""} onChange={v=>setDg("grado",v)}/>&nbsp;—&nbsp;<EF value={dg.ciclo||data.ciclo||""} onChange={v=>setDg("ciclo",v)}/></span>, "SECCIÓN:", <EF key="sec" value={dg.seccion||""} onChange={v=>setDg("seccion",v)}/>],
-                ["DURACIÓN:", <EF key="dur" value={dg.duracion||`${data.horasClase} h`} onChange={v=>setDg("duracion",v)}/>, "LUGAR:", <EF key="lug" value={dg.lugar||""} onChange={v=>setDg("lugar",v)}/>],
+                ["I.E.:", <EditableField key="ie" value={dg.ie||""} onChange={v=>setDg("ie",v)}/>, "UGEL:", <EditableField key="ugel" value={dg.ugel||""} onChange={v=>setDg("ugel",v)}/>],
+                ["DOCENTE:", <EditableField key="doc" value={dg.docente||""} onChange={v=>setDg("docente",v)}/>, "FECHA:", <EditableField key="fecha" value={dg.fecha||""} onChange={v=>setDg("fecha",v)}/>],
+                ["GRADO/CICLO:", <span key="gc"><EditableField value={dg.grado||""} onChange={v=>setDg("grado",v)}/>&nbsp;—&nbsp;<EditableField value={dg.ciclo||data.ciclo||""} onChange={v=>setDg("ciclo",v)}/></span>, "SECCIÓN:", <EditableField key="sec" value={dg.seccion||""} onChange={v=>setDg("seccion",v)}/>],
+                ["DURACIÓN:", <EditableField key="dur" value={dg.duracion||`${data.horasClase} h`} onChange={v=>setDg("duracion",v)}/>, "LUGAR:", <EditableField key="lug" value={dg.lugar||""} onChange={v=>setDg("lugar",v)}/>],
               ].map((r,i) => (
-                <tr key={i} className="border-b border-[#90A4AE]" style={{ background: i%2===0?"#fff":"#F5F5F5" }}>
+                <tr key={r[0] as string} className="border-b border-[#90A4AE]" style={{ background: i%2===0?"#fff":"#F5F5F5" }}>
                   <td className="py-1 px-2 font-bold text-[#1565C0] w-[24%]">{r[0]}</td>
                   <td className="py-1 px-2 w-[26%]">{r[1]}</td>
                   <td className="py-1 px-2 font-bold text-[#1565C0] w-[24%]">{r[2]}</td>
@@ -149,15 +172,15 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
               <div className="flex-1 border border-[#90A4AE]">
                 <div className={SUBH}>¿QUÉ ACTIVIDADES HACER ANTES?</div>
                 <div className="p-2 bg-[#E3F2FD] min-h-[36px] text-[8.5pt]">
-                  <EF value={(data as any).actividades_previas||""} onChange={v=>setData(p=>({...p,actividades_previas:v} as any))} multiline />
+                  <EditableField value={data.actividades_previas||""} onChange={v=>setData(p=>({...p,actividades_previas:v}))} multiline />
                 </div>
               </div>
               <div className="flex-1 border border-[#90A4AE] border-l-0">
                 <div className={SUBH}>¿QUÉ RECURSOS O MATERIALES?</div>
                 <div className="p-2 bg-[#E3F2FD] min-h-[36px] text-[8.5pt]">
                   {mats.length > 0
-                    ? <ul>{mats.map((m,i)=><li key={i}>• {m}</li>)}</ul>
-                    : <EF value={data.materialesDisponibles||""} onChange={v=>setData(p=>({...p,materialesDisponibles:v}))} multiline />}
+                    ? <ul>{mats.map((m)=><li key={m}>• {m}</li>)}</ul>
+                    : <EditableField value={data.materialesDisponibles||""} onChange={v=>setData(p=>({...p,materialesDisponibles:v}))} multiline />}
                 </div>
               </div>
             </div>
@@ -166,12 +189,12 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
             <div className="flex items-center border border-[#1565C0] bg-[#E3F2FD] mt-3 px-3 py-2">
               <span className="font-bold text-[#1565C0] mr-3 flex-shrink-0">TÍTULO:</span>
               <span className="font-bold text-[11pt] flex-1 text-center">
-                <EF value={(dg.titulo||data.tema||"").toUpperCase()} onChange={v=>setDg("titulo",v)} />
+                <EditableField value={(dg.titulo||data.tema||"").toUpperCase()} onChange={v=>setDg("titulo",v)} />
               </span>
             </div>
             <div className="flex items-start border border-[#90A4AE] px-3 py-1.5 mt-1">
               <span className="font-bold text-[#1565C0] mr-2 flex-shrink-0">PROPÓSITO:</span>
-              <span className="flex-1"><EF value={data.propositoSesion||""} onChange={v=>setData(p=>({...p,propositoSesion:v}))} multiline /></span>
+              <span className="flex-1"><EditableField value={data.propositoSesion||""} onChange={v=>setData(p=>({...p,propositoSesion:v}))} multiline /></span>
             </div>
 
             {/* III. Propósitos */}
@@ -188,22 +211,22 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
                 <tr className="bg-[#E3F2FD] align-top">
                   <td className="py-2 px-2 border border-[#90A4AE]">
                     {comps[0] && <div className="font-bold mb-1">{comps[0]}</div>}
-                    {caps.map((c,i)=><div key={i}>• {c}</div>)}
+                    {caps.map((c)=><div key={c}>• {c}</div>)}
                   </td>
-                  <td className="py-2 px-2 border border-[#90A4AE]"><EF value={data.competenciaDescripcion||""} onChange={v=>setData(p=>({...p,competenciaDescripcion:v}))} multiline /></td>
-                  <td className="py-2 px-2 border border-[#90A4AE]"><EF value={data.criteriosEvaluacion||""} onChange={v=>setData(p=>({...p,criteriosEvaluacion:v}))} multiline /></td>
-                  <td className="py-2 px-2 border border-[#90A4AE]"><EF value={data.evidenciasAprendizaje||""} onChange={v=>setData(p=>({...p,evidenciasAprendizaje:v}))} multiline /></td>
+                  <td className="py-2 px-2 border border-[#90A4AE]"><EditableField value={data.competenciaDescripcion||""} onChange={v=>setData(p=>({...p,competenciaDescripcion:v}))} multiline /></td>
+                  <td className="py-2 px-2 border border-[#90A4AE]"><EditableField value={data.criteriosEvaluacion||""} onChange={v=>setData(p=>({...p,criteriosEvaluacion:v}))} multiline /></td>
+                  <td className="py-2 px-2 border border-[#90A4AE]"><EditableField value={data.evidenciasAprendizaje||""} onChange={v=>setData(p=>({...p,evidenciasAprendizaje:v}))} multiline /></td>
                 </tr>
               </tbody>
             </table>
             <div className="flex mt-1">
               <div className="border border-[#90A4AE]" style={{width:"30%"}}>
                 <div className={SUBH}>ENFOQUE TRANSVERSAL</div>
-                <div className="p-2 text-[8.5pt] font-bold"><EF value={data.enfoqueTransversal||""} onChange={v=>setData(p=>({...p,enfoqueTransversal:v}))} multiline /></div>
+                <div className="p-2 text-[8.5pt] font-bold"><EditableField value={data.enfoqueTransversal||""} onChange={v=>setData(p=>({...p,enfoqueTransversal:v}))} multiline /></div>
               </div>
               <div className="border border-[#90A4AE] border-l-0 flex-1">
                 <div className={SUBH}>ACTITUDES OBSERVABLES</div>
-                <div className="p-2 text-[8.5pt]"><EF value={(data as any).actitudes_observables||data.competenciaTransversal||""} onChange={v=>setData(p=>({...p,competenciaTransversal:v}))} multiline /></div>
+                <div className="p-2 text-[8.5pt]"><EditableField value={data.actitudes_observables||data.competenciaTransversal||""} onChange={v=>setData(p=>({...p,competenciaTransversal:v}))} multiline /></div>
               </div>
             </div>
 
@@ -239,69 +262,69 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
 
             <div className="bg-blue-600 text-white font-bold text-[9pt] px-3 py-1 mt-2">
               INICIO <span className="font-normal text-[8pt]">
-                (<EF value={(data as any).duracion_inicio||"15 min"} onChange={v=>setData(p=>({...p,duracion_inicio:v} as any))} cls="text-white"/>)
+                (<EditableField value={data.duracion_inicio||"15 min"} onChange={v=>setData(p=>({...p,duracion_inicio:v}))} cls="text-white"/>)
               </span>
             </div>
             <div className="border border-[#90A4AE] p-3 text-[8.5pt] min-h-[56px]">
-              <EF value={sm.inicio||""} onChange={v=>setSm("inicio",v)} multiline />
+              <EditableField value={sm.inicio||""} onChange={v=>setSm("inicio",v)} multiline />
             </div>
 
             <div className="bg-[#1976D2] text-white font-bold text-[9pt] px-3 py-1 mt-2">
               DESARROLLO <span className="font-normal text-[8pt]">
-                (<EF value={(data as any).duracion_desarrollo||"60 min"} onChange={v=>setData(p=>({...p,duracion_desarrollo:v} as any))} cls="text-white"/>)
+                (<EditableField value={data.duracion_desarrollo||"60 min"} onChange={v=>setData(p=>({...p,duracion_desarrollo:v}))} cls="text-white"/>)
               </span>
             </div>
             <div className="border border-[#90A4AE] p-3 text-[8.5pt] min-h-[80px]">
-              <EF value={sm.desarrollo||""} onChange={v=>setSm("desarrollo",v)} multiline />
+              <EditableField value={sm.desarrollo||""} onChange={v=>setSm("desarrollo",v)} multiline />
             </div>
 
             <div className="bg-[#0D47A1] text-white font-bold text-[9pt] px-3 py-1 mt-2">
               CIERRE <span className="font-normal text-[8pt]">
-                (<EF value={(data as any).duracion_cierre||"15 min"} onChange={v=>setData(p=>({...p,duracion_cierre:v} as any))} cls="text-white"/>)
+                (<EditableField value={data.duracion_cierre||"15 min"} onChange={v=>setData(p=>({...p,duracion_cierre:v}))} cls="text-white"/>)
               </span>
             </div>
             <div className="border border-[#90A4AE] p-3 text-[8.5pt] min-h-[56px]">
-              <EF value={sm.cierre||""} onChange={v=>setSm("cierre",v)} multiline />
+              <EditableField value={sm.cierre||""} onChange={v=>setSm("cierre",v)} multiline />
             </div>
 
             {/* V. Extensión */}
             <div className="flex items-start border border-[#90A4AE] bg-[#E3F2FD] mt-4 px-3 py-2">
               <span className="font-bold text-[#1565C0] mr-2 flex-shrink-0 text-[8.5pt]">V.&nbsp;EXTENSIÓN (TAREA):</span>
-              <span className="text-[8.5pt] flex-1"><EF value={(data as any).extension||""} onChange={v=>setData(p=>({...p,extension:v} as any))} multiline /></span>
+              <span className="text-[8.5pt] flex-1"><EditableField value={data.extension||""} onChange={v=>setData(p=>({...p,extension:v}))} multiline /></span>
             </div>
 
             {/* VI. Instrumento de evaluación */}
-            {data.recursosAdicionales?.instrumentoEvaluacionGenerado && (
-              <div className="mt-4">
-                <div className={BAR}>VI.&nbsp;&nbsp;INSTRUMENTO DE EVALUACIÓN: {(data.recursosAdicionales.instrumentoEvaluacionGenerado.tipo_instrumento || "INSTRUMENTO").toUpperCase()}</div>
-                <table className="w-full border-collapse text-[8.5pt]">
-                  <thead>
-                    <tr className="bg-[#1976D2] text-white">
-                      <th className="py-1.5 px-2 font-semibold text-center border-r border-[#1565C0] text-[8pt]">CRITERIOS / ÍTEMS A EVALUAR</th>
-                      {(data.recursosAdicionales!.instrumentoEvaluacionGenerado?.escalas_o_niveles || []).map((e: string) => (
+            {(() => {
+              const inst = data.recursosAdicionales?.instrumentoEvaluacionGenerado;
+              if (!inst) return null;
+              return (
+                <div className="mt-4">
+                  <div className={BAR}>VI.&nbsp;&nbsp;INSTRUMENTO DE EVALUACIÓN: {(inst.tipo_instrumento || "INSTRUMENTO").toUpperCase()}</div>
+                  <table className="w-full border-collapse text-[8.5pt]">
+                    <thead>
+                      <tr className="bg-[#1976D2] text-white">
+                        <th className="py-1.5 px-2 font-semibold text-center border-r border-[#1565C0] text-[8pt]">CRITERIOS / ÍTEMS A EVALUAR</th>
+                        {(inst.escalas_o_niveles || []).map((e: string) => (
                           <th key={e} className="py-1.5 px-2 font-semibold text-center border-r border-[#1565C0] last:border-r-0 text-[8pt]">{e}</th>
                         ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(data.recursosAdicionales!.instrumentoEvaluacionGenerado?.criterios_o_items || []).map((c: string, i: number) => (
-                      <tr key={i} className="bg-[#E3F2FD] align-top border border-[#90A4AE]">
-                        <td className="py-2 px-2 border-r border-[#90A4AE]">
-                          <EF value={c} onChange={v => {
-                            const newCrits = [...(data.recursosAdicionales!.instrumentoEvaluacionGenerado?.criterios_o_items || [])];
-                            newCrits[i] = v;
-                            setData(p => ({...p, recursosAdicionales: {...p.recursosAdicionales!, instrumentoEvaluacionGenerado: {...p.recursosAdicionales!.instrumentoEvaluacionGenerado, criterios_o_items: newCrits}}}));
-                          }} multiline />
-                        </td>
-                        {(data.recursosAdicionales!.instrumentoEvaluacionGenerado?.escalas_o_niveles || []).map((_, j: number) => (
-                          <td key={j} className="border-r border-[#90A4AE] last:border-r-0 bg-white min-w-[30px]"></td>
-                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    </thead>
+                    <tbody>
+                      {(inst.criterios_o_items || []).map((c: string, i: number) => (
+                        <tr key={c} className="bg-[#E3F2FD] align-top border border-[#90A4AE]">
+                          <td className="py-2 px-2 border-r border-[#90A4AE]">
+                            <EditableField value={c} onChange={v => updateCriterio(i, v, inst.criterios_o_items || [])} multiline />
+                          </td>
+                          {(inst.escalas_o_niveles || []).map((scale: string) => (
+                            <td key={scale} className="border-r border-[#90A4AE] last:border-r-0 bg-white min-w-[30px]"></td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })()}
 
             {/* Dynamic blocks page 2 */}
             {page2Blocks.map(b => (
@@ -315,7 +338,7 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
             <div className="flex justify-around mt-10 text-center text-[8.5pt]">
               <div className="w-[40%]">
                 <div className="border-t border-[#212121] mt-8 pt-1 font-bold">
-                  <EF value={dg.docente||"Docente"} onChange={v=>setDg("docente",v)} />
+                  <EditableField value={dg.docente||"Docente"} onChange={v=>setDg("docente",v)} />
                 </div>
                 <div className="text-[#90A4AE] text-[7.5pt]">Docente del Área</div>
               </div>

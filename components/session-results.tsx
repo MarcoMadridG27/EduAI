@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import {
   Brain,
@@ -28,11 +28,11 @@ import { toast } from "sonner"
 import { PdfPreview } from "@/components/pdf-preview"
 
 interface SessionResultsProps {
-  session: SessionData
-  isSavedSession?: boolean
-  onBack: () => void
-  onViewDashboard: () => void
-  onEdit: () => void
+  readonly session: SessionData
+  readonly isSavedSession?: boolean
+  readonly onBack: () => void
+  readonly onViewDashboard: () => void
+  readonly onEdit: () => void
 }
 
 // Small helpers to keep rendering logic readable and reduce complexity
@@ -61,7 +61,6 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
   const [publishConfirmed, setPublishConfirmed] = useState(false)
   const [activeTab, setActiveTab] = useState<'secuencia' | 'evaluacion' | 'recursos'>('secuencia')
   const contentRef = useRef<HTMLDivElement>(null)
-  const API_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || ""
   const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || ""
 
   // Estados editables
@@ -95,6 +94,49 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
   const juegoInstrucciones = getJuegoInstrucciones(ra.juegoDidactico)
 
 
+  // Save button content extraction to resolve SonarQube S1125/S3358 nested ternaries
+  const renderSaveButtonContent = () => {
+    if (isSaving) {
+      return (
+        <>
+          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          Guardando...
+        </>
+      )
+    }
+    if (isSaved) {
+      return (
+        <>
+          <CheckCircle className="h-4 w-4 mr-2" />
+          ¡Sesión Guardada!
+        </>
+      )
+    }
+    return (
+      <>
+        <CheckCircle className="h-4 w-4 mr-2" />
+        Guardar en Personal
+      </>
+    )
+  }
+
+  const renderPublishButtonContent = () => {
+    if (isPublished) {
+      return (
+        <>
+          <CheckCircle className="h-4 w-4 mr-2" />
+          Publicado
+        </>
+      )
+    }
+    return (
+      <>
+        <Share2 className="h-4 w-4 mr-2" />
+        Publicar en Comunidad
+      </>
+    )
+  }
+
   const handleSaveSession = async (isPublic = false) => {
     if (isPublic && isPublished) return
     if (!isPublic && isSaved) return
@@ -126,7 +168,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
         session_data: payloadData,
       }
 
-      const res = await fetch(`${AUTH_URL}/save-session`, {
+      await fetch(`${AUTH_URL}/save-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -328,7 +370,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                 )}
 
                 {/* Competencias */}
-                {editedSession.competenciasSeleccionadas && editedSession.competenciasSeleccionadas.length > 0 && (
+                {editedSession.competenciasSeleccionadas?.length > 0 && (
                   <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
@@ -348,7 +390,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                 )}
 
                 {/* Capacidades */}
-                {editedSession.capacidades && editedSession.capacidades.length > 0 && (
+                {(editedSession.capacidades?.length ?? 0) > 0 && (
                   <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
@@ -357,7 +399,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
-                      {editedSession.capacidades.map((cap) => (
+                      {editedSession.capacidades?.map((cap) => (
                         <div key={cap} className="bg-white border border-slate-200 shadow-sm rounded p-2 text-xs border-l-2 border-emerald-500 flex items-start gap-2">
                           <CheckCircle className="h-3 w-3 text-emerald-600 flex-shrink-0 mt-0.5" />
                           <p>{cap}</p>
@@ -464,7 +506,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                                 <span className="bg-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">1</span> INICIO
                               </h4>
                               {isEditing ? (
-                                <Textarea value={editedSession.secuenciaMetodologica?.inicio ?? ""} onChange={(e) => setEditedSession({ ...editedSession, secuenciaMetodologica: { ...(editedSession.secuenciaMetodologica || {}), inicio: e.target.value } })} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
+                                <Textarea value={editedSession.secuenciaMetodologica?.inicio ?? ""} onChange={(e) => setEditedSession({ ...editedSession, secuenciaMetodologica: { ...editedSession.secuenciaMetodologica, inicio: e.target.value } })} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                               ) : (
                                 <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{ __html: (editedSession.secuenciaMetodologica?.inicio ?? "").replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-blue-600'>$1</strong>").replaceAll("\n", "<br>") }} />
                               )}
@@ -475,7 +517,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                                 <span className="bg-indigo-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">2</span> DESARROLLO
                               </h4>
                               {isEditing ? (
-                                <Textarea value={editedSession.secuenciaMetodologica?.desarrollo ?? ""} onChange={(e) => setEditedSession({ ...editedSession, secuenciaMetodologica: { ...(editedSession.secuenciaMetodologica || {}), desarrollo: e.target.value } })} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
+                                <Textarea value={editedSession.secuenciaMetodologica?.desarrollo ?? ""} onChange={(e) => setEditedSession({ ...editedSession, secuenciaMetodologica: { ...editedSession.secuenciaMetodologica, desarrollo: e.target.value } })} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                               ) : (
                                 <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{ __html: (editedSession.secuenciaMetodologica?.desarrollo ?? "").replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-indigo-600'>$1</strong>").replaceAll("\n", "<br>") }} />
                               )}
@@ -486,7 +528,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                                 <span className="bg-emerald-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">3</span> CIERRE
                               </h4>
                               {isEditing ? (
-                                <Textarea value={editedSession.secuenciaMetodologica?.cierre ?? ""} onChange={(e) => setEditedSession({ ...editedSession, secuenciaMetodologica: { ...(editedSession.secuenciaMetodologica || {}), cierre: e.target.value } })} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
+                                <Textarea value={editedSession.secuenciaMetodologica?.cierre ?? ""} onChange={(e) => setEditedSession({ ...editedSession, secuenciaMetodologica: { ...editedSession.secuenciaMetodologica, cierre: e.target.value } })} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                               ) : (
                                 <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{ __html: (editedSession.secuenciaMetodologica?.cierre ?? "").replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-emerald-600'>$1</strong>").replaceAll("\n", "<br>") }} />
                               )}
@@ -555,7 +597,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                     )}
 
                     {/* Procesos Didácticos */}
-                    {editedSession.procesosDidacticos && editedSession.procesosDidacticos.length > 0 && (
+                    {(editedSession.procesosDidacticos?.length ?? 0) > 0 && (
                       <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
@@ -565,8 +607,8 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         </CardHeader>
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-                            {editedSession.procesosDidacticos.map((proceso, index) => (
-                              <div key={`proceso-${index}`} className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 text-center">
+                            {editedSession.procesosDidacticos?.map((proceso, index) => (
+                              <div key={proceso} className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 text-center">
                                 <div className="bg-emerald-600 rounded-full w-8 h-8 flex items-center justify-center text-white font-bold text-xs mx-auto mb-2">{index + 1}</div>
                                 <p className="text-xs font-medium">{proceso}</p>
                               </div>
@@ -577,7 +619,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                     )}
 
                     {/* Actividades Contextualizadas */}
-                    {editedSession.actividadesContextualizadas && editedSession.actividadesContextualizadas.length > 0 && (
+                    {(editedSession.actividadesContextualizadas?.length ?? 0) > 0 && (
                       <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
@@ -587,8 +629,8 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         </CardHeader>
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {editedSession.actividadesContextualizadas.map((actividad, index) => (
-                              <div key={`act-${index}`} className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-l-4 border-indigo-500 flex items-start gap-3">
+                            {editedSession.actividadesContextualizadas?.map((actividad, index) => (
+                              <div key={actividad} className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-l-4 border-indigo-500 flex items-start gap-3">
                                 <Zap className="h-4 w-4 text-indigo-600 flex-shrink-0 mt-0.5" />
                                 <p className="text-sm text-slate-800">{actividad}</p>
                               </div>
@@ -646,7 +688,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                     )}
 
                     {/* Evaluación Formativa (Corregido mapeo arrays) */}
-                    {ra.evaluacionFormativa && ra.evaluacionFormativa.preguntas && ra.evaluacionFormativa.preguntas.length > 0 && (
+                    {ra.evaluacionFormativa?.preguntas?.length > 0 && (
                       <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
@@ -657,7 +699,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardContent className="space-y-3">
                           <div className="space-y-2">
                             {ra.evaluacionFormativa.preguntas.map((pregunta: string, idx: number) => (
-                              <details key={`preg-${idx}`} className="bg-white border border-slate-200 shadow-sm rounded p-3 text-sm border-l-2 border-emerald-500">
+                              <details key={pregunta} className="bg-white border border-slate-200 shadow-sm rounded p-3 text-sm border-l-2 border-emerald-500">
                                 <summary className="cursor-pointer font-medium text-slate-800">Pregunta {idx + 1}</summary>
                                 <div className="mt-2 space-y-1 text-xs pl-4 border-l border-slate-300">
                                   <p className="font-medium text-slate-800">{pregunta}</p>
@@ -677,7 +719,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                 {activeTab === 'recursos' && (
                   <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {/* Materiales Didácticos Sugeridos */}
-                    {editedSession.materialesDidacticosSugeridos && editedSession.materialesDidacticosSugeridos.length > 0 && (
+                    {(editedSession.materialesDidacticosSugeridos?.length ?? 0) > 0 && (
                       <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
@@ -687,7 +729,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         </CardHeader>
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {editedSession.materialesDidacticosSugeridos.map((material) => (
+                            {editedSession.materialesDidacticosSugeridos?.map((material) => (
                               <div key={safeKeyFromString(material) || material} className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-l-4 border-blue-500 flex items-start gap-3">
                                 <Package className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
                                 <p className="text-sm text-slate-800">{material}</p>
@@ -699,7 +741,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                     )}
 
                     {/* Actividades de Activación */}
-                    {ra.actividadDeActivacion && ra.actividadDeActivacion.length > 0 && (
+                    {ra.actividadDeActivacion?.length > 0 && (
                       <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
@@ -710,7 +752,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {ra.actividadDeActivacion.map((act: any, idx: number) => (
-                              <div key={`act-${idx}`} className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-l-4 border-indigo-500">
+                              <div key={act} className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-l-4 border-indigo-500">
                                 <p className="text-sm mt-1">{act}</p>
                               </div>
                             ))}
@@ -720,7 +762,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                     )}
 
                     {/* Fichas de Trabajo */}
-                    {ra.fichasDeTrabajo && ra.fichasDeTrabajo.length > 0 && (
+                    {ra.fichasDeTrabajo?.length > 0 && (
                       <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
@@ -730,7 +772,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         </CardHeader>
                         <CardContent className="space-y-3">
                           {ra.fichasDeTrabajo.map((ficha: any, idx: number) => (
-                            <details key={`ficha-${idx}`} className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-indigo-500">
+                            <details key={ficha.titulo || idx} className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-indigo-500">
                               <summary className="font-semibold text-sm cursor-pointer hover:text-indigo-600 transition-colors">
                                 {ficha.titulo || `Ficha ${idx + 1}`}
                               </summary>
@@ -739,8 +781,8 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                                 <div>
                                   <strong className="text-slate-800">Ejercicios:</strong>
                                   <ul className="list-disc list-inside space-y-1 mt-1 text-slate-800/80">
-                                    {ficha.ejercicios && ficha.ejercicios.map((ejercicio: any, i: number) => (
-                                      <li key={`ej-${i}`}>{ejercicio}</li>
+                                    {ficha.ejercicios?.map((ejercicio: any, i: number) => (
+                                      <li key={ejercicio}>{ejercicio}</li>
                                     ))}
                                   </ul>
                                 </div>
@@ -752,7 +794,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                     )}
 
                     {/* Problemas y Ejercicios (Corregido mapeo respuesta) */}
-                    {ra.problemasYEjercicios && ra.problemasYEjercicios.length > 0 && (
+                    {ra.problemasYEjercicios?.length > 0 && (
                       <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
@@ -763,7 +805,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {ra.problemasYEjercicios.map((problema: any, idx: number) => (
-                              <details key={`problema-${idx}`} className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-l-4 border-emerald-500">
+                              <details key={problema.problema || problema.enunciado || idx} className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-l-4 border-emerald-500">
                                 <summary className="font-semibold text-xs uppercase cursor-pointer">
                                   {problema.nivel || `Problema ${idx + 1}`}
                                 </summary>
@@ -782,7 +824,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                     )}
 
                     {/* Juego Didáctico */}
-                    {ra.juegoDidactico && (
+                    {ra?.juegoDidactico && (
                       <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
@@ -805,7 +847,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                             <strong className="text-sm">Instrucciones:</strong>
                             <ol className="list-decimal list-inside space-y-1 mt-1 text-xs text-slate-800/80">
                               {juegoInstrucciones.map((instr: any, i: number) => (
-                                <li key={`instr-${i}`}>{instr}</li>
+                                <li key={instr}>{instr}</li>
                               ))}
                             </ol>
                           </div>
@@ -814,7 +856,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                     )}
 
                     {/* Actividades Diferenciadas (Corregido a arrays de strings) */}
-                    {ra.actividadesDiferenciadas && (
+                    {ra?.actividadesDiferenciadas && (
                       <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
@@ -825,34 +867,34 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardContent>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                             {/* Refuerzo */}
-                            {ra.actividadesDiferenciadas.refuerzo && ra.actividadesDiferenciadas.refuerzo.length > 0 && (
+                            {ra.actividadesDiferenciadas.refuerzo?.length > 0 && (
                               <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-t-4 border-blue-500 space-y-2">
                                 <p className="font-semibold text-sm text-blue-600">Refuerzo</p>
                                 <ul className="list-disc list-inside space-y-1 mt-1 text-xs">
                                   {ra.actividadesDiferenciadas.refuerzo.map((act: string, idx: number) => (
-                                    <li key={`ref-${idx}`}>{act}</li>
+                                    <li key={act}>{act}</li>
                                   ))}
                                 </ul>
                               </div>
                             )}
                             {/* Consolidación */}
-                            {ra.actividadesDiferenciadas.consolidacion && ra.actividadesDiferenciadas.consolidacion.length > 0 && (
+                            {ra.actividadesDiferenciadas.consolidacion?.length > 0 && (
                               <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-t-4 border-indigo-500 space-y-2">
                                 <p className="font-semibold text-sm text-indigo-600">Consolidación</p>
                                 <ul className="list-disc list-inside space-y-1 mt-1 text-xs">
                                   {ra.actividadesDiferenciadas.consolidacion.map((act: string, idx: number) => (
-                                    <li key={`cons-${idx}`}>{act}</li>
+                                    <li key={act}>{act}</li>
                                   ))}
                                 </ul>
                               </div>
                             )}
                             {/* Profundización */}
-                            {ra.actividadesDiferenciadas.profundizacion && ra.actividadesDiferenciadas.profundizacion.length > 0 && (
+                            {ra.actividadesDiferenciadas.profundizacion?.length > 0 && (
                               <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-3 border-t-4 border-emerald-500 space-y-2">
                                 <p className="font-semibold text-sm text-emerald-600">Profundización</p>
                                 <ul className="list-disc list-inside space-y-1 mt-1 text-xs">
                                   {ra.actividadesDiferenciadas.profundizacion.map((act: string, idx: number) => (
-                                    <li key={`prof-${idx}`}>{act}</li>
+                                    <li key={act}>{act}</li>
                                   ))}
                                 </ul>
                               </div>
@@ -863,7 +905,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                     )}
 
                     {/* Comunicado para Padres */}
-                    {ra.comunicadoParaPadres && (
+                    {ra?.comunicadoParaPadres && (
                       <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
@@ -899,39 +941,14 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                 disabled={isSaving || isSaved}
                 className={`${isSaved ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white shadow-sm hover:scale-105 transition-all duration-300 h-12`}
               >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Guardando...
-                  </>
-                ) : isSaved ? (
-                  <>
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    ¡Sesión Guardada!
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Guardar en Personal
-                  </>
-                )}
+                {renderSaveButtonContent()}
               </Button>
               <Button
                 onClick={() => setShowPublishModal(true)}
                 disabled={isSaving || isPublished}
                 className={`${isPublished ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-blue-600 hover:bg-blue-700'} text-white shadow-sm hover:scale-105 transition-all duration-300 h-12`}
               >
-                {isPublished ? (
-                  <>
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Publicado
-                  </>
-                ) : (
-                  <>
-                    <Share2 className="h-4 w-4 mr-2" />
-                    Publicar en Comunidad
-                  </>
-                )}
+                {renderPublishButtonContent()}
               </Button>
               <Button
                 onClick={() => { setShowPreview(true); setHasInteracted(true); }}

@@ -2,17 +2,15 @@
 
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
 import { BookOpen, Layers, Users, Sparkles, BrainCircuit, Lightbulb, ChevronRight, ChevronLeft, Target, PlayCircle } from "lucide-react"
 
 interface LandingPageProps {
-  onEnterGeneratorPreview: () => void
-  onEnterRepositoryPreview: () => void
-  onLogin: () => void
+  readonly onEnterGeneratorPreview: () => void
+  readonly onEnterRepositoryPreview: () => void
+  readonly onLogin: () => void
 }
 
-export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview, onLogin }: LandingPageProps) {
-  const router = useRouter()
+export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview, onLogin }: Readonly<LandingPageProps>) {
 
   // Animation variants
   const staggerContainer = {
@@ -310,7 +308,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
               { title: "Comprensión Lectora", sub: "Comunicación", rating: "4.7 (780)", area: "Primaria" }
             ].map((item, i) => (
               <motion.div 
-                key={i}
+                key={item.title}
                 variants={springUp}
                 whileHover={{ y: -10, scale: 1.03 }}
                 className="group relative h-64 rounded-3xl overflow-hidden cursor-pointer shadow-md bg-card border border-border flex flex-col transition-all"

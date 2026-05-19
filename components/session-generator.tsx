@@ -6,24 +6,22 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
-import { Progress } from "@/components/ui/progress"
 import {
   Brain, User, BarChart3, Loader2, Sparkles, Target, Clock, Package,
-  Calendar, Award, CheckCircle2, X, Calculator, LineChart, Ruler, BarChart,
+  Award, CheckCircle2, X, Calculator, LineChart, Ruler, BarChart,
   ChevronDown, ChevronUp, Info, FileText, BookOpen, GraduationCap
 } from "lucide-react"
 import type { SessionData } from "@/app/page"
 
 interface SessionGeneratorProps {
-  user?: { name: string; email: string } | null
-  onSessionGenerated: (session: SessionData) => void
-  onViewDashboard: () => void
-  onLogout: () => void
-  editingSession?: SessionData | null
-  guestMode?: boolean
-  onLoginRequired?: () => void
+  readonly user?: { readonly name: string; readonly email: string } | null
+  readonly onSessionGenerated: (session: SessionData) => void
+  readonly onViewDashboard: () => void
+  readonly onLogout: () => void
+  readonly editingSession?: SessionData | null
+  readonly guestMode?: boolean
+  readonly onLoginRequired?: () => void
 }
 
 const competenciasData = [
@@ -109,16 +107,215 @@ const materialesPorContexto: Record<string, string[]> = {
   "Comunidad": ["Pizarra", "Tizas", "Materiales de la comunidad", "Elementos naturales", "Telares"]
 }
 
-export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, onLogout, editingSession, guestMode = false, onLoginRequired }: SessionGeneratorProps) {
+interface WebSocketMessageConfig {
+  socket: WebSocket
+  intervalId: ReturnType<typeof setInterval>
+  sId: string
+  tracker: { current: number }
+  setCurrentStep: (step: string) => void
+  setProgress: (progress: number) => void
+  setIsGenerating: (isGenerating: boolean) => void
+  onSessionGenerated: (session: SessionData) => void
+}
+
+function handleWebSocketMessage(event: MessageEvent, config: WebSocketMessageConfig) {
+  try {
+    const data = JSON.parse(event.data)
+
+    if (data.status === 'progress') {
+      if (data.step) config.setCurrentStep(data.step)
+      if (data.progress) {
+        config.setProgress(data.progress)
+        config.tracker.current = data.progress
+      } else {
+        config.tracker.current = Math.min(config.tracker.current + 15, 90)
+        config.setProgress(config.tracker.current)
+      }
+    } else if (data.status === 'completed') {
+      clearInterval(config.intervalId)
+      config.setProgress(100)
+      config.setCurrentStep("¡Sesión generada exitosamente!")
+
+      if (!data.data || typeof data.data !== 'object') {
+        throw new Error("La sesión generada no tiene el formato correcto")
+      }
+
+      setTimeout(() => {
+        const sessionData = { ...data.data, session_id: config.sId }
+        config.onSessionGenerated(sessionData)
+        config.socket.close()
+      }, 1000)
+    } else if (data.status === 'error') {
+      clearInterval(config.intervalId)
+      config.setIsGenerating(false)
+      alert("Error de IA: " + (data.message || "desconocido"))
+      config.socket.close()
+    }
+  } catch (e) {
+    clearInterval(config.intervalId)
+    config.setIsGenerating(false)
+    console.error("Error parsing websocket message data:", e)
+    alert("Error al procesar la respuesta del servidor")
+    config.socket.close()
+  }
+}
+
+function getContextoBase(ctx: string) {
+  if (!ctx) return ""
+  if (ctx.includes("Urbano (")) return "Urbano"
+  if (ctx.includes("Urbano-marginal")) return "Urbano-marginal"
+  if (ctx.includes("Rural")) return "Rural"
+  if (ctx.includes("Costero")) return "Costero"
+  if (ctx.includes("Comunidad")) return "Comunidad"
+  return ""
+}
+
+function calculateFormProgress(
+  nombreDocente: string,
+  grado: string,
+  hasCompetencias: boolean,
+  tema: string,
+  tituloSesion: string,
+  contexto: string
+) {
+  let fields = 0
+  const totalFields = 6
+  if (nombreDocente) fields++
+  if (grado) fields++
+  if (hasCompetencias) fields++
+  if (tema) fields++
+  if (tituloSesion) fields++
+  if (contexto) fields++
+  return (fields / totalFields) * 100
+}
+
+interface RunWebSocketGenerationParams {
+  tema: string
+  tituloSesion: string
+  nombreDocente: string
+  fecha: string
+  grado: string
+  seccion: string
+  competenciasSeleccionadas: string[]
+  capacidadesSeleccionadas: string[]
+  enfoqueTransversal: string
+  competenciaTransversal: string
+  ciclo: string
+  contexto: string
+  horasClase: number
+  materialesSeleccionados: string[]
+  materialesNoEstructurados: string
+  instrumentoEvaluacion: string
+  user: any
+  setCurrentStep: (step: string) => void
+  setProgress: (progress: number) => void
+  setIsGenerating: (isGenerating: boolean) => void
+  onSessionGenerated: (session: SessionData) => void
+}
+
+function runWebSocketSessionGeneration(params: RunWebSocketGenerationParams) {
+  const materialesCombinados = [
+    ...params.materialesSeleccionados,
+    ...(params.materialesNoEstructurados ? [params.materialesNoEstructurados] : [])
+  ].join(", ")
+
+  const evalInst = params.instrumentoEvaluacion === instrumentosEvaluacion[0] ? "A decisión de la IA" : params.instrumentoEvaluacion
+
+  const message = `Tema de la Sesión: ${params.tema}
+Título: ${params.tituloSesion}
+Docente: ${params.nombreDocente}
+Fecha: ${params.fecha}
+Grado: ${params.grado}º Secundaria
+Sección: ${params.seccion}
+Competencias: ${params.competenciasSeleccionadas.join(", ")}
+Capacidades: ${params.capacidadesSeleccionadas.join(", ")}
+Enfoque Transversal: ${params.enfoqueTransversal}
+Competencia Transversal: ${params.competenciaTransversal}
+Ciclo: ${params.ciclo}
+Contexto Social: ${params.contexto}
+Duración: ${params.horasClase} horas (${params.horasClase * 45} minutos)
+Materiales: ${materialesCombinados}
+Instrumento de Evaluación Sugerido: ${evalInst}
+
+Nota: La IA debe generar automáticamente:
+- Propósito de la Sesión
+- Criterios de Evaluación
+- Evidencias de Aprendizaje
+- Desarrollo de la sesión (Inicio, Desarrollo, Cierre)
+- Recursos y materiales estructurados`
+
+  const sessionId = params.user?.email || params.user?.name || "guest"
+  const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL || ""
+  let wsUrl = webhookUrl
+    .replace(/^https:\/\//, "wss://")
+    .replace(/^http:\/\//, "ws://")
+
+  if (wsUrl.includes("/webhook")) {
+    wsUrl = wsUrl.replace("/webhook", "/ws/generate")
+  } else {
+    wsUrl = wsUrl.replace(/\/$/, "") + "/ws/generate"
+  }
+
+  const ws = new WebSocket(wsUrl)
+  let currentProgress = 0
+
+  const loadingMessages = [
+    "Analizando el currículo nacional...",
+    "Diseñando la secuencia didáctica...",
+    "Preparando las evidencias y criterios...",
+    "Ajustando al contexto social...",
+    "Casi listo..."
+  ]
+
+  let messageIndex = 0
+  const messageInterval = setInterval(() => {
+    if (currentProgress < 90) {
+      params.setCurrentStep(loadingMessages[messageIndex % loadingMessages.length])
+      messageIndex++
+    }
+  }, 3000)
+
+  ws.onopen = () => {
+    ws.send(JSON.stringify({
+      session_id: sessionId,
+      message: message
+    }))
+  }
+
+  ws.onmessage = (event) => {
+    const tracker = { current: currentProgress }
+    handleWebSocketMessage(event, {
+      socket: ws,
+      intervalId: messageInterval,
+      sId: sessionId,
+      tracker,
+      setCurrentStep: params.setCurrentStep,
+      setProgress: params.setProgress,
+      setIsGenerating: params.setIsGenerating,
+      onSessionGenerated: params.onSessionGenerated,
+    })
+    currentProgress = tracker.current
+  }
+
+  ws.onerror = (error) => {
+    clearInterval(messageInterval)
+    params.setIsGenerating(false)
+    params.setProgress(0)
+    params.setCurrentStep("")
+    alert("Error de conexión al generar la sesión. Asegúrate de que el backend esté en ejecución.")
+    ws.close()
+  }
+}
+
+function useSessionGeneratorState({ user, onSessionGenerated, editingSession, guestMode = false, onLoginRequired }: SessionGeneratorProps) {
   const [nombreDocente, setNombreDocente] = useState("")
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
   const [grado, setGrado] = useState("")
   const [seccion, setSeccion] = useState("")
 
   const ciclo = useMemo(() => {
-    if (["1", "2"].includes(grado)) return "VI"
-    if (["3", "4", "5"].includes(grado)) return "VII"
-    return ""
+    const cicloMap: Record<string, string> = { "1": "VI", "2": "VI", "3": "VII", "4": "VII", "5": "VII" }
+    return cicloMap[grado] ?? ""
   }, [grado])
 
   const [competenciasSeleccionadas, setCompetenciasSeleccionadas] = useState<string[]>([])
@@ -145,55 +342,42 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, on
   const [showErrors, setShowErrors] = useState(false)
 
   useEffect(() => {
-    if (editingSession) {
-      setTema(editingSession.tema || "")
-      setTituloSesion(editingSession.tituloSesion || editingSession.titulo || editingSession.tema || "")
-      setCompetenciasSeleccionadas(Array.isArray(editingSession.competenciasSeleccionadas) ? editingSession.competenciasSeleccionadas : [])
-      setContexto(editingSession.contexto || "")
-      setHorasClase(editingSession.horasClase || 1)
-    }
+    if (!editingSession) return
+    const { tema = "", tituloSesion, titulo, competenciasSeleccionadas, contexto = "", horasClase = 1 } = editingSession
+    setTema(tema)
+    setTituloSesion(tituloSesion ?? titulo ?? tema)
+    setCompetenciasSeleccionadas(Array.isArray(competenciasSeleccionadas) ? competenciasSeleccionadas : [])
+    setContexto(contexto)
+    setHorasClase(horasClase)
   }, [editingSession])
-
-  const getContextoBase = (ctx: string) => {
-    if (!ctx) return ""
-    if (ctx.includes("Urbano (")) return "Urbano"
-    if (ctx.includes("Urbano-marginal")) return "Urbano-marginal"
-    if (ctx.includes("Rural")) return "Rural"
-    if (ctx.includes("Costero")) return "Costero"
-    if (ctx.includes("Comunidad")) return "Comunidad"
-    return ""
-  }
 
   const contextoBase = getContextoBase(contexto)
 
   useEffect(() => {
-    if (contextoBase && materialesPorContexto[contextoBase]) {
-      setMaterialesSeleccionados(materialesPorContexto[contextoBase])
-    } else {
-      setMaterialesSeleccionados([])
-    }
+    const materiales = materialesPorContexto[contextoBase] || []
+    setMaterialesSeleccionados(materiales)
   }, [contextoBase])
 
-  const handleCompetenciaChange = (competencia: string, checked: boolean) => {
-    if (checked) {
-      setCompetenciasSeleccionadas((prev) => [...prev, competencia])
-      setCompetenciaExpandida(competencia)
-    } else {
-      setCompetenciasSeleccionadas((prev) => prev.filter((c) => c !== competencia))
-      const capacidadesToRemove = capacidadesPorCompetencia[competencia] || []
-      setCapacidadesSeleccionadas((prev) => prev.filter((c) => !capacidadesToRemove.includes(c)))
-      if (competenciaExpandida === competencia) {
-        setCompetenciaExpandida(null)
-      }
+  const addCompetencia = (competencia: string) => {
+    setCompetenciasSeleccionadas((prev) => [...prev, competencia])
+    setCompetenciaExpandida(competencia)
+  }
+
+  const removeCompetencia = (competencia: string) => {
+    setCompetenciasSeleccionadas((prev) => prev.filter((c) => c !== competencia))
+    const capacidadesToRemove = capacidadesPorCompetencia[competencia] || []
+    setCapacidadesSeleccionadas((prev) => prev.filter((c) => !capacidadesToRemove.includes(c)))
+    if (competenciaExpandida === competencia) {
+      setCompetenciaExpandida(null)
     }
   }
 
-  const handleCapacidadChange = (capacidad: string, checked: boolean) => {
-    if (checked) {
-      setCapacidadesSeleccionadas((prev) => [...prev, capacidad])
-    } else {
-      setCapacidadesSeleccionadas((prev) => prev.filter((c) => c !== capacidad))
-    }
+  const addCapacidad = (capacidad: string) => {
+    setCapacidadesSeleccionadas((prev) => [...prev, capacidad])
+  }
+
+  const removeCapacidad = (capacidad: string) => {
+    setCapacidadesSeleccionadas((prev) => prev.filter((c) => c !== capacidad))
   }
 
   const toggleMaterial = (material: string) => {
@@ -208,7 +392,15 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, on
     setCompetenciaExpandida(competenciaExpandida === competencia ? null : competencia)
   }
 
-  const isValid = nombreDocente && tema && tituloSesion && competenciasSeleccionadas.length > 0 && grado && contexto && horasClase
+  const isValid = [
+    nombreDocente,
+    tema,
+    tituloSesion,
+    competenciasSeleccionadas.length > 0,
+    grado,
+    contexto,
+    horasClase
+  ].every(Boolean)
 
   const generateSession = async () => {
     if (guestMode) {
@@ -218,7 +410,7 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, on
 
     if (!isValid) {
       setShowErrors(true)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      globalThis.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
 
@@ -227,124 +419,29 @@ export function SessionGenerator({ user, onSessionGenerated, onViewDashboard, on
     setCurrentStep("Iniciando conexión con IA...")
 
     try {
-      const materialesCombinados = [
-        ...materialesSeleccionados,
-        ...(materialesNoEstructurados ? [materialesNoEstructurados] : [])
-      ].join(", ")
-
-      const evalInst = instrumentoEvaluacion === instrumentosEvaluacion[0] ? "A decisión de la IA" : instrumentoEvaluacion
-
-      const message = `Tema de la Sesión: ${tema}
-Título: ${tituloSesion}
-Docente: ${nombreDocente}
-Fecha: ${fecha}
-Grado: ${grado}º Secundaria
-Sección: ${seccion}
-Competencias: ${competenciasSeleccionadas.join(", ")}
-Capacidades: ${capacidadesSeleccionadas.join(", ")}
-Enfoque Transversal: ${enfoqueTransversal}
-Competencia Transversal: ${competenciaTransversal}
-Ciclo: ${ciclo}
-Contexto Social: ${contexto}
-Duración: ${horasClase} horas (${horasClase * 45} minutos)
-Materiales: ${materialesCombinados}
-Instrumento de Evaluación Sugerido: ${evalInst}
-
-Nota: La IA debe generar automáticamente:
-- Propósito de la Sesión
-- Criterios de Evaluación
-- Evidencias de Aprendizaje
-- Desarrollo de la sesión (Inicio, Desarrollo, Cierre)
-- Recursos y materiales estructurados`
-
-      const sessionId = user?.email || user?.name || "guest"
-      const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL || ""
-      let wsUrl = webhookUrl
-        .replace(/^https:\/\//, "wss://")
-        .replace(/^http:\/\//, "ws://")
-
-      if (wsUrl.includes("/webhook")) {
-        wsUrl = wsUrl.replace("/webhook", "/ws/generate")
-      } else {
-        wsUrl = wsUrl.replace(/\/$/, "") + "/ws/generate"
-      }
-
-      const ws = new WebSocket(wsUrl)
-      let currentProgress = 0
-
-      const loadingMessages = [
-        "Analizando el currículo nacional...",
-        "Diseñando la secuencia didáctica...",
-        "Preparando las evidencias y criterios...",
-        "Ajustando al contexto social...",
-        "Casi listo..."
-      ]
-
-      let messageIndex = 0
-      const messageInterval = setInterval(() => {
-        if (currentProgress < 90) {
-          setCurrentStep(loadingMessages[messageIndex % loadingMessages.length])
-          messageIndex++
-        }
-      }, 3000)
-
-      ws.onopen = () => {
-        ws.send(JSON.stringify({
-          session_id: sessionId,
-          message: message
-        }))
-      }
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data)
-
-          if (data.status === 'progress') {
-            if (data.step) setCurrentStep(data.step)
-            if (data.progress) {
-              setProgress(data.progress)
-              currentProgress = data.progress
-            } else {
-              currentProgress = Math.min(currentProgress + 15, 90)
-              setProgress(currentProgress)
-            }
-          } else if (data.status === 'completed') {
-            clearInterval(messageInterval)
-            setProgress(100)
-            setCurrentStep("¡Sesión generada exitosamente!")
-
-            if (!data.data || typeof data.data !== 'object') {
-              throw new Error("La sesión generada no tiene el formato correcto")
-            }
-
-            setTimeout(() => {
-              const sessionData = { ...data.data, session_id: sessionId }
-              onSessionGenerated(sessionData)
-              ws.close()
-            }, 1000)
-          } else if (data.status === 'error') {
-            clearInterval(messageInterval)
-            setIsGenerating(false)
-            alert("Error de IA: " + (data.message || "desconocido"))
-            ws.close()
-          }
-        } catch (e) {
-          clearInterval(messageInterval)
-          setIsGenerating(false)
-          alert("Error al procesar la respuesta del servidor")
-          ws.close()
-        }
-      }
-
-      ws.onerror = (error) => {
-        clearInterval(messageInterval)
-        setIsGenerating(false)
-        setProgress(0)
-        setCurrentStep("")
-        alert("Error de conexión al generar la sesión. Asegúrate de que el backend esté en ejecución.")
-        ws.close()
-      }
-
+      runWebSocketSessionGeneration({
+        tema,
+        tituloSesion,
+        nombreDocente,
+        fecha,
+        grado,
+        seccion,
+        competenciasSeleccionadas,
+        capacidadesSeleccionadas,
+        enfoqueTransversal,
+        competenciaTransversal,
+        ciclo,
+        contexto,
+        horasClase,
+        materialesSeleccionados,
+        materialesNoEstructurados,
+        instrumentoEvaluacion,
+        user,
+        setCurrentStep,
+        setProgress,
+        setIsGenerating,
+        onSessionGenerated,
+      })
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Error desconocido"
       alert(`Error: ${errorMessage}\n\nPor favor, intenta de nuevo.`)
@@ -352,182 +449,551 @@ Nota: La IA debe generar automáticamente:
     }
   }
 
-  // Helper para el progreso general del formulario
-  const calculateFormProgress = () => {
-    let fields = 0;
-    let totalFields = 6;
-    if (nombreDocente) fields++;
-    if (grado) fields++;
-    if (competenciasSeleccionadas.length > 0) fields++;
-    if (tema) fields++;
-    if (tituloSesion) fields++;
-    if (contexto) fields++;
-    return (fields / totalFields) * 100;
+  const formProgress = calculateFormProgress(
+    nombreDocente,
+    grado,
+    competenciasSeleccionadas.length > 0,
+    tema,
+    tituloSesion,
+    contexto
+  )
+
+  return {
+    nombreDocente, setNombreDocente,
+    fecha, setFecha,
+    grado, setGrado,
+    seccion, setSeccion,
+    ciclo,
+    competenciasSeleccionadas,
+    capacidadesSeleccionadas,
+    competenciaExpandida,
+    tema, setTema,
+    tituloSesion, setTituloSesion,
+    enfoqueTransversal, setEnfoqueTransversal,
+    competenciaTransversal, setCompetenciaTransversal,
+    contexto, setContexto,
+    horasClase, setHorasClase,
+    materialesSeleccionados,
+    materialesNoEstructurados, setMaterialesNoEstructurados,
+    instrumentoEvaluacion, setInstrumentoEvaluacion,
+    isGenerating,
+    progress,
+    currentStep,
+    showErrors,
+    addCompetencia,
+    removeCompetencia,
+    addCapacidad,
+    removeCapacidad,
+    toggleMaterial,
+    toggleAccordion,
+    generateSession,
+    formProgress,
+    contextoBase,
+    isValid
   }
+}
+
+interface SessionHeaderProps {
+  readonly guestMode: boolean
+  readonly onLoginRequired?: () => void
+  readonly onViewDashboard: () => void
+  readonly onLogout: () => void
+  readonly user?: { readonly name: string; readonly email: string } | null
+}
+
+function SessionHeader({
+  guestMode,
+  onLoginRequired,
+  onViewDashboard,
+  onLogout,
+  user
+}: Readonly<SessionHeaderProps>) {
+  return (
+    <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+      <div className="container mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
+          <div>
+            <h1 className="font-bold text-xl md:text-2xl text-slate-800 flex items-center gap-2">
+              Genera tu Sesión de Aprendizaje
+            </h1>
+            <div className="flex items-center gap-2">
+              <p className="text-xs md:text-sm text-slate-500 font-medium">Asistente para docentes de matemática</p>
+              <span className="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full border border-indigo-100 font-semibold">Powered by IA</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+          <Button
+            variant="outline"
+            onClick={() => {
+              if (guestMode) {
+                onLoginRequired?.()
+              } else {
+                onViewDashboard()
+              }
+            }}
+            className="bg-white border-slate-300 hover:bg-slate-50 text-slate-700 transition-all h-9 text-sm font-medium shadow-sm"
+          >
+            <BarChart3 className="h-4 w-4 mr-2 text-slate-500" />
+            <span className="hidden sm:inline">Dashboard</span>
+          </Button>
+          {guestMode ? (
+            <Button
+              onClick={onLoginRequired}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-9 px-4 rounded-full text-sm shadow-sm transition-all hover:scale-105 active:scale-95"
+            >
+              Iniciar Sesión
+            </Button>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
+                <div className="bg-blue-100 p-1 rounded-full">
+                  <User className="h-3 w-3 text-blue-600" />
+                </div>
+                <span className="text-sm font-medium text-slate-700 truncate max-w-[100px] sm:max-w-[150px]">{user?.name}</span>
+              </div>
+              <Button
+                variant="ghost"
+                onClick={onLogout}
+                className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-2 sm:px-3 font-medium"
+                title="Cerrar Sesión"
+              >
+                <X className="h-4 w-4 sm:mr-1" />
+                <span className="hidden sm:inline">Salir</span>
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+    </header>
+  )
+}
+
+interface ProgressModalProps {
+  readonly isGenerating: boolean
+  readonly currentStep: string
+  readonly progress: number
+}
+
+function ProgressModal({ isGenerating, currentStep, progress }: Readonly<ProgressModalProps>) {
+  if (!isGenerating) return null
+  return (
+    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
+      <Card className="bg-white border border-slate-200 shadow-2xl max-w-md w-full rounded-2xl">
+        <CardHeader className="text-center pb-6">
+          <div className="flex justify-center mb-4">
+            <img
+              src="/pinguinos/pinguino_pensando.png"
+              alt="Pingüino pensando"
+              className="w-24 h-24 object-contain animate-bounce"
+            />
+          </div>
+          <CardTitle className="text-2xl text-slate-800 font-bold">
+            Diseñando tu Sesión
+          </CardTitle>
+          <CardDescription className="text-base text-blue-600 font-medium mt-1">
+            {currentStep}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+              <div className="h-full bg-blue-600 transition-all" style={{ width: `${progress}%` }} />
+            </div>
+            <div className="flex justify-between text-xs text-slate-500 font-medium px-1">
+              <span>{progress}% completado</span>
+              <span>~{Math.max(1, Math.ceil((100 - progress) / 15))}s restantes</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+interface SessionSidebarSummaryProps {
+  readonly nombreDocente: string
+  readonly grado: string
+  readonly ciclo: string
+  readonly tema: string
+  readonly competenciasSeleccionadas: readonly string[]
+  readonly formProgress: number
+}
+
+function SessionSidebarSummary({
+  nombreDocente,
+  grado,
+  ciclo,
+  tema,
+  competenciasSeleccionadas,
+  formProgress
+}: Readonly<SessionSidebarSummaryProps>) {
+  return (
+    <div className="hidden lg:block lg:col-span-4 sticky top-24 space-y-6">
+      <div className="mb-2">
+        <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Nueva Sesión</h2>
+        <p className="text-slate-500 mt-1">Completa el formulario para generar tu clase con Inteligencia Artificial.</p>
+      </div>
+
+      <Card className="bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden">
+        <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2 text-slate-700">
+            <BookOpen className="h-4 w-4 text-blue-600" />
+            Resumen de la Sesión
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-5 space-y-4">
+          <div className="space-y-1">
+            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Docente</p>
+            <p className="text-sm font-medium text-slate-800">{nombreDocente || <span className="text-slate-300 italic">No especificado</span>}</p>
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Grado y Ciclo</p>
+            <p className="text-sm font-medium text-slate-800">
+              {grado ? (
+                <span>
+                  {grado}º Secundaria {ciclo && `(Ciclo ${ciclo})`}
+                </span>
+              ) : (
+                <span className="text-slate-300 italic">No especificado</span>
+              )}
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Tema Central</p>
+            <p className="text-sm font-medium text-slate-800 line-clamp-2">{tema || <span className="text-slate-300 italic">No especificado</span>}</p>
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Competencias ({competenciasSeleccionadas.length})</p>
+            {competenciasSeleccionadas.length > 0 ? (
+              <ul className="text-xs text-slate-700 space-y-1 list-disc list-inside">
+                {competenciasSeleccionadas.map(c => <li key={c} className="truncate">{c}</li>)}
+              </ul>
+            ) : (
+              <p className="text-sm font-medium text-slate-300 italic">Ninguna seleccionada</p>
+            )}
+          </div>
+
+          <div className="space-y-1 pt-2 border-t border-slate-100">
+            <div className="flex justify-between items-center text-xs mb-1">
+              <span className="font-semibold text-slate-600">Progreso general</span>
+              <span className="text-blue-600 font-bold">{Math.round(formProgress)}%</span>
+            </div>
+            <div className="relative h-2 w-full overflow-hidden rounded-full bg-slate-100">
+              <div className="h-full bg-emerald-500 transition-all" style={{ width: `${formProgress}%` }} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3">
+        <Sparkles className="h-5 w-5 text-blue-600 shrink-0" />
+        <p className="text-xs text-blue-800 font-medium leading-relaxed">
+          La IA estructurará tu sesión automáticamente siguiendo el enfoque del Currículo Nacional (CNEB) y adaptando las actividades a tu contexto social seleccionado.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+interface CompetenciasSectionProps {
+  readonly showErrors: boolean
+  readonly competenciasSeleccionadas: readonly string[]
+  readonly competenciaExpandida: string | null
+  readonly capacidadesSeleccionadas: readonly string[]
+  readonly toggleAccordion: (competencia: string) => void
+  readonly addCompetencia: (competencia: string) => void
+  readonly removeCompetencia: (competencia: string) => void
+  readonly addCapacidad: (capacidad: string) => void
+  readonly removeCapacidad: (capacidad: string) => void
+}
+
+function CompetenciasSection({
+  showErrors,
+  competenciasSeleccionadas,
+  competenciaExpandida,
+  capacidadesSeleccionadas,
+  toggleAccordion,
+  addCompetencia,
+  removeCompetencia,
+  addCapacidad,
+  removeCapacidad
+}: Readonly<CompetenciasSectionProps>) {
+  return (
+    <section className="space-y-5 animate-in fade-in">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="flex items-center gap-2">
+          <div className="bg-blue-100 p-1.5 rounded-md">
+            <Target className="h-5 w-5 text-blue-600" />
+          </div>
+          <h3 className="text-lg font-bold text-slate-800">2. Competencias y Capacidades</h3>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <Label className="text-sm font-semibold text-slate-700">
+          Competencias del CNEB <span className="text-red-500">*</span>
+        </Label>
+
+        <div className="grid grid-cols-1 gap-3">
+          {competenciasData.map((comp) => {
+            const Icon = comp.icon
+            const isSelected = competenciasSeleccionadas.includes(comp.name)
+            const isExpanded = competenciaExpandida === comp.name
+            const capacidades = capacidadesPorCompetencia[comp.name] || []
+            return (
+              <div key={comp.name}>
+                {/* Tarjeta de Competencia */}
+                <div
+                  className={`flex items-center p-4 rounded-xl border transition-all duration-200 shadow-sm ${isSelected
+                      ? "bg-blue-50 border-blue-500 ring-1 ring-blue-500"
+                      : "bg-white border-slate-200 hover:border-blue-300 hover:bg-slate-50"
+                    }`}
+                >
+                  {/* Left & Middle Interactive Area */}
+                  <button
+                    type="button"
+                    className="flex-1 flex items-center text-left"
+                    onClick={() => {
+                      if (isSelected) {
+                        toggleAccordion(comp.name)
+                      } else {
+                        addCompetencia(comp.name)
+                      }
+                    }}
+                  >
+                    <div className={`p-2.5 rounded-lg mr-4 ${isSelected ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "bg-slate-100 text-slate-500"}`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div className={`font-semibold text-sm ${isSelected ? "text-blue-900" : "text-slate-700"}`}>
+                        {comp.name}
+                    </div>
+                  </button>
+
+                  {/* Right Interactive Area */}
+                  <div className="flex items-center gap-3 ml-4">
+                    {isSelected && (
+                      <button
+                        type="button"
+                        onClick={() => toggleAccordion(comp.name)}
+                        className="text-slate-400 hover:text-blue-600 p-1 bg-white rounded-md border border-slate-200 animate-in fade-in"
+                      >
+                        {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (isSelected) {
+                          removeCompetencia(comp.name)
+                        } else {
+                          addCompetencia(comp.name)
+                        }
+                      }}
+                      className={`h-5 w-5 border-2 rounded flex items-center justify-center transition-all ${
+                        isSelected
+                          ? "border-blue-600 bg-blue-600 text-white"
+                          : "border-slate-300 bg-white hover:border-blue-400"
+                      }`}
+                      aria-label={`Seleccionar ${comp.name}`}
+                    >
+                      {isSelected && <CheckCircle2 className="h-3 w-3 text-white" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Acordeón de Capacidades */}
+                {isSelected && isExpanded && (
+                  <div className="mt-2 ml-4 p-4 bg-slate-50 border border-slate-200 rounded-xl animate-in slide-in-from-top-2">
+                    <p className="text-xs text-slate-600 font-semibold mb-3 flex items-center gap-1.5 uppercase tracking-wide">
+                      Selecciona las capacidades:
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      {capacidades.map((capacidad) => {
+                        const isCapSelected = capacidadesSeleccionadas.includes(capacidad)
+                        return (
+                          <button
+                            key={capacidad}
+                            type="button"
+                            className={`w-full flex items-start gap-3 p-3 rounded-lg border text-left transition-colors ${isCapSelected
+                                ? "bg-white border-blue-200 shadow-sm"
+                                : "bg-transparent border-transparent hover:bg-slate-100"
+                              }`}
+                            onClick={() => {
+                              if (isCapSelected) {
+                                removeCapacidad(capacidad)
+                              } else {
+                                addCapacidad(capacidad)
+                              }
+                            }}
+                          >
+                            <div
+                              className={`mt-0.5 h-5 w-5 min-w-[20px] min-h-[20px] border-2 rounded flex items-center justify-center transition-all ${
+                                isCapSelected
+                                  ? "border-blue-600 bg-blue-600 text-white"
+                                  : "border-slate-300 bg-white"
+                              }`}
+                            >
+                              {isCapSelected && <CheckCircle2 className="h-3 w-3 text-white" />}
+                            </div>
+                            <span className={`text-sm leading-snug font-medium ${isCapSelected ? "text-slate-900" : "text-slate-600"}`}>
+                              {capacidad}
+                            </span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+        {showErrors && competenciasSeleccionadas.length === 0 && (
+          <p className="text-xs text-red-500 font-medium">Selecciona al menos una competencia</p>
+        )}
+      </div>
+    </section>
+  )
+}
+
+interface MaterialesSectionProps {
+  readonly contextoBase: string
+  readonly materialesSeleccionados: readonly string[]
+  readonly toggleMaterial: (material: string) => void
+  readonly materialesNoEstructurados: string
+  readonly setMaterialesNoEstructurados: (val: string) => void
+}
+
+function MaterialesSection({
+  contextoBase,
+  materialesSeleccionados,
+  toggleMaterial,
+  materialesNoEstructurados,
+  setMaterialesNoEstructurados
+}: Readonly<MaterialesSectionProps>) {
+  return (
+    <section className="space-y-5 animate-in fade-in">
+      <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+        <div className="bg-violet-100 p-1.5 rounded-md">
+          <Package className="h-5 w-5 text-violet-600" />
+        </div>
+        <h3 className="text-lg font-bold text-slate-800">6. Materiales Didácticos</h3>
+      </div>
+
+      {contextoBase && materialesPorContexto[contextoBase] && (
+        <div className="space-y-3">
+          <Label className="text-sm font-semibold text-slate-700">Sugeridos para {contextoBase}</Label>
+          <div className="flex flex-wrap gap-2">
+            {materialesPorContexto[contextoBase].map((material) => {
+              const isSelected = materialesSeleccionados.includes(material)
+              return (
+                <Button
+                  key={material}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => toggleMaterial(material)}
+                  className={`h-9 rounded-full transition-all border shadow-sm ${isSelected
+                      ? "bg-violet-50 border-violet-300 text-violet-700 hover:bg-violet-100"
+                      : "bg-white border-slate-300 text-slate-600 hover:border-slate-400 hover:bg-slate-50"
+                    }`}
+                >
+                  {isSelected ? <CheckCircle2 className="h-3.5 w-3.5 mr-1.5 text-violet-600" /> : null}
+                  {material}
+                </Button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      <div className="space-y-2">
+        <Label htmlFor="materialesNoEstructurados" className="text-sm font-semibold text-slate-700">Material No Estructurado (opcional)</Label>
+        <Textarea
+          id="materialesNoEstructurados"
+          placeholder="Ej: chapas, piedritas, palitos, recortes de periódicos..."
+          value={materialesNoEstructurados}
+          onChange={(e) => setMaterialesNoEstructurados(e.target.value)}
+          className="min-h-[80px] bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm resize-none"
+        />
+      </div>
+    </section>
+  )
+}
+
+export function SessionGenerator(props: SessionGeneratorProps) {
+  const { user, onViewDashboard, onLogout, guestMode = false, onLoginRequired, editingSession } = props
+  const {
+    nombreDocente, setNombreDocente,
+    fecha, setFecha,
+    grado, setGrado,
+    seccion, setSeccion,
+    ciclo,
+    competenciasSeleccionadas,
+    capacidadesSeleccionadas,
+    competenciaExpandida,
+    tema, setTema,
+    tituloSesion, setTituloSesion,
+    enfoqueTransversal, setEnfoqueTransversal,
+    competenciaTransversal, setCompetenciaTransversal,
+    contexto, setContexto,
+    horasClase, setHorasClase,
+    materialesSeleccionados,
+    materialesNoEstructurados, setMaterialesNoEstructurados,
+    instrumentoEvaluacion, setInstrumentoEvaluacion,
+    isGenerating,
+    progress,
+    currentStep,
+    showErrors,
+    addCompetencia,
+    removeCompetencia,
+    addCapacidad,
+    removeCapacidad,
+    toggleMaterial,
+    toggleAccordion,
+    generateSession,
+    formProgress,
+    contextoBase,
+    isValid
+  } = useSessionGeneratorState(props)
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 relative font-sans">
 
       {/* HEADER LUMINOSO Y LIMPIO */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-        <div className="container mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
-            <div>
-              <h1 className="font-bold text-xl md:text-2xl text-slate-800 flex items-center gap-2">
-                Genera tu Sesión de Aprendizaje
-              </h1>
-              <div className="flex items-center gap-2">
-                <p className="text-xs md:text-sm text-slate-500 font-medium">Asistente para docentes de matemática</p>
-                <span className="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full border border-indigo-100 font-semibold">Powered by IA</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (guestMode) {
-                  onLoginRequired?.()
-                } else {
-                  onViewDashboard()
-                }
-              }}
-              className="bg-white border-slate-300 hover:bg-slate-50 text-slate-700 transition-all h-9 text-sm font-medium shadow-sm"
-            >
-              <BarChart3 className="h-4 w-4 mr-2 text-slate-500" />
-              <span className="hidden sm:inline">Dashboard</span>
-            </Button>
-            {guestMode ? (
-              <Button
-                onClick={onLoginRequired}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-9 px-4 rounded-full text-sm shadow-sm transition-all hover:scale-105 active:scale-95"
-              >
-                Iniciar Sesión
-              </Button>
-            ) : (
-              <>
-                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
-                  <div className="bg-blue-100 p-1 rounded-full">
-                    <User className="h-3 w-3 text-blue-600" />
-                  </div>
-                  <span className="text-sm font-medium text-slate-700 truncate max-w-[100px] sm:max-w-[150px]">{user?.name}</span>
-                </div>
-                <Button
-                  variant="ghost"
-                  onClick={onLogout}
-                  className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-2 sm:px-3 font-medium"
-                  title="Cerrar Sesión"
-                >
-                  <X className="h-4 w-4 sm:mr-1" />
-                  <span className="hidden sm:inline">Salir</span>
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <SessionHeader
+        guestMode={guestMode}
+        onLoginRequired={onLoginRequired}
+        onViewDashboard={onViewDashboard}
+        onLogout={onLogout}
+        user={user}
+      />
 
       {/* Progress Modal */}
-      {isGenerating && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
-          <Card className="bg-white border border-slate-200 shadow-2xl max-w-md w-full rounded-2xl">
-            <CardHeader className="text-center pb-6">
-              <div className="flex justify-center mb-4">
-                <img
-                  src="/pinguinos/pinguino_pensando.png"
-                  alt="Pingüino pensando"
-                  className="w-24 h-24 object-contain animate-bounce"
-                />
-              </div>
-              <CardTitle className="text-2xl text-slate-800 font-bold">
-                Diseñando tu Sesión
-              </CardTitle>
-              <CardDescription className="text-base text-blue-600 font-medium mt-1">
-                {currentStep}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
-                  <div className="h-full bg-blue-600 transition-all" style={{ width: `${progress}%` }} />
-                </div>
-                <div className="flex justify-between text-xs text-slate-500 font-medium px-1">
-                  <span>{progress}% completado</span>
-                  <span>~{Math.max(1, Math.ceil((100 - progress) / 15))}s restantes</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      <ProgressModal
+        isGenerating={isGenerating}
+        currentStep={currentStep}
+        progress={progress}
+      />
 
       {/* CONTENIDO PRINCIPAL A 2 COLUMNAS */}
       <div className="max-w-7xl mx-auto px-4 py-8 relative z-10 pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
           {/* SIDEBAR - RESUMEN (Pegajoso en Desktop) */}
-          <div className="hidden lg:block lg:col-span-4 sticky top-24 space-y-6">
-            <div className="mb-2">
-              <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Nueva Sesión</h2>
-              <p className="text-slate-500 mt-1">Completa el formulario para generar tu clase con Inteligencia Artificial.</p>
-            </div>
-
-            <Card className="bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden">
-              <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
-                <CardTitle className="text-sm font-semibold flex items-center gap-2 text-slate-700">
-                  <BookOpen className="h-4 w-4 text-blue-600" />
-                  Resumen de la Sesión
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-5 space-y-4">
-                <div className="space-y-1">
-                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Docente</p>
-                  <p className="text-sm font-medium text-slate-800">{nombreDocente || <span className="text-slate-300 italic">No especificado</span>}</p>
-                </div>
-
-                <div className="space-y-1">
-                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Grado y Ciclo</p>
-                  <p className="text-sm font-medium text-slate-800">
-                    {grado ? `${grado}º Secundaria ${ciclo ? `(Ciclo ${ciclo})` : ''}` : <span className="text-slate-300 italic">No especificado</span>}
-                  </p>
-                </div>
-
-                <div className="space-y-1">
-                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Tema Central</p>
-                  <p className="text-sm font-medium text-slate-800 line-clamp-2">{tema || <span className="text-slate-300 italic">No especificado</span>}</p>
-                </div>
-
-                <div className="space-y-1">
-                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Competencias ({competenciasSeleccionadas.length})</p>
-                  {competenciasSeleccionadas.length > 0 ? (
-                    <ul className="text-xs text-slate-700 space-y-1 list-disc list-inside">
-                      {competenciasSeleccionadas.map(c => <li key={c} className="truncate">{c}</li>)}
-                    </ul>
-                  ) : (
-                    <p className="text-sm font-medium text-slate-300 italic">Ninguna seleccionada</p>
-                  )}
-                </div>
-
-                <div className="space-y-1 pt-2 border-t border-slate-100">
-                  <div className="flex justify-between items-center text-xs mb-1">
-                    <span className="font-semibold text-slate-600">Progreso general</span>
-                    <span className="text-blue-600 font-bold">{Math.round(calculateFormProgress())}%</span>
-                  </div>
-                  <div className="relative h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                    <div className="h-full bg-emerald-500 transition-all" style={{ width: `${calculateFormProgress()}%` }} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3">
-              <Sparkles className="h-5 w-5 text-blue-600 shrink-0" />
-              <p className="text-xs text-blue-800 font-medium leading-relaxed">
-                La IA estructurará tu sesión automáticamente siguiendo el enfoque del Currículo Nacional (CNEB) y adaptando las actividades a tu contexto social seleccionado.
-              </p>
-            </div>
-          </div>
+          <SessionSidebarSummary
+            nombreDocente={nombreDocente}
+            grado={grado}
+            ciclo={ciclo}
+            tema={tema}
+            competenciasSeleccionadas={competenciasSeleccionadas}
+            formProgress={formProgress}
+          />
 
           {/* FORMULARIO PRINCIPAL */}
           <div className="col-span-1 lg:col-span-8 space-y-6">
@@ -616,109 +1082,17 @@ Nota: La IA debe generar automáticamente:
                 </section>
 
                 {/* 2. COMPETENCIAS Y CAPACIDADES */}
-                <section className="space-y-5 animate-in fade-in">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="bg-blue-100 p-1.5 rounded-md">
-                        <Target className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <h3 className="text-lg font-bold text-slate-800">2. Competencias y Capacidades</h3>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <Label className="text-sm font-semibold text-slate-700">
-                      Competencias del CNEB <span className="text-red-500">*</span>
-                    </Label>
-
-                    <div className="grid grid-cols-1 gap-3">
-                      {competenciasData.map((comp) => {
-                        const Icon = comp.icon
-                        const isSelected = competenciasSeleccionadas.includes(comp.name)
-                        const isExpanded = competenciaExpandida === comp.name
-                        const capacidades = capacidadesPorCompetencia[comp.name] || []
-
-                        return (
-                          <div key={comp.name} className="flex flex-col">
-                            {/* Tarjeta de Competencia */}
-                            <div
-                              className={`flex items-center p-4 rounded-xl border transition-all duration-200 cursor-pointer shadow-sm ${isSelected
-                                  ? "bg-blue-50 border-blue-500 ring-1 ring-blue-500"
-                                  : "bg-white border-slate-200 hover:border-blue-300 hover:bg-slate-50"
-                                }`}
-                              onClick={() => {
-                                if (!isSelected) {
-                                  handleCompetenciaChange(comp.name, true)
-                                } else {
-                                  toggleAccordion(comp.name)
-                                }
-                              }}
-                            >
-                              <div className={`p-2.5 rounded-lg mr-4 ${isSelected ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "bg-slate-100 text-slate-500"}`}>
-                                <Icon className="h-5 w-5" />
-                              </div>
-                              <div className={`flex-1 font-semibold text-sm ${isSelected ? "text-blue-900" : "text-slate-700"}`}>
-                                {comp.name}
-                              </div>
-                              <div className="flex items-center gap-3">
-                                {isSelected && (
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); toggleAccordion(comp.name) }}
-                                    className="text-slate-400 hover:text-blue-600 p-1 bg-white rounded-md border border-slate-200"
-                                  >
-                                    {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                                  </button>
-                                )}
-                                <Checkbox
-                                  checked={isSelected}
-                                  onCheckedChange={(checked) => handleCompetenciaChange(comp.name, checked as boolean)}
-                                  onClick={(e) => e.stopPropagation()}
-                                  className={`h-5 w-5 border-2 rounded ${isSelected ? "border-blue-600 bg-blue-600 text-white" : "border-slate-300"}`}
-                                />
-                              </div>
-                            </div>
-
-                            {/* Acordeón de Capacidades */}
-                            {isSelected && isExpanded && (
-                              <div className="mt-2 ml-4 p-4 bg-slate-50 border border-slate-200 rounded-xl animate-in slide-in-from-top-2">
-                                <p className="text-xs text-slate-600 font-semibold mb-3 flex items-center gap-1.5 uppercase tracking-wide">
-                                  Selecciona las capacidades:
-                                </p>
-                                <div className="flex flex-col gap-2">
-                                  {capacidades.map((capacidad) => {
-                                    const isCapSelected = capacidadesSeleccionadas.includes(capacidad)
-                                    return (
-                                      <div
-                                        key={capacidad}
-                                        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${isCapSelected
-                                            ? "bg-white border-blue-200 shadow-sm"
-                                            : "bg-transparent border-transparent hover:bg-slate-100"
-                                          }`}
-                                        onClick={() => handleCapacidadChange(capacidad, !isCapSelected)}
-                                      >
-                                        <Checkbox
-                                          checked={isCapSelected}
-                                          onCheckedChange={(checked) => handleCapacidadChange(capacidad, checked as boolean)}
-                                          className="mt-0.5 border-slate-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 rounded"
-                                        />
-                                        <span className={`text-sm leading-snug font-medium ${isCapSelected ? "text-slate-900" : "text-slate-600"}`}>
-                                          {capacidad}
-                                        </span>
-                                      </div>
-                                    )
-                                  })}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                    {showErrors && competenciasSeleccionadas.length === 0 && (
-                      <p className="text-xs text-red-500 font-medium">Selecciona al menos una competencia</p>
-                    )}
-                  </div>
-                </section>
+                <CompetenciasSection
+                  showErrors={showErrors}
+                  competenciasSeleccionadas={competenciasSeleccionadas}
+                  competenciaExpandida={competenciaExpandida}
+                  capacidadesSeleccionadas={capacidadesSeleccionadas}
+                  toggleAccordion={toggleAccordion}
+                  addCompetencia={addCompetencia}
+                  removeCompetencia={removeCompetencia}
+                  addCapacidad={addCapacidad}
+                  removeCapacidad={removeCapacidad}
+                />
 
                 {/* 3. CONTENIDO DE LA SESIÓN */}
                 <section className="space-y-5 animate-in fade-in">
@@ -866,52 +1240,13 @@ Nota: La IA debe generar automáticamente:
                 </section>
 
                 {/* 6. MATERIALES DIDÁCTICOS */}
-                <section className="space-y-5 animate-in fade-in">
-                  <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                    <div className="bg-violet-100 p-1.5 rounded-md">
-                      <Package className="h-5 w-5 text-violet-600" />
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-800">6. Materiales Didácticos</h3>
-                  </div>
-
-                  {contextoBase && materialesPorContexto[contextoBase] && (
-                    <div className="space-y-3">
-                      <Label className="text-sm font-semibold text-slate-700">Sugeridos para {contextoBase}</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {materialesPorContexto[contextoBase].map((material) => {
-                          const isSelected = materialesSeleccionados.includes(material)
-                          return (
-                            <Button
-                              key={material}
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => toggleMaterial(material)}
-                              className={`h-9 rounded-full transition-all border shadow-sm ${isSelected
-                                  ? "bg-violet-50 border-violet-300 text-violet-700 hover:bg-violet-100"
-                                  : "bg-white border-slate-300 text-slate-600 hover:border-slate-400 hover:bg-slate-50"
-                                }`}
-                            >
-                              {isSelected ? <CheckCircle2 className="h-3.5 w-3.5 mr-1.5 text-violet-600" /> : null}
-                              {material}
-                            </Button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <Label htmlFor="materialesNoEstructurados" className="text-sm font-semibold text-slate-700">Material No Estructurado (opcional)</Label>
-                    <Textarea
-                      id="materialesNoEstructurados"
-                      placeholder="Ej: chapas, piedritas, palitos, recortes de periódicos..."
-                      value={materialesNoEstructurados}
-                      onChange={(e) => setMaterialesNoEstructurados(e.target.value)}
-                      className="min-h-[80px] bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm resize-none"
-                    />
-                  </div>
-                </section>
+                <MaterialesSection
+                  contextoBase={contextoBase}
+                  materialesSeleccionados={materialesSeleccionados}
+                  toggleMaterial={toggleMaterial}
+                  materialesNoEstructurados={materialesNoEstructurados}
+                  setMaterialesNoEstructurados={setMaterialesNoEstructurados}
+                />
 
                 {/* 7. EVALUACIÓN */}
                 <section className="space-y-5 animate-in fade-in pb-2">
