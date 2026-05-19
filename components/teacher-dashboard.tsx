@@ -23,7 +23,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
   const [activeTab, setActiveTab] = useState<'overview' | 'sessions'>('overview')
   const [groupBy, setGroupBy] = useState<'recientes' | 'bimestre' | 'curso'>('recientes')
 
-  const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || "https://eduai-auth-1.onrender.com"
+  const API_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || "http://localhost:10000"
 
   // Cargar sesiones guardadas del backend
   useEffect(() => {
@@ -32,7 +32,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
         const accessToken = localStorage.getItem("access_token")
         if (!accessToken) return
 
-        const res = await fetch(`${AUTH_URL}/sessions?user_id=${user.email}`, {
+        const res = await fetch(`${API_URL}/api/sessions`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -40,7 +40,9 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
 
         if (res.ok) {
           const data = await res.json()
-          setSavedSessions(data)
+          // Filter out sessions by user_id. We fetch all from /api/sessions and filter locally.
+          const userSessions = data.filter((s: any) => s.user_id === user.email || !s.user_id)
+          setSavedSessions(userSessions)
         }
       } catch (err) {
         console.error("Error cargando sesiones:", err)
@@ -50,14 +52,14 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
     }
 
     loadSessions()
-  }, [user.email, AUTH_URL])
+  }, [user.email, API_URL])
 
   // KPIs
   const totalSessions = savedSessions.length
   const timesSaved = totalSessions * 45 // 45 minutos por sesión
   const competenciasUsadas = [...new Set(savedSessions.flatMap((s) => s.session_data?.competenciasSeleccionadas || []))].length
   const contextsUsed = [...new Set(savedSessions.map((s) => s.session_data?.contexto).filter(Boolean))].length
-  
+
   const sesionesPublicadas = savedSessions.filter(s => s.session_data?.is_public).length
   const totalLikes = savedSessions.reduce((acc, s) => acc + (s.session_data?.likes || 0), 0)
 
@@ -67,20 +69,20 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
     // Inicializar los últimos 6 meses para que el gráfico no esté vacío
     const currentMonth = new Date().getMonth();
     const data: { name: string; sesiones: number }[] = [];
-    for(let i = 5; i >= 0; i--) {
-        const mIndex = (currentMonth - i + 12) % 12;
-        data.push({ name: months[mIndex], sesiones: 0 });
+    for (let i = 5; i >= 0; i--) {
+      const mIndex = (currentMonth - i + 12) % 12;
+      data.push({ name: months[mIndex], sesiones: 0 });
     }
-    
+
     savedSessions.forEach(item => {
       try {
         const date = new Date(item.created_at);
         const monthName = months[date.getMonth()];
         const entry = data.find(d => d.name === monthName);
-        if(entry) {
-            entry.sesiones += 1;
+        if (entry) {
+          entry.sesiones += 1;
         }
-      } catch(e) {}
+      } catch (e) { }
     });
     return data;
   }, [savedSessions]);
@@ -101,12 +103,12 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
       comps.forEach((c: string) => {
         // Acortar nombre para el gráfico
         let shortName = c;
-        if(c.includes("Resuelve problemas de cantidad")) shortName = "Cantidad";
-        else if(c.includes("regularidad, equivalencia y cambio")) shortName = "Regularidad y Cambio";
-        else if(c.includes("forma, movimiento y localización")) shortName = "Forma y Movimiento";
-        else if(c.includes("gestión de datos e incertidumbre")) shortName = "Datos e Incertidumbre";
+        if (c.includes("Resuelve problemas de cantidad")) shortName = "Cantidad";
+        else if (c.includes("regularidad, equivalencia y cambio")) shortName = "Regularidad y Cambio";
+        else if (c.includes("forma, movimiento y localización")) shortName = "Forma y Movimiento";
+        else if (c.includes("gestión de datos e incertidumbre")) shortName = "Datos e Incertidumbre";
         else shortName = c.substring(0, 20) + "...";
-        
+
         counts[shortName] = (counts[shortName] || 0) + 1;
       });
     });
@@ -118,7 +120,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
     if (groupBy === 'recientes') {
       return { 'Todas las Sesiones': savedSessions };
     }
-    
+
     if (groupBy === 'bimestre') {
       const groups: Record<string, any[]> = {
         'I Bimestre (Ene-Mar)': [],
@@ -126,7 +128,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
         'III Bimestre (Jun-Ago)': [],
         'IV Bimestre (Sep-Dic)': [],
       };
-      
+
       savedSessions.forEach(item => {
         const month = new Date(item.created_at).getMonth() + 1;
         if (month <= 3) groups['I Bimestre (Ene-Mar)'].push(item);
@@ -134,21 +136,21 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
         else if (month <= 8) groups['III Bimestre (Jun-Ago)'].push(item);
         else groups['IV Bimestre (Sep-Dic)'].push(item);
       });
-      
+
       return Object.fromEntries(Object.entries(groups).filter(([k, v]) => v.length > 0));
     }
-    
+
     if (groupBy === 'curso') {
       // Simulado: Agrupar por áreas de matemática u otro curso en el futuro
       const groups: Record<string, any[]> = {};
       savedSessions.forEach(item => {
         const area = item.session_data?.area || 'Matemática';
-        if(!groups[area]) groups[area] = [];
+        if (!groups[area]) groups[area] = [];
         groups[area].push(item);
       });
       return groups;
     }
-    
+
     return { 'Sesiones': savedSessions };
   }, [savedSessions, groupBy]);
 
@@ -200,17 +202,17 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
 
       <div className="container mx-auto px-4 py-8 relative z-10">
         <div className="max-w-7xl mx-auto space-y-8">
-          
+
           {/* TAB NAVIGATION */}
           <div className="flex bg-white rounded-xl shadow-sm border border-slate-200 p-1 w-full max-w-sm mx-auto">
-            <button 
+            <button
               onClick={() => setActiveTab('overview')}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-lg transition-all ${activeTab === 'overview' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
             >
               <BarChart3 className="w-4 h-4" />
               Vista General
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('sessions')}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-lg transition-all ${activeTab === 'sessions' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
             >
@@ -325,7 +327,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
 
               {/* CHARTS */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                
+
                 {/* Sesiones por Mes */}
                 <Card className="bg-white border-slate-200 shadow-sm rounded-xl">
                   <CardHeader>
@@ -443,7 +445,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
                   <h2>Organizar Historial</h2>
                 </div>
                 <div className="flex gap-2">
-                  <Button 
+                  <Button
                     variant={groupBy === 'recientes' ? 'default' : 'outline'}
                     size="sm"
                     className={groupBy === 'recientes' ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 hover:text-blue-600 border-slate-200'}
@@ -451,7 +453,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
                   >
                     Recientes
                   </Button>
-                  <Button 
+                  <Button
                     variant={groupBy === 'bimestre' ? 'default' : 'outline'}
                     size="sm"
                     className={groupBy === 'bimestre' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 hover:text-indigo-600 border-slate-200'}
@@ -494,12 +496,12 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Teac
                     <div key={groupName} className="space-y-4">
                       <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2">
                         <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                        {groupName} 
+                        {groupName}
                         <span className="text-sm font-normal text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full ml-2">
                           {groupSessions.length}
                         </span>
                       </h3>
-                      
+
                       <div className="grid grid-cols-1 gap-3">
                         {groupSessions.map((item, index) => {
                           const session = item.session_data

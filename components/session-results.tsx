@@ -59,9 +59,9 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
   const [showPublishModal, setShowPublishModal] = useState(false)
   const [hasInteracted, setHasInteracted] = useState(false)
   const [publishConfirmed, setPublishConfirmed] = useState(false)
-  const [activeTab, setActiveTab] = useState<'secuencia'|'evaluacion'|'recursos'>('secuencia')
+  const [activeTab, setActiveTab] = useState<'secuencia' | 'evaluacion' | 'recursos'>('secuencia')
   const contentRef = useRef<HTMLDivElement>(null)
-  const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || "https://eduai-auth-1.onrender.com"
+  const API_URL = process.env.NEXT_PUBLIC_WEBHOOK_URL || "http://localhost:10000"
 
   // Estados editables
   const [editedSession, setEditedSession] = useState<SessionData>(session)
@@ -69,16 +69,16 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
   // Parsear distribución horaria del backend
   const parseDistribucionHoras = () => {
     if (!editedSession.distribucionHoras) return { inicio: 0, desarrollo: 0, cierre: 0 }
-    
+
     const text = editedSession.distribucionHoras.toLowerCase()
     const inicioRegex = /inicio\D*(\d+)/i
     const desarrolloRegex = /desarrollo\D*(\d+)/i
     const cierreRegex = /cierre\D*(\d+)/i
-    
+
     const inicioMatch = inicioRegex.exec(text)
     const desarrolloMatch = desarrolloRegex.exec(text)
     const cierreMatch = cierreRegex.exec(text)
-    
+
     return {
       inicio: inicioMatch ? Number.parseInt(inicioMatch[1]) : 0,
       desarrollo: desarrolloMatch ? Number.parseInt(desarrolloMatch[1]) : 0,
@@ -108,7 +108,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
       }
 
       const userData = JSON.parse(user)
-      
+
       const payloadData = { ...editedSession }
       if (isPublic) {
         payloadData.is_public = true
@@ -121,7 +121,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
         session_data: payloadData,
       }
 
-      const res = await fetch(`${AUTH_URL}/save-session`, {
+      const res = await fetch(`${API_URL}/api/sessions/save`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -151,119 +151,119 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
   return (
     <>
-    {showPreview && (
-      <PdfPreview session={editedSession} onClose={() => setShowPreview(false)} />
-    )}
-    
-    {showPublishModal && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-        <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl relative animate-in fade-in zoom-in duration-200">
-          <button 
-            onClick={() => setShowPublishModal(false)}
-            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
-          >
-            <X className="h-5 w-5" />
-          </button>
-          
-          <div className="flex justify-center mb-4">
-            <div className="bg-blue-100 p-3 rounded-full text-blue-600">
-              <Share2 className="h-8 w-8" />
-            </div>
-          </div>
-          
-          <h3 className="text-xl font-bold text-slate-800 text-center mb-2">Publicar en el Repositorio</h3>
-          <p className="text-sm text-slate-500 text-center mb-6">
-            Para mantener la calidad de nuestra comunidad, requerimos que los docentes validen el contenido generado por la IA antes de compartirlo.
-          </p>
+      {showPreview && (
+        <PdfPreview session={editedSession} onClose={() => setShowPreview(false)} />
+      )}
 
-          {!hasInteracted && (
-            <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3 rounded-lg mb-4 flex gap-2">
-              <Lightbulb className="h-5 w-5 flex-shrink-0" />
-              <p><strong>Sugerencia:</strong> Notamos que aún no has editado la sesión ni generado una vista previa en PDF. Te recomendamos revisarla antes de hacerla pública.</p>
-            </div>
-          )}
+      {showPublishModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            <button
+              onClick={() => setShowPublishModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
+            >
+              <X className="h-5 w-5" />
+            </button>
 
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6 hover:bg-slate-100 transition-colors">
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input 
-                type="checkbox" 
-                checked={publishConfirmed}
-                onChange={(e) => setPublishConfirmed(e.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-              />
-              <span className="text-sm text-slate-700 font-medium">
-                Certifico que he revisado pedagógicamente el contenido de esta sesión, realizando los ajustes necesarios para asegurar su calidad.
-              </span>
-            </label>
-          </div>
-
-          <Button 
-            onClick={() => {
-              setShowPublishModal(false);
-              handleSaveSession(true);
-            }}
-            disabled={!publishConfirmed || isSaving}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12"
-          >
-            Confirmar y Publicar
-          </Button>
-        </div>
-      </div>
-    )}
-
-    <div className="min-h-screen bg-slate-50 text-slate-900 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 right-20 w-64 h-64 bg-blue-600 rounded-full blur-3xl opacity-10 animate-pulse"></div>
-        <div className="absolute bottom-20 left-20 w-64 h-64 bg-indigo-600 rounded-full blur-3xl opacity-10 animate-pulse delay-1000"></div>
-      </div>
-
-      {/* Header */}
-      <header className="bg-white border border-slate-200 shadow-sm border-b border-slate-200 border-b relative z-10">
-        <div className="container mx-auto px-4 py-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={onBack} className="bg-white border border-slate-200 shadow-sm hover:shadow-sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver
-            </Button>
-            <div className="flex items-center gap-3">
-              <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
-              <div>
-                <h1 className="font-bold text-lg text-blue-800 font-bold">
-                  Sesión Generada
-                </h1>
-                <p className="text-sm text-slate-500">Con IA y Currículo Nacional</p>
+            <div className="flex justify-center mb-4">
+              <div className="bg-blue-100 p-3 rounded-full text-blue-600">
+                <Share2 className="h-8 w-8" />
               </div>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
+
+            <h3 className="text-xl font-bold text-slate-800 text-center mb-2">Publicar en el Repositorio</h3>
+            <p className="text-sm text-slate-500 text-center mb-6">
+              Para mantener la calidad de nuestra comunidad, requerimos que los docentes validen el contenido generado por la IA antes de compartirlo.
+            </p>
+
+            {!hasInteracted && (
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs p-3 rounded-lg mb-4 flex gap-2">
+                <Lightbulb className="h-5 w-5 flex-shrink-0" />
+                <p><strong>Sugerencia:</strong> Notamos que aún no has editado la sesión ni generado una vista previa en PDF. Te recomendamos revisarla antes de hacerla pública.</p>
+              </div>
+            )}
+
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6 hover:bg-slate-100 transition-colors">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={publishConfirmed}
+                  onChange={(e) => setPublishConfirmed(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                />
+                <span className="text-sm text-slate-700 font-medium">
+                  Certifico que he revisado pedagógicamente el contenido de esta sesión, realizando los ajustes necesarios para asegurar su calidad.
+                </span>
+              </label>
+            </div>
+
             <Button
-              variant="outline"
-              onClick={onViewDashboard}
-              className="bg-white border border-slate-200 shadow-sm border-indigo-500/30 hover:shadow-sm bg-transparent"
+              onClick={() => {
+                setShowPublishModal(false);
+                handleSaveSession(true);
+              }}
+              disabled={!publishConfirmed || isSaving}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12"
             >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Dashboard
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => { setIsEditing(!isEditing); setHasInteracted(true); }}
-              className={`bg-white border border-slate-200 shadow-sm border-emerald-500/30 hover:shadow-sm bg-transparent ${isEditing ? 'shadow-sm' : ''}`}
-            >
-              <Edit3 className="h-4 w-4 mr-2" />
-              {isEditing ? "Vista Previa" : "Editar Contenido"}
+              Confirmar y Publicar
             </Button>
           </div>
         </div>
-      </header>
+      )}
+
+      <div className="min-h-screen bg-slate-50 text-slate-900 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 right-20 w-64 h-64 bg-blue-600 rounded-full blur-3xl opacity-10 animate-pulse"></div>
+          <div className="absolute bottom-20 left-20 w-64 h-64 bg-indigo-600 rounded-full blur-3xl opacity-10 animate-pulse delay-1000"></div>
+        </div>
+
+        {/* Header */}
+        <header className="bg-white border border-slate-200 shadow-sm border-b border-slate-200 border-b relative z-10">
+          <div className="container mx-auto px-4 py-6 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" onClick={onBack} className="bg-white border border-slate-200 shadow-sm hover:shadow-sm">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Volver
+              </Button>
+              <div className="flex items-center gap-3">
+                <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
+                <div>
+                  <h1 className="font-bold text-lg text-blue-800 font-bold">
+                    Sesión Generada
+                  </h1>
+                  <p className="text-sm text-slate-500">Con IA y Currículo Nacional</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                onClick={onViewDashboard}
+                className="bg-white border border-slate-200 shadow-sm border-indigo-500/30 hover:shadow-sm bg-transparent"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => { setIsEditing(!isEditing); setHasInteracted(true); }}
+                className={`bg-white border border-slate-200 shadow-sm border-emerald-500/30 hover:shadow-sm bg-transparent ${isEditing ? 'shadow-sm' : ''}`}
+              >
+                <Edit3 className="h-4 w-4 mr-2" />
+                {isEditing ? "Vista Previa" : "Editar Contenido"}
+              </Button>
+            </div>
+          </div>
+        </header>
 
 
-      <div className="container mx-auto px-4 py-8 relative z-10">
-        <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto" ref={contentRef}>
-          
-          {/* SIDEBAR */}
-          <div className="w-full lg:w-1/3 space-y-6 flex-shrink-0">
-             <div className="sticky top-24 space-y-6">
+        <div className="container mx-auto px-4 py-8 relative z-10">
+          <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto" ref={contentRef}>
+
+            {/* SIDEBAR */}
+            <div className="w-full lg:w-1/3 space-y-6 flex-shrink-0">
+              <div className="sticky top-24 space-y-6">
                 <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4 border-l-4 border-blue-500">
                   <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
                     <BookOpen className="h-5 w-5 text-blue-600" />
@@ -376,29 +376,29 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                     </CardContent>
                   </Card>
                 )}
-             </div>
-          </div>
+              </div>
+            </div>
 
-          {/* MAIN CONTENT */}
-          <div className="w-full lg:w-2/3 space-y-6">
-             <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-2 mb-2 flex flex-wrap sm:flex-nowrap overflow-x-auto gap-2 border-b border-slate-200 border-b sticky top-[80px] z-20 backdrop-blur-xl">
-               <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'secuencia' ? 'bg-blue-100 text-blue-600 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'}`} onClick={() => setActiveTab('secuencia')}>
-                 <BookOpen className="h-4 w-4 mr-2" />
-                 Secuencia Didáctica
-               </Button>
-               <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'evaluacion' ? 'bg-emerald-100 text-emerald-600 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'}`} onClick={() => setActiveTab('evaluacion')}>
-                 <CheckCircle className="h-4 w-4 mr-2" />
-                 Evaluación
-               </Button>
-               <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'recursos' ? 'bg-indigo-100 text-indigo-600 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'}`} onClick={() => setActiveTab('recursos')}>
-                 <Package className="h-4 w-4 mr-2" />
-                 Recursos Adicionales
-               </Button>
-             </div>
+            {/* MAIN CONTENT */}
+            <div className="w-full lg:w-2/3 space-y-6">
+              <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-2 mb-2 flex flex-wrap sm:flex-nowrap overflow-x-auto gap-2 border-b border-slate-200 border-b sticky top-[80px] z-20 backdrop-blur-xl">
+                <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'secuencia' ? 'bg-blue-100 text-blue-600 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'}`} onClick={() => setActiveTab('secuencia')}>
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Secuencia Didáctica
+                </Button>
+                <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'evaluacion' ? 'bg-emerald-100 text-emerald-600 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'}`} onClick={() => setActiveTab('evaluacion')}>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Evaluación
+                </Button>
+                <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'recursos' ? 'bg-indigo-100 text-indigo-600 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'}`} onClick={() => setActiveTab('recursos')}>
+                  <Package className="h-4 w-4 mr-2" />
+                  Recursos Adicionales
+                </Button>
+              </div>
 
-             <div className="min-h-[600px] pb-10">
-               {/* TAB 1: SECUENCIA */}
-               {activeTab === 'secuencia' && (
+              <div className="min-h-[600px] pb-10">
+                {/* TAB 1: SECUENCIA */}
+                {activeTab === 'secuencia' && (
                   <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {/* Propósito de la Sesión */}
                     {editedSession.propositoSesion && (
@@ -411,7 +411,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         </CardHeader>
                         <CardContent>
                           {isEditing ? (
-                            <Textarea value={editedSession.propositoSesion} onChange={(e) => setEditedSession({...editedSession, propositoSesion: e.target.value})} className="min-h-[80px] bg-white border border-slate-200 shadow-sm" />
+                            <Textarea value={editedSession.propositoSesion} onChange={(e) => setEditedSession({ ...editedSession, propositoSesion: e.target.value })} className="min-h-[80px] bg-white border border-slate-200 shadow-sm" />
                           ) : (
                             <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-indigo-500 bg-gradient-to-r from-indigo-50 to-transparent">
                               <p className="text-slate-800 leading-relaxed text-sm">{editedSession.propositoSesion}</p>
@@ -432,7 +432,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         </CardHeader>
                         <CardContent>
                           {isEditing ? (
-                            <Textarea value={editedSession.competenciaDescripcion} onChange={(e) => setEditedSession({...editedSession, competenciaDescripcion: e.target.value})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
+                            <Textarea value={editedSession.competenciaDescripcion} onChange={(e) => setEditedSession({ ...editedSession, competenciaDescripcion: e.target.value })} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                           ) : (
                             <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-indigo-500 bg-gradient-to-r from-indigo-50 to-transparent">
                               <p className="text-slate-800 leading-relaxed text-sm">{editedSession.competenciaDescripcion}</p>
@@ -459,9 +459,9 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                                 <span className="bg-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">1</span> INICIO
                               </h4>
                               {isEditing ? (
-                                <Textarea value={editedSession.secuenciaMetodologica?.inicio ?? ""} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: { ...(editedSession.secuenciaMetodologica || {}), inicio: e.target.value }})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
+                                <Textarea value={editedSession.secuenciaMetodologica?.inicio ?? ""} onChange={(e) => setEditedSession({ ...editedSession, secuenciaMetodologica: { ...(editedSession.secuenciaMetodologica || {}), inicio: e.target.value } })} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                               ) : (
-                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{__html: (editedSession.secuenciaMetodologica?.inicio ?? "").replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-blue-600'>$1</strong>").replaceAll("\n", "<br>")}} />
+                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{ __html: (editedSession.secuenciaMetodologica?.inicio ?? "").replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-blue-600'>$1</strong>").replaceAll("\n", "<br>") }} />
                               )}
                             </div>
                             {/* DESARROLLO */}
@@ -470,9 +470,9 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                                 <span className="bg-indigo-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">2</span> DESARROLLO
                               </h4>
                               {isEditing ? (
-                                <Textarea value={editedSession.secuenciaMetodologica?.desarrollo ?? ""} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: { ...(editedSession.secuenciaMetodologica || {}), desarrollo: e.target.value }})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
+                                <Textarea value={editedSession.secuenciaMetodologica?.desarrollo ?? ""} onChange={(e) => setEditedSession({ ...editedSession, secuenciaMetodologica: { ...(editedSession.secuenciaMetodologica || {}), desarrollo: e.target.value } })} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                               ) : (
-                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{__html: (editedSession.secuenciaMetodologica?.desarrollo ?? "").replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-indigo-600'>$1</strong>").replaceAll("\n", "<br>")}} />
+                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{ __html: (editedSession.secuenciaMetodologica?.desarrollo ?? "").replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-indigo-600'>$1</strong>").replaceAll("\n", "<br>") }} />
                               )}
                             </div>
                             {/* CIERRE */}
@@ -481,9 +481,9 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                                 <span className="bg-emerald-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">3</span> CIERRE
                               </h4>
                               {isEditing ? (
-                                <Textarea value={editedSession.secuenciaMetodologica?.cierre ?? ""} onChange={(e) => setEditedSession({...editedSession, secuenciaMetodologica: { ...(editedSession.secuenciaMetodologica || {}), cierre: e.target.value }})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
+                                <Textarea value={editedSession.secuenciaMetodologica?.cierre ?? ""} onChange={(e) => setEditedSession({ ...editedSession, secuenciaMetodologica: { ...(editedSession.secuenciaMetodologica || {}), cierre: e.target.value } })} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                               ) : (
-                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{__html: (editedSession.secuenciaMetodologica?.cierre ?? "").replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-emerald-600'>$1</strong>").replaceAll("\n", "<br>")}} />
+                                <div className="text-sm text-slate-800 space-y-2" dangerouslySetInnerHTML={{ __html: (editedSession.secuenciaMetodologica?.cierre ?? "").replaceAll(/\*\*(.*?)\*\*/g, "<strong class='text-emerald-600'>$1</strong>").replaceAll("\n", "<br>") }} />
                               )}
                             </div>
                           </div>
@@ -593,10 +593,10 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                       </Card>
                     )}
                   </div>
-               )}
+                )}
 
-               {/* TAB 2: EVALUACION */}
-               {activeTab === 'evaluacion' && (
+                {/* TAB 2: EVALUACION */}
+                {activeTab === 'evaluacion' && (
                   <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {/* Criterios de Evaluación */}
                     {editedSession.criteriosEvaluacion && (
@@ -609,7 +609,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         </CardHeader>
                         <CardContent>
                           {isEditing ? (
-                            <Textarea value={editedSession.criteriosEvaluacion} onChange={(e) => setEditedSession({...editedSession, criteriosEvaluacion: e.target.value})} className="min-h-[120px] bg-white border border-slate-200 shadow-sm" />
+                            <Textarea value={editedSession.criteriosEvaluacion} onChange={(e) => setEditedSession({ ...editedSession, criteriosEvaluacion: e.target.value })} className="min-h-[120px] bg-white border border-slate-200 shadow-sm" />
                           ) : (
                             <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-emerald-500 bg-gradient-to-r from-emerald-50 to-transparent">
                               <pre className="text-slate-800 leading-relaxed text-sm whitespace-pre-wrap font-sans">{editedSession.criteriosEvaluacion}</pre>
@@ -630,7 +630,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         </CardHeader>
                         <CardContent>
                           {isEditing ? (
-                            <Textarea value={editedSession.evidenciasAprendizaje} onChange={(e) => setEditedSession({...editedSession, evidenciasAprendizaje: e.target.value})} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
+                            <Textarea value={editedSession.evidenciasAprendizaje} onChange={(e) => setEditedSession({ ...editedSession, evidenciasAprendizaje: e.target.value })} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
                           ) : (
                             <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-blue-500 bg-gradient-to-r from-blue-50 to-transparent">
                               <pre className="text-slate-800 leading-relaxed text-sm whitespace-pre-wrap font-sans">{editedSession.evidenciasAprendizaje}</pre>
@@ -666,10 +666,10 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                       </Card>
                     )}
                   </div>
-               )}
+                )}
 
-               {/* TAB 3: RECURSOS */}
-               {activeTab === 'recursos' && (
+                {/* TAB 3: RECURSOS */}
+                {activeTab === 'recursos' && (
                   <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {/* Materiales Didácticos Sugeridos */}
                     {editedSession.materialesDidacticosSugeridos && editedSession.materialesDidacticosSugeridos.length > 0 && (
@@ -727,7 +727,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                           {ra.fichasDeTrabajo.map((ficha: any, idx: number) => (
                             <details key={`ficha-${idx}`} className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-indigo-500">
                               <summary className="font-semibold text-sm cursor-pointer hover:text-indigo-600 transition-colors">
-                                {ficha.titulo || `Ficha ${idx+1}`}
+                                {ficha.titulo || `Ficha ${idx + 1}`}
                               </summary>
                               <div className="mt-3 space-y-2 text-sm">
                                 <p className="text-slate-500"><strong>Instrucciones:</strong> {ficha.instrucciones}</p>
@@ -872,73 +872,73 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                       </Card>
                     )}
                   </div>
-               )}
-             </div>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Botones de Acción */}
-        <div className="flex flex-col items-center mt-8 pt-6 border-t border-slate-200 w-full max-w-7xl mx-auto">
-          <img src="/pinguinos/pinguino_like.png" alt="Pingüino" className="w-24 h-24 object-contain mb-4" />
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full">
-            <Button
-              onClick={onBack}
-              variant="outline"
-              className="bg-white border border-slate-200 shadow-sm border-blue-500/30 hover:shadow-sm h-12 bg-transparent"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Nueva Sesión
-            </Button>
-            <Button
-              onClick={() => handleSaveSession(false)}
-              disabled={isSaving || isSaved}
-              className={`${isSaved ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white shadow-sm hover:scale-105 transition-all duration-300 h-12`}
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Guardando...
-                </>
-              ) : isSaved ? (
-                <>
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  ¡Sesión Guardada!
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Guardar en Personal
-                </>
-              )}
-            </Button>
-            <Button
-              onClick={() => setShowPublishModal(true)}
-              disabled={isSaving || isPublished}
-              className={`${isPublished ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-blue-600 hover:bg-blue-700'} text-white shadow-sm hover:scale-105 transition-all duration-300 h-12`}
-            >
-              {isPublished ? (
-                <>
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Publicado
-                </>
-              ) : (
-                <>
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Publicar en Comunidad
-                </>
-              )}
-            </Button>
-            <Button
-              onClick={() => { setShowPreview(true); setHasInteracted(true); }}
-              className="bg-blue-600 hover:bg-blue-700 shadow-sm hover:scale-105 transition-all duration-300 h-12 text-white"
-            >
-              <Eye className="h-4 w-4 mr-2" />
-              Vista Previa PDF
-            </Button>
+          {/* Botones de Acción */}
+          <div className="flex flex-col items-center mt-8 pt-6 border-t border-slate-200 w-full max-w-7xl mx-auto">
+            <img src="/pinguinos/pinguino_like.png" alt="Pingüino" className="w-24 h-24 object-contain mb-4" />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-full">
+              <Button
+                onClick={onBack}
+                variant="outline"
+                className="bg-white border border-slate-200 shadow-sm border-blue-500/30 hover:shadow-sm h-12 bg-transparent"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Nueva Sesión
+              </Button>
+              <Button
+                onClick={() => handleSaveSession(false)}
+                disabled={isSaving || isSaved}
+                className={`${isSaved ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white shadow-sm hover:scale-105 transition-all duration-300 h-12`}
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Guardando...
+                  </>
+                ) : isSaved ? (
+                  <>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    ¡Sesión Guardada!
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Guardar en Personal
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={() => setShowPublishModal(true)}
+                disabled={isSaving || isPublished}
+                className={`${isPublished ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-blue-600 hover:bg-blue-700'} text-white shadow-sm hover:scale-105 transition-all duration-300 h-12`}
+              >
+                {isPublished ? (
+                  <>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Publicado
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Publicar en Comunidad
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={() => { setShowPreview(true); setHasInteracted(true); }}
+                className="bg-blue-600 hover:bg-blue-700 shadow-sm hover:scale-105 transition-all duration-300 h-12 text-white"
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Vista Previa PDF
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </>
   )
 }
