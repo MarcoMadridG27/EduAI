@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { BookOpen, Layers, Users, Sparkles, BrainCircuit, Lightbulb, ChevronRight, ChevronLeft, Target, PlayCircle } from "lucide-react"
 
@@ -64,7 +65,9 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 w-full bg-background/80 backdrop-blur-md pb-6 px-6 lg:px-12 h-12 md:h-14 lg:h-16 flex items-center justify-between z-50 border-b border-border">
         <div className="flex items-center">
-          <img src="/sesion_+.png" alt="Sesión+" className="h-20 md:h-24 lg:h-28 w-auto object-contain drop-shadow-sm translate-y-2 md:translate-y-3 lg:translate-y-4" />
+          <Link href="/" aria-label="Ir a la página principal">
+            <img src="/sesion_+.png" alt="Sesión+" className="h-20 md:h-24 lg:h-28 w-auto object-contain drop-shadow-sm translate-y-2 md:translate-y-3 lg:translate-y-4" />
+          </Link>
         </div>
 
         <div className="flex items-center gap-4">

@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Sparkles, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import Script from "next/script"
 
 interface LoginScreenProps {
@@ -144,7 +145,9 @@ export function LoginScreen({ onLogin }: Readonly<LoginScreenProps>) {
                 transition={{ type: "spring", bounce: 0.6, delay: 0.4 }}
                 className="mx-auto flex items-center justify-center mb-6"
               >
-                <img src="/sesion_+.png" alt="Sesión + Logo" className="h-40 w-auto object-contain drop-shadow-sm" />
+                <Link href="/" aria-label="Ir a la página principal">
+                  <img src="/sesion_+.png" alt="Sesión + Logo" className="h-40 w-auto object-contain drop-shadow-sm" />
+                </Link>
               </motion.div>
               
               <CardTitle className="text-3xl font-extrabold text-foreground">¡Hola de nuevo!</CardTitle>
