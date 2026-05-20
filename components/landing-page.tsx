@@ -28,9 +28,11 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
         })
         if (!res.ok) throw new Error("Error al cargar sesiones")
         const data = await res.json()
-        // Suponiendo que el backend retorna un array de sesiones con estructura: { id, tema, competencias, etc }
-        const sessions = Array.isArray(data) ? data : data.sessions || []
-        setRepositorySessions(sessions.slice(0, 4)) // Mostrar solo 4
+        // Filtrar solo sesiones públicas
+        const publicSessions = Array.isArray(data) 
+          ? data.filter((s: any) => s.session_data?.is_public !== false)
+          : []
+        setRepositorySessions(publicSessions.slice(0, 4)) // Mostrar solo 4
         setSessionsError(null)
       } catch (err) {
         console.error("Error fetching sessions:", err)
@@ -363,13 +365,13 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                   <div className="p-5 flex-1 relative z-10 flex flex-col justify-between">
                     <div>
                       <div className="inline-block backdrop-blur-md px-3 py-1 rounded-full text-foreground text-[10px] font-bold tracking-wide mb-3 border border-border shadow-sm" style={i === 0 ? { backgroundColor: 'var(--papaya-whip)', color: 'var(--deep-space-blue)' } : undefined}>
-                        {session.grado || "General"}
+                        {session.session_data?.grado || "General"}
                       </div>
                       <h4 className="text-xl font-bold mb-1 text-foreground leading-tight group-hover:text-primary transition-colors">
-                        {session.titulo || session.tema || "Sin título"}
+                        {session.session_data?.titulo || session.session_data?.tema || "Sin título"}
                       </h4>
                       <p className="text-xs text-muted-foreground font-medium mb-2">
-                        {session.tema || "Tema no especificado"}
+                        {session.session_data?.tema || "Tema no especificado"}
                       </p>
                     </div>
                     
