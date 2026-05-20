@@ -78,7 +78,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
   useEffect(() => {
     async function fetchSession() {
       try {
-        const res = await fetch(`${AUTH_URL}/api/sessions`)
+        const res = await fetch(`${AUTH_URL}/sessions`)
         if (!res.ok) throw new Error("Error fetching sessions")
         const data = await res.json()
 
