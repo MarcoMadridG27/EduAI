@@ -60,8 +60,8 @@ export function PublicRepository({
   useEffect(() => {
     async function fetchPublicSessions() {
       try {
-        const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || ""
-        const res = await fetch(`${AUTH_URL}/sessions`)
+        const baseUrl = (process.env.NEXT_PUBLIC_AUTH_URL || "").replace('/api/auth', '') || "http://localhost:8000"
+        const res = await fetch(`${baseUrl}/api/sessions`)
         if (!res.ok) throw new Error("Error fetching sessions")
         const data = await res.json()
 
