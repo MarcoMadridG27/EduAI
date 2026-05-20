@@ -22,7 +22,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
     ? JSON.parse(localStorage.getItem("user") || "null")
     : null
 
-  const baseUrl = (process.env.NEXT_PUBLIC_AUTH_URL || "").replace('/api/auth', '') || "http://localhost:8000"
+  const AUTH_URL = process.env.NEXT_PUBLIC_AUTH_URL || ""
 
   const handleAddComment = async () => {
     if (!user) {
@@ -37,7 +37,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
     if (!newComment.trim()) return
 
     try {
-      const res = await fetch(`${baseUrl}/api/sessions/${session.id}/comment`, {
+      const res = await fetch(`${AUTH_URL}/sessions/${session.id}/comment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ author: user?.name || "Anónimo", text: newComment })
@@ -64,7 +64,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
     }
     if (liked) return
     try {
-      const res = await fetch(`${baseUrl}/api/sessions/${session.id}/like`, { method: "POST" })
+      const res = await fetch(`${AUTH_URL}/api/sessions/${session.id}/like`, { method: "POST" })
       if (!res.ok) throw new Error("Error")
       const r = await res.json()
       setLikes(r.likes)
@@ -78,7 +78,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
   useEffect(() => {
     async function fetchSession() {
       try {
-        const res = await fetch(`${baseUrl}/api/sessions`)
+        const res = await fetch(`${AUTH_URL}/sessions`)
         if (!res.ok) throw new Error("Error fetching sessions")
         const data = await res.json()
 
@@ -103,7 +103,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
     }
 
     fetchSession()
-  }, [id, baseUrl])
+  }, [id, AUTH_URL])
 
   const handleEditOwner = () => {
     if (globalThis.window !== undefined) {
