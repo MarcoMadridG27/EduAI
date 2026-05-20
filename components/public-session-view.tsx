@@ -289,7 +289,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
 
               {/* End of Doc watermark */}
               <div className="mt-16 pt-8 border-t border-slate-100 text-center opacity-50 flex flex-col items-center">
-                <img src="/sesion_icon.png" className="h-6 w-auto grayscale mb-2" alt="Sesión+" />
+                <img src="/sesion_+.png" className="h-6 w-auto grayscale mb-2" alt="Sesión+" />
                 <p className="text-xs font-semibold">Documento publicado en la Comunidad Sesión+</p>
               </div>
 
