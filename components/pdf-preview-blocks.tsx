@@ -1,6 +1,6 @@
 "use client"
 import { useState, useRef } from "react"
-import { Edit3, Check, ImagePlus, Type, Trash2 } from "lucide-react"
+import { Edit3, Check, ImagePlus, Trash2 } from "lucide-react"
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export type Block =
@@ -125,18 +125,8 @@ export function AddBlockBar({ onAdd }: Readonly<{ onAdd: (b: Block) => void }>) 
   return (
     <div className="flex items-center gap-2 mt-4 pt-3 border-t border-dashed border-slate-300">
       <span className="text-xs text-slate-400 font-medium uppercase tracking-wide">Añadir bloque:</span>
-      <button
-        onClick={() => onAdd({ id: makeId(), type: "text", title: "Nuevo bloque", content: "" })}
-        className="flex items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-lg border border-blue-200 transition-colors"
-      >
-        <Type className="h-3.5 w-3.5" /> Cuadro de texto
-      </button>
-      <button
-        onClick={() => onAdd({ id: makeId(), type: "image", title: "Imagen", src: "" })}
-        className="flex items-center gap-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1.5 rounded-lg border border-indigo-200 transition-colors"
-      >
-        <ImagePlus className="h-3.5 w-3.5" /> Imagen
-      </button>
+      {/* Botón de agregar texto eliminado según petición del usuario */}
+      {/* Botón de imagen eliminado */}
     </div>
   )
 }
