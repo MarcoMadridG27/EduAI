@@ -82,7 +82,11 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
         if (!res.ok) throw new Error("Error fetching sessions")
         const data = await res.json()
 
-        const found = data.find((s: any) => s.id.toString() === id.toString() && s.session_data?.is_public)
+        const decodedId = decodeURIComponent(id)
+        const found = data.find((s: any) => 
+          (s.id.toString() === id.toString() || s.id.toString() === decodedId) && 
+          s.session_data?.is_public
+        )
 
         if (found) {
           setSession(found)

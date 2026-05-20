@@ -244,7 +244,7 @@ Nota: La IA debe generar automáticamente:
 - Desarrollo de la sesión (Inicio, Desarrollo, Cierre)
 - Recursos y materiales estructurados`
 
-  const sessionId = params.user?.email || params.user?.name || "guest"
+  const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
   const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL || ""
   let wsUrl = webhookUrl
     .replace(/^https:\/\//, "wss://")
