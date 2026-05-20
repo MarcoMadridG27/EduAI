@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -512,7 +513,13 @@ function SessionHeader({
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
       <div className="container mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
+          {guestMode ? (
+            <Link href="/" aria-label="Ir a la página principal">
+              <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
+            </Link>
+          ) : (
+            <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
+          )}
           <div>
             <h1 className="font-bold text-xl md:text-2xl text-slate-800 flex items-center gap-2">
               Genera tu Sesión de Aprendizaje
