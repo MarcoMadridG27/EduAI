@@ -22,7 +22,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
       try {
         setIsLoadingSessions(true)
         const authUrl = process.env.NEXT_PUBLIC_AUTH_URL || "http://localhost:8000"
-        const res = await fetch(`${authUrl}/api/sessions`, {
+        const res = await fetch(`${authUrl}/api/auth/sessions`, {
           method: "GET",
           headers: { "Content-Type": "application/json" }
         })
