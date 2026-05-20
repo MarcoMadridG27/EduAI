@@ -3,7 +3,8 @@
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { BookOpen, Layers, Users, Sparkles, BrainCircuit, Lightbulb, ChevronRight, ChevronLeft, Target, PlayCircle } from "lucide-react"
+import { BookOpen, Layers, Users, Sparkles, BrainCircuit, Lightbulb, ChevronRight, ChevronLeft, Target, PlayCircle, Loader } from "lucide-react"
+import { useState, useEffect } from "react"
 
 interface LandingPageProps {
   readonly onEnterGeneratorPreview: () => void
@@ -12,6 +13,35 @@ interface LandingPageProps {
 }
 
 export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview, onLogin }: Readonly<LandingPageProps>) {
+  const [repositorySessions, setRepositorySessions] = useState<any[]>([])
+  const [isLoadingSessions, setIsLoadingSessions] = useState(true)
+  const [sessionsError, setSessionsError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        setIsLoadingSessions(true)
+        const authUrl = process.env.NEXT_PUBLIC_AUTH_URL || "http://localhost:8000"
+        const res = await fetch(`${authUrl}/api/sessions`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" }
+        })
+        if (!res.ok) throw new Error("Error al cargar sesiones")
+        const data = await res.json()
+        // Suponiendo que el backend retorna un array de sesiones con estructura: { id, tema, competencias, etc }
+        const sessions = Array.isArray(data) ? data : data.sessions || []
+        setRepositorySessions(sessions.slice(0, 4)) // Mostrar solo 4
+        setSessionsError(null)
+      } catch (err) {
+        console.error("Error fetching sessions:", err)
+        setSessionsError("No se pudieron cargar las sesiones del repositorio")
+        setRepositorySessions([])
+      } finally {
+        setIsLoadingSessions(false)
+      }
+    }
+    fetchSessions()
+  }, [])
 
   // Animation variants
   const staggerContainer = {
@@ -185,27 +215,13 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
               </p>
             </div>
 
-            <div className="grid grid-cols-3 gap-6 pt-8 max-w-md border-t border-border">
-              <div className="flex flex-col items-center text-center">
-                <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
-                  <Users className="w-6 h-6" />
-                </div>
-                <span className="text-xl font-black text-foreground">12k+</span>
-                <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider leading-tight mt-1">Docentes<br/>Activos</span>
-              </div>
-              <div className="flex flex-col items-center text-center">
-                <div className="w-14 h-14 rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: 'var(--papaya-whip)', color: 'var(--deep-space-blue)' }}>
-                  <Layers className="w-6 h-6" />
-                </div>
-                <span className="text-xl font-black text-foreground">50k+</span>
-                <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider leading-tight mt-1">Sesiones<br/>Generadas</span>
-              </div>
+            <div className="flex justify-center pt-8 border-t border-border">
               <div className="flex flex-col items-center text-center">
                 <div className="w-14 h-14 rounded-full p-4 shrink-0" style={{ backgroundColor: 'var(--brick-red)', color: 'var(--papaya-whip)' }}>
                   <Target className="w-6 h-6" />
                 </div>
-                <span className="text-xl font-black text-foreground">100%</span>
-                <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider leading-tight mt-1">Alineado al<br/>CNEB</span>
+                <span className="text-xl font-black text-foreground mt-3">✓ CNEB</span>
+                <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider leading-tight mt-1">Currículo<br/>Nacional</span>
               </div>
             </div>
           </motion.div>
@@ -300,41 +316,71 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
             </div>
           </div>
 
-          <motion.div 
-            variants={staggerContainer}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 relative z-10"
-          >
-            {[
-              { title: "Fracciones Divertidas", sub: "Matemática", rating: "4.9 (1.2k)", area: "Primaria" },
-              { title: "El Imperio Incaico", sub: "Personal Social", rating: "4.8 (950)", area: "Primaria" },
-              { title: "Célula y sus partes", sub: "Ciencia y Tecnología", rating: "4.9 (2k)", area: "Secundaria" },
-              { title: "Comprensión Lectora", sub: "Comunicación", rating: "4.7 (780)", area: "Primaria" }
-            ].map((item, i) => (
-              <motion.div 
-                key={item.title}
-                variants={springUp}
-                whileHover={{ y: -10, scale: 1.03 }}
-                className="group relative h-64 rounded-3xl overflow-hidden cursor-pointer shadow-md bg-card border border-border flex flex-col transition-all"
-              >
-                {/* Abstract geometric background instead of travel photos */}
-                <div className={`absolute inset-0 opacity-20 bg-gradient-to-br ${i % 2 === 0 ? 'from-primary to-transparent' : 'from-secondary to-transparent'}`}></div>
-                
-                <div className="p-5 flex-1 relative z-10 flex flex-col justify-between">
-                  <div>
-                    <div className="inline-block backdrop-blur-md px-3 py-1 rounded-full text-foreground text-[10px] font-bold tracking-wide mb-3 border border-border shadow-sm" style={i === 0 ? { backgroundColor: 'var(--papaya-whip)', color: 'var(--deep-space-blue)' } : undefined}>
-                      {item.area}
-                    </div>
-                    <h4 className="text-xl font-bold mb-1 text-foreground leading-tight group-hover:text-primary transition-colors">{item.title}</h4>
-                    <p className="text-xs text-muted-foreground font-medium mb-2">{item.sub}</p>
-                  </div>
+          {isLoadingSessions ? (
+            <motion.div 
+              variants={scaleIn}
+              className="flex flex-col items-center justify-center py-16 px-8 rounded-3xl bg-card border border-border relative z-10"
+            >
+              <Loader className="w-8 h-8 text-muted-foreground/60 mb-4 animate-spin" />
+              <h3 className="text-lg font-bold text-foreground">Cargando sesiones...</h3>
+            </motion.div>
+          ) : sessionsError ? (
+            <motion.div 
+              variants={scaleIn}
+              className="flex flex-col items-center justify-center py-16 px-8 rounded-3xl bg-card border border-border relative z-10"
+            >
+              <Layers className="w-16 h-16 text-muted-foreground/40 mb-4" />
+              <h3 className="text-lg font-bold text-foreground">Repositorio en Construcción</h3>
+              <p className="text-sm text-muted-foreground text-center max-w-md mt-2">
+                Próximamente podrás acceder a sesiones colaborativas creadas por docentes de la comunidad.
+              </p>
+            </motion.div>
+          ) : repositorySessions.length === 0 ? (
+            <motion.div 
+              variants={scaleIn}
+              className="flex flex-col items-center justify-center py-16 px-8 rounded-3xl bg-card border border-border relative z-10"
+            >
+              <Layers className="w-16 h-16 text-muted-foreground/40 mb-4" />
+              <h3 className="text-lg font-bold text-foreground">Sin sesiones publicadas</h3>
+              <p className="text-sm text-muted-foreground text-center max-w-md mt-2">
+                Sé el primero en compartir una sesión con la comunidad.
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div 
+              variants={staggerContainer}
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 relative z-10"
+            >
+              {repositorySessions.map((session: any, i: number) => (
+                <motion.div 
+                  key={session.id || i}
+                  variants={springUp}
+                  whileHover={{ y: -10, scale: 1.03 }}
+                  className="group relative h-64 rounded-3xl overflow-hidden cursor-pointer shadow-md bg-card border border-border flex flex-col transition-all"
+                >
+                  <div className={`absolute inset-0 opacity-20 bg-gradient-to-br ${i % 2 === 0 ? 'from-primary to-transparent' : 'from-secondary to-transparent'}`}></div>
                   
-                  <div className="flex items-center gap-1 text-xs font-bold" style={{ color: 'var(--brick-red)' }}>
-                    ★ {item.rating}
+                  <div className="p-5 flex-1 relative z-10 flex flex-col justify-between">
+                    <div>
+                      <div className="inline-block backdrop-blur-md px-3 py-1 rounded-full text-foreground text-[10px] font-bold tracking-wide mb-3 border border-border shadow-sm" style={i === 0 ? { backgroundColor: 'var(--papaya-whip)', color: 'var(--deep-space-blue)' } : undefined}>
+                        {session.grado || "General"}
+                      </div>
+                      <h4 className="text-xl font-bold mb-1 text-foreground leading-tight group-hover:text-primary transition-colors">
+                        {session.titulo || session.tema || "Sin título"}
+                      </h4>
+                      <p className="text-xs text-muted-foreground font-medium mb-2">
+                        {session.tema || "Tema no especificado"}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-1 text-xs font-bold" style={{ color: 'var(--brick-red)' }}>
+                      ✓ Publicado
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
 
           <div className="mt-8 flex justify-start relative z-10">
             <Button variant="default" onClick={onEnterRepositoryPreview} className="rounded-full font-bold px-8 py-2 text-sm shadow-md">
