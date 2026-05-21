@@ -102,7 +102,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
           </Link>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 pt-2">
           <Button onClick={onLogin} className="rounded-full text-primary-foreground hover:bg-primary/90 font-bold pt-8 px-8 py-5  shadow-lg transition-all hover:scale-105 active:scale-95" style={{ color: '#003049' }}>
             Iniciar Sesión
           </Button>
