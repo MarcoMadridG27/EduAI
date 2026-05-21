@@ -149,12 +149,12 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
             >
               <Button
                 onClick={onEnterGeneratorPreview}
-                className="rounded-full font-bold px-8 py-6 text-lg shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95"
+                className="rounded-full font-bold px-8 py-6 text-lg min-w-[220px] shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95"
                 style={{ backgroundColor: '#2A5D78', color: 'var(--papaya-whip)' }}
               >
                 Comenzar ahora
               </Button>
-              <Button onClick={onEnterRepositoryPreview} variant="outline" className="rounded-full border-2 font-bold px-8 py-6 text-lg transition-all hover:scale-105 active:scale-90" style={{ backgroundColor: 'var(--papaya-whip)', color: 'var(--deep-space-blue)', borderColor: 'var(--border)' }}>
+              <Button onClick={onEnterRepositoryPreview} className="rounded-full font-bold px-8 py-6 text-lg min-w-[220px] shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#2A5D78', color: 'var(--papaya-whip)' }}>
                 Explorar Repositorio
               </Button>
             </motion.div>
@@ -385,7 +385,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
           )}
 
           <div className="mt-8 flex justify-start relative z-10">
-            <Button variant="default" onClick={onEnterRepositoryPreview} className="rounded-full font-bold px-8 py-2 text-sm shadow-md">
+            <Button onClick={onEnterRepositoryPreview} className="rounded-full font-bold px-8 py-2 text-sm shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#2A5D78', color: 'var(--papaya-whip)' }}>
               Ir al Repositorio
             </Button>
           </div>
@@ -419,7 +419,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
             </div>
             
             <div className="relative z-10">
-              <Button onClick={onEnterGeneratorPreview} className="rounded-full font-bold px-6 py-2 text-sm shadow-md">
+              <Button onClick={onEnterGeneratorPreview} className="rounded-full font-bold px-6 py-2 text-sm shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#2A5D78', color: 'var(--papaya-whip)' }}>
                 Generar Documentos
               </Button>
             </div>
