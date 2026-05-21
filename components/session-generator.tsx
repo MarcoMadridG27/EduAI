@@ -143,9 +143,28 @@ function handleWebSocketMessage(event: MessageEvent, config: WebSocketMessageCon
       }
 
       setTimeout(() => {
-        const sessionData = {
+        // Normalize posibles variantes de la clave `actividades_previas`
+        const incoming = { ...(data.data || {}) } as any
+        let actividades: string[] | undefined = undefined
+        if (Array.isArray(incoming.actividades_previas)) actividades = incoming.actividades_previas
+        else if (Array.isArray(incoming.actividadesPrevias)) actividades = incoming.actividadesPrevias
+        else if (Array.isArray(incoming.actividadInicial)) actividades = incoming.actividadInicial
+        else if (Array.isArray(incoming.actividad_inicial)) actividades = incoming.actividad_inicial
+        else if (incoming.recursosAdicionales && Array.isArray(incoming.recursosAdicionales.actividadDeActivacion)) actividades = incoming.recursosAdicionales.actividadDeActivacion
+        else if (typeof incoming.actividades_previas === 'string') actividades = incoming.actividades_previas.split(/\r?\n/).map((s: string) => s.trim()).filter(Boolean)
+        else if (typeof incoming.actividadInicial === 'string') actividades = [incoming.actividadInicial]
+
+        const merged = {
           ...config.formData,
-          ...data.data,
+          ...incoming,
+        }
+
+        if (actividades && actividades.length > 0) {
+          merged.actividades_previas = actividades
+        }
+
+        const sessionData = {
+          ...merged,
           session_id: config.sId,
         }
         config.onSessionGenerated(sessionData)
