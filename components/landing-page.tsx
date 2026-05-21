@@ -460,11 +460,6 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 whileHover={{ scale: 1.03 }}
                 className="bg-card border border-border rounded-[2rem] p-8 flex flex-col justify-between h-[450px] relative group cursor-pointer shadow-md"
              >
-                <div className="absolute top-4 left-4 z-10">
-                  <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <BookOpen className="w-6 h-6 text-secondary" />
-                  </div>
-                </div>
 
                 <div className="flex items-center justify-center flex-1 py-6">
                   <img
