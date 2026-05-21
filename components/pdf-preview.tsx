@@ -148,7 +148,6 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
                 <div className="text-[#1976D2] text-[8.5pt]">
                   Área: <EditableField value={dg.area || data.tema || "Matemática"} onChange={v => setDg("area", v)} />
                   &nbsp;·&nbsp;Unidad: <EditableField value={dg.unidad || ""} onChange={v => setDg("unidad", v)} />
-                  &nbsp;·&nbsp;<EditableField value={dg.sesion_num || ""} onChange={v => setDg("sesion_num", v)} />
                 </div>
               </div>
               <div className="text-transparent">Sesión+</div>
