@@ -68,6 +68,7 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
             datosGenerales: data.datosGenerales, tema: data.tema, ciclo: data.ciclo,
             horasClase: data.horasClase, competenciasSeleccionadas: data.competenciasSeleccionadas,
             capacidades: data.capacidades, materialesDisponibles: data.materialesDisponibles,
+            actividades_previas: data.actividades_previas,
             enfoqueTransversal: data.enfoqueTransversal, competenciaTransversal: data.competenciaTransversal,
             competenciaDescripcion: data.competenciaDescripcion, propositoSesion: data.propositoSesion,
             criteriosEvaluacion: data.criteriosEvaluacion, evidenciasAprendizaje: data.evidenciasAprendizaje,
