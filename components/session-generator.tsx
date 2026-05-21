@@ -113,6 +113,7 @@ interface WebSocketMessageConfig {
   intervalId: ReturnType<typeof setInterval>
   sId: string
   tracker: { current: number }
+  formData: Partial<SessionData>
   setCurrentStep: (step: string) => void
   setProgress: (progress: number) => void
   setIsGenerating: (isGenerating: boolean) => void
@@ -142,7 +143,11 @@ function handleWebSocketMessage(event: MessageEvent, config: WebSocketMessageCon
       }
 
       setTimeout(() => {
-        const sessionData = { ...data.data, session_id: config.sId }
+        const sessionData = {
+          ...config.formData,
+          ...data.data,
+          session_id: config.sId,
+        }
         config.onSessionGenerated(sessionData)
         config.socket.close()
       }, 1000)
@@ -212,6 +217,7 @@ interface RunWebSocketGenerationParams {
   setProgress: (progress: number) => void
   setIsGenerating: (isGenerating: boolean) => void
   onSessionGenerated: (session: SessionData) => void
+  formData: Partial<SessionData>
 }
 
 function runWebSocketSessionGeneration(params: RunWebSocketGenerationParams) {
@@ -290,6 +296,7 @@ Nota: La IA debe generar automáticamente:
       intervalId: messageInterval,
       sId: sessionId,
       tracker,
+      formData: params.formData,
       setCurrentStep: params.setCurrentStep,
       setProgress: params.setProgress,
       setIsGenerating: params.setIsGenerating,
@@ -344,12 +351,23 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
 
   useEffect(() => {
     if (!editingSession) return
-    const { tema = "", tituloSesion, titulo, competenciasSeleccionadas, contexto = "", horasClase = 1 } = editingSession
+    const {
+      tema = "",
+      tituloSesion,
+      titulo,
+      competenciasSeleccionadas,
+      contexto = "",
+      horasClase = 1,
+      enfoqueTransversal = "",
+      competenciaTransversal = "",
+    } = editingSession
     setTema(tema)
     setTituloSesion(tituloSesion ?? titulo ?? tema)
     setCompetenciasSeleccionadas(Array.isArray(competenciasSeleccionadas) ? competenciasSeleccionadas : [])
     setContexto(contexto)
     setHorasClase(horasClase)
+    setEnfoqueTransversal(enfoqueTransversal)
+    setCompetenciaTransversal(competenciaTransversal)
   }, [editingSession])
 
   const contextoBase = getContextoBase(contexto)
@@ -419,6 +437,11 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     setProgress(0)
     setCurrentStep("Iniciando conexión con IA...")
 
+    const materialesCombinados = [
+      ...materialesSeleccionados,
+      ...(materialesNoEstructurados ? [materialesNoEstructurados] : [])
+    ].join(", ")
+
     try {
       runWebSocketSessionGeneration({
         tema,
@@ -442,6 +465,26 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
         setProgress,
         setIsGenerating,
         onSessionGenerated,
+        formData: {
+          datosGenerales: {
+            docente: nombreDocente,
+            fecha,
+            grado,
+            seccion,
+            ciclo,
+            titulo: tituloSesion,
+          },
+          tema,
+          titulo: tituloSesion,
+          tituloSesion,
+          competenciasSeleccionadas,
+          capacidades: capacidadesSeleccionadas,
+          contexto,
+          horasClase,
+          enfoqueTransversal,
+          competenciaTransversal,
+          materialesDisponibles: materialesCombinados,
+        },
       })
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Error desconocido"
