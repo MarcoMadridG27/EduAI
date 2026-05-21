@@ -251,7 +251,7 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
           <div className="bg-white shadow-2xl rounded-sm" style={PAGE}>
             {/* Mini-header */}
             <div className="flex items-center justify-between border-b border-slate-200 pb-2 mb-3">
-              <div><img src="/sesion_icon.png" alt="Sesión+" className="h-4 w-auto" /></div>
+              <div><img src="/sesion_+.png" alt="Sesión+" className="h-4 w-auto" /></div>
               <div className="flex-1 text-center text-slate-500 text-[8pt]">
                 Continuación · <span className="font-semibold text-slate-700">{dg.titulo||data.tema}</span>
               </div>
