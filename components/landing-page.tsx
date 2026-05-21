@@ -442,8 +442,18 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 whileHover={{ scale: 1.03 }}
                 className="bg-card border border-border rounded-[2rem] p-8 flex flex-col justify-between h-[450px] relative group cursor-pointer shadow-md"
              >
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Sparkles className="w-6 h-6 text-primary" />
+                <div className="absolute top-4 left-4 z-10">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Sparkles className="w-6 h-6 text-primary" />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-center flex-1 py-6">
+                  <img
+                    src="/innovacion.jpg"
+                    alt="Innovación pedagógica"
+                    className="w-52 h-52 object-contain drop-shadow-lg"
+                  />
                 </div>
 
                 <div>
