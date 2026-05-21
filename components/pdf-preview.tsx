@@ -32,14 +32,7 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
   const setSm = (k: "inicio" | "desarrollo" | "cierre", v: string) =>
     setData(p => ({ ...p, secuenciaMetodologica: { ...p.secuenciaMetodologica, [k]: v } }))
 
-  // Normalizar `actividades_previas` para mostrar y editar como texto multilínea
-  const actividadesPreviasText = Array.isArray(data.actividades_previas)
-    ? data.actividades_previas.join("\n")
-    : (data.actividades_previas || "")
-  const setActividadesPreviasFromText = (text: string) => {
-    // Frontend `SessionData` espera un string; almacenamos el texto
-    setData(p => ({ ...p, actividades_previas: text }))
-  }
+  
 
   const updateBlock = (list: Block[], setList: (b: Block[]) => void, id: string, updated: Block) =>
     setList(list.map(b => b.id === id ? updated : b))
@@ -77,11 +70,7 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
             datosGenerales: data.datosGenerales, tema: data.tema, ciclo: data.ciclo,
             horasClase: data.horasClase, competenciasSeleccionadas: data.competenciasSeleccionadas,
             capacidades: data.capacidades, materialesDisponibles: data.materialesDisponibles,
-            actividades_previas: Array.isArray(data.actividades_previas)
-              ? data.actividades_previas
-              : (typeof data.actividades_previas === "string"
-                ? data.actividades_previas.split(/\r?\n/).map(s => s.trim()).filter(Boolean)
-                : []),
+            actividades_previas: data.actividades_previas,
             enfoqueTransversal: data.enfoqueTransversal, competenciaTransversal: data.competenciaTransversal,
             competenciaDescripcion: data.competenciaDescripcion, propositoSesion: data.propositoSesion,
             criteriosEvaluacion: data.criteriosEvaluacion, evidenciasAprendizaje: data.evidenciasAprendizaje,
@@ -186,7 +175,7 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
               <div className="flex-1 border border-[#90A4AE]">
                 <div className={SUBH}>¿QUÉ ACTIVIDADES HACER ANTES?</div>
                 <div className="p-2 bg-[#E3F2FD] min-h-[36px] text-[8.5pt]">
-                  <EditableField value={actividadesPreviasText} onChange={setActividadesPreviasFromText} multiline />
+                  <EditableField value={data.actividades_previas||""} onChange={v=>setData(p=>({...p,actividades_previas:v}))} multiline />
                 </div>
               </div>
               <div className="flex-1 border border-[#90A4AE] border-l-0">
