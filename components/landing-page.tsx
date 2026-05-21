@@ -154,7 +154,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
               >
                 Comenzar ahora
               </Button>
-              <Button onClick={onEnterRepositoryPreview} className="rounded-full font-bold px-8 py-6 text-lg min-w-[220px] shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#2A5D78', color: 'var(--papaya-whip)' }}>
+              <Button onClick={onEnterRepositoryPreview} className="rounded-full font-bold px-8 py-6 text-lg min-w-[220px] shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#5590af', color: 'var(--papaya-whip)' }}>
                 Explorar Repositorio
               </Button>
             </motion.div>
