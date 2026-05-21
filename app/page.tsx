@@ -57,7 +57,7 @@ export type SessionData = {
   materialesDidacticosSugeridos?: string[]
 
   // Preview & Contextual editable fields
-  actividades_previas?: string
+  actividades_previas?: string | string[]
   actitudes_observables?: string
   duracion_inicio?: string
   duracion_desarrollo?: string

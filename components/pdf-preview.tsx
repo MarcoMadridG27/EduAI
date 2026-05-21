@@ -28,6 +28,9 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
 
   const dg = data.datosGenerales || {}
   const sm = data.secuenciaMetodologica || { inicio: "", desarrollo: "", cierre: "" }
+  const actividadesPreviasTexto = Array.isArray(data.actividades_previas)
+    ? data.actividades_previas.join("\n")
+    : (data.actividades_previas || "")
   const setDg = (k: string, v: string) => setData(p => ({ ...p, datosGenerales: { ...p.datosGenerales, [k]: v } }))
   const setSm = (k: "inicio" | "desarrollo" | "cierre", v: string) =>
     setData(p => ({ ...p, secuenciaMetodologica: { ...p.secuenciaMetodologica, [k]: v } }))
@@ -175,7 +178,7 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
               <div className="flex-1 border border-[#90A4AE]">
                 <div className={SUBH}>¿QUÉ ACTIVIDADES HACER ANTES?</div>
                 <div className="p-2 bg-[#E3F2FD] min-h-[36px] text-[8.5pt]">
-                  <EditableField value={data.actividades_previas||""} onChange={v=>setData(p=>({...p,actividades_previas:v}))} multiline />
+                  <EditableField value={actividadesPreviasTexto} onChange={v=>setData(p=>({...p,actividades_previas:v}))} multiline />
                 </div>
               </div>
               <div className="flex-1 border border-[#90A4AE] border-l-0">
