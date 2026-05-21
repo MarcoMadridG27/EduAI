@@ -460,6 +460,13 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 whileHover={{ scale: 1.03 }}
                 className="bg-card border border-border rounded-[2rem] p-8 flex flex-col justify-between h-[450px] relative group cursor-pointer shadow-md"
              >
+                <div className="flex items-center justify-center mb-4 mt-1">
+                  <img
+                    src="/sesion_ap_doc.png"
+                    alt="Sesión en documento"
+                    className="w-24 h-24 object-contain drop-shadow-md"
+                  />
+                </div>
                 <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-4">
                   <BookOpen className="w-6 h-6 text-secondary" />
                 </div>
