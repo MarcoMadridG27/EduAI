@@ -21,7 +21,22 @@ const PAGE: React.CSSProperties = {
 }
 
 export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
-  const [data, setData] = useState<SessionData>(session)
+  // Asegurar que la vista previa siempre muestre actividades_previas: si vienen vacías,
+  // intentar inferir desde la secuencia metodológica (inicio) para mejorar la UX.
+  const inferActividadesPrevias = (sess: SessionData) => {
+    const ap = sess.actividades_previas
+    if (ap && ((Array.isArray(ap) && ap.length > 0) || (typeof ap === "string" && ap.trim()))) return ap
+    const sm = sess.secuenciaMetodologica || {}
+    const inicio = sm?.inicio || ""
+    if (inicio && typeof inicio === "string") {
+      const items = inicio.split(/\n|\.|\s*\d+\.\s*/).map(s => s.trim()).filter(Boolean)
+      if (items.length > 0) return items.slice(0, 3)
+    }
+    return sess.actividades_previas
+  }
+
+  const initialSession: SessionData = { ...session, actividades_previas: inferActividadesPrevias(session) }
+  const [data, setData] = useState<SessionData>(initialSession)
   const [isExporting, setIsExporting] = useState(false)
   const [page1Blocks, setPage1Blocks] = useState<Block[]>([])
   const [page2Blocks, setPage2Blocks] = useState<Block[]>([])
@@ -31,6 +46,13 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
   const actividadesPreviasTexto = Array.isArray(data.actividades_previas)
     ? data.actividades_previas.join("\n")
     : (data.actividades_previas || "")
+  // Debug: muestra en consola lo que llega y cómo se interpreta
+  if (process.env.NODE_ENV !== "production") {
+    // eslint-disable-next-line no-console
+    console.debug("PdfPreview actividades_previas (raw):", session.actividades_previas)
+    // eslint-disable-next-line no-console
+    console.debug("PdfPreview actividades_previas (used):", actividadesPreviasTexto)
+  }
   const setDg = (k: string, v: string) => setData(p => ({ ...p, datosGenerales: { ...p.datosGenerales, [k]: v } }))
   const setSm = (k: "inicio" | "desarrollo" | "cierre", v: string) =>
     setData(p => ({ ...p, secuenciaMetodologica: { ...p.secuenciaMetodologica, [k]: v } }))
