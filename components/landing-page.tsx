@@ -18,6 +18,21 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
   const [sessionsError, setSessionsError] = useState<string | null>(null)
 
   useEffect(() => {
+    const script = document.createElement("script")
+    script.src = "https://js.storylane.io/js/v2/storylane.js"
+    script.async = true
+    script.setAttribute("data-verify-origin", "")
+    document.body.appendChild(script)
+    return () => {
+      try {
+        document.body.removeChild(script)
+      } catch (e) {
+        // Silently catch
+      }
+    }
+  }, [])
+
+  useEffect(() => {
     const fetchSessions = async () => {
       try {
         setIsLoadingSessions(true)
@@ -277,7 +292,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
         </motion.div>
       </section>
 
-      {/* Video Demonstration Section */}
+      {/* Demo Demonstration Section */}
       <section className="px-4 lg:px-8 py-16">
         <motion.div 
           initial="hidden"
@@ -288,26 +303,30 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
         >
           <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-black text-foreground mb-4">Mira cómo funciona</h2>
-            <p className="text-lg text-muted-foreground">Descubre en este breve video de demostración cómo Sesión + agiliza tu trabajo.</p>
+            <p className="text-lg text-muted-foreground">Experimenta con nuestra demo interactiva de Sesión + y descubre el poder de la planificación con IA.</p>
           </div>
-          <div className="aspect-video bg-card rounded-[2rem] shadow-xl border border-border overflow-hidden relative group cursor-pointer">
-            {/* Play Button Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center bg-black/5 group-hover:bg-black/20 transition-colors z-10">
-              <div className="bg-background/90 p-5 rounded-full shadow-lg group-hover:scale-110 transition-transform">
-                <PlayCircle className="w-12 h-12 text-primary" />
-              </div>
-            </div>
-            {/* Video Thumbnail Placeholder (can be replaced by an actual <video> tag later) */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 flex flex-col items-center justify-center">
-               <motion.img 
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                  src="/pinguinos/pinguino_chill.png"
-                  className="w-24 h-24 object-contain opacity-50 mb-4"
-                  alt="Pinguino"
-               />
-              <span className="text-muted-foreground font-medium text-lg">Espacio para Video de Animación</span>
-            </div>
+          <div 
+            className="w-full relative overflow-hidden rounded-[2rem] shadow-2xl border border-border bg-card sl-embed"
+            style={{ paddingBottom: "calc(49.22% + 25px)", height: 0 }}
+          >
+            <iframe 
+              loading="lazy" 
+              className="absolute top-0 left-0 w-full h-full border-0 rounded-[2rem] shadow-xl sl-demo"
+              src="https://app.storylane.io/demo/l7mjkcatobdt?embed=inline" 
+              name="sl-embed" 
+              allow="fullscreen" 
+              allowFullScreen
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                border: "1px solid rgba(63,95,172,0.35)",
+                boxShadow: "0px 0px 18px rgba(26, 19, 72, 0.15)",
+                boxSizing: "border-box"
+              }}
+            />
           </div>
         </motion.div>
       </section>
