@@ -43,6 +43,7 @@ export type SessionData = {
 
   // Outputs generados por IA
   competenciaDescripcion?: string
+  desempenos?: string[]
   criteriosEvaluacion?: string
   evidenciasAprendizaje?: string
   propositoSesion?: string
@@ -303,7 +304,7 @@ export default function Home() {
               ¡Planifica sin límites!
             </h3>
             <p className="text-sm text-slate-500 mb-6 leading-relaxed">
-              Inicia sesión de forma gratuita para generar sesiones de aprendizaje estructuradas con IA, descargar tus PDFs oficiales del MINEDU y guardar tus materiales preferidos en el repositorio.
+              Inicia sesión de forma gratuita para generar sesiones de aprendizaje estructuradas con IA y guardar tus materiales preferidos en el repositorio.
             </p>
             <div className="flex flex-col gap-3 w-full">
               <Button

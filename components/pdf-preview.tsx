@@ -46,6 +46,19 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
   const actividadesPreviasTexto = Array.isArray(data.actividades_previas)
     ? data.actividades_previas.join("\n")
     : (data.actividades_previas || "")
+  const desempenosTexto = Array.isArray(data.desempenos)
+    ? data.desempenos.join("\n")
+    : (typeof data.desempenos === "string" ? data.desempenos : (data.competenciaDescripcion || ""))
+  const normalizeToList = (value: string | string[] | undefined, fallbackSource?: string) => {
+    if (Array.isArray(value)) return value.map(item => String(item).trim()).filter(Boolean)
+    if (typeof value === "string" && value.trim()) {
+      return value.split(/\n|\s*\d+\.\s*/).map(item => item.trim()).filter(Boolean)
+    }
+    if (fallbackSource && fallbackSource.trim()) {
+      return fallbackSource.split(/\n|\s*\d+\.\s*/).map(item => item.trim()).filter(Boolean)
+    }
+    return []
+  }
   // Debug: muestra en consola lo que llega y cómo se interpreta
   if (process.env.NODE_ENV !== "production") {
     // eslint-disable-next-line no-console
@@ -96,7 +109,9 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
             horasClase: data.horasClase, competenciasSeleccionadas: data.competenciasSeleccionadas,
             capacidades: data.capacidades, materialesDisponibles: data.materialesDisponibles,
             actividades_previas: data.actividades_previas,
+            desempenos: normalizeToList(data.desempenos, data.competenciaDescripcion),
             enfoqueTransversal: data.enfoqueTransversal, competenciaTransversal: data.competenciaTransversal,
+            actitudes_observables: data.actitudes_observables || data.competenciaTransversal || data.enfoqueTransversal,
             competenciaDescripcion: data.competenciaDescripcion, propositoSesion: data.propositoSesion,
             criteriosEvaluacion: data.criteriosEvaluacion, evidenciasAprendizaje: data.evidenciasAprendizaje,
             secuenciaMetodologica: data.secuenciaMetodologica, distribucionHoras: data.distribucionHoras,
@@ -240,7 +255,7 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
                     {comps[0] && <div className="font-bold mb-1">{comps[0]}</div>}
                     {caps.map((c)=><div key={c}>• {c}</div>)}
                   </td>
-                  <td className="py-2 px-2 border border-[#90A4AE]"><EditableField value={data.competenciaDescripcion||""} onChange={v=>setData(p=>({...p,competenciaDescripcion:v}))} multiline /></td>
+                  <td className="py-2 px-2 border border-[#90A4AE]"><EditableField value={desempenosTexto} onChange={v=>setData(p=>({...p,desempenos:v.split(/\n|\s*\d+\.\s*/).map(item => item.trim()).filter(Boolean)}))} multiline /></td>
                   <td className="py-2 px-2 border border-[#90A4AE]"><EditableField value={data.criteriosEvaluacion||""} onChange={v=>setData(p=>({...p,criteriosEvaluacion:v}))} multiline /></td>
                   <td className="py-2 px-2 border border-[#90A4AE]"><EditableField value={data.evidenciasAprendizaje||""} onChange={v=>setData(p=>({...p,evidenciasAprendizaje:v}))} multiline /></td>
                 </tr>
