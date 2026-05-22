@@ -491,30 +491,7 @@ export async function exportToExcel(data: SessionData) {
     currentRow++ // Pequeño espaciador
   })
 
-  // -------------------------------------------------------------
-  // ─── BLOQUE V: EXTENSIÓN (TAREA) ───
-  // -------------------------------------------------------------
-  styleCell(worksheet.getCell(currentRow, 1), {
-    font: { bold: true, color: AZUL_HEADER },
-    fillColor: AZUL_PALIDO,
-    border: { top: true, bottom: true, left: true },
-  })
-  worksheet.getCell(currentRow, 1).value = " V.  EXTENSIÓN (TAREA):"
-
-  styleRange(worksheet, `B${currentRow}:F${currentRow + 1}`, {
-    font: { color: NEGRO },
-    fillColor: AZUL_PALIDO,
-    align: "justify",
-    valign: "middle",
-    border: { top: true, bottom: true, right: true },
-  })
-  worksheet.getCell(`B${currentRow}`).value = data.extension || "—"
-
-  worksheet.getRow(currentRow).height = 18
-  worksheet.getRow(currentRow + 1).height = 18
-  currentRow += 2
-
-  currentRow++ // Espaciador
+  // BLOQUE V eliminado (EXTENSIÓN/TAREA)
 
   // -------------------------------------------------------------
   // ─── BLOQUE VI: INSTRUMENTO DE EVALUACIÓN ───

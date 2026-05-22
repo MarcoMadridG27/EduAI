@@ -463,11 +463,7 @@ export function PdfPreview({
               <EditableField value={sm.cierre||""} onChange={v=>setSm("cierre",v)} multiline />
             </div>
 
-            {/* V. Extensión */}
-            <div className="flex items-start border border-[#90A4AE] bg-[#E3F2FD] mt-4 px-3 py-2">
-              <span className="font-bold text-[#1565C0] mr-2 flex-shrink-0 text-[8.5pt]">V.&nbsp;EXTENSIÓN (TAREA):</span>
-              <span className="text-[8.5pt] flex-1"><EditableField value={data.extension||""} onChange={v=>setData(p=>({...p,extension:v}))} multiline /></span>
-            </div>
+            {/* V. Extensión eliminado */}
 
             {/* VI. Instrumento de evaluación */}
             {(() => {
