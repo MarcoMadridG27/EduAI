@@ -21,6 +21,19 @@ const PAGE: React.CSSProperties = {
 }
 
 export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
+  const formatDatePeru = (input?: string | Date | null) => {
+    if (!input) return new Date().toLocaleDateString("es-PE")
+    if (input instanceof Date) return input.toLocaleDateString("es-PE")
+    const s = String(input).trim()
+    // ISO YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS
+    const isoMatch = s.match(/^(\d{4})-(\d{2})-(\d{2})/)
+    if (isoMatch) return `${isoMatch[3]}/${isoMatch[2]}/${isoMatch[1]}`
+    // already dd/mm/yyyy
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s
+    const d = new Date(s)
+    if (!isNaN(d.getTime())) return d.toLocaleDateString("es-PE")
+    return s
+  }
   // Asegurar que la vista previa siempre muestre actividades_previas: si vienen vacías,
   // intentar inferir desde la secuencia metodológica (inicio) para mejorar la UX.
   const inferActividadesPrevias = (sess: SessionData) => {
@@ -100,12 +113,13 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
     setIsExporting(true)
     try {
       const url = process.env.NEXT_PUBLIC_PDF_URL || ""
+      const dgForSend = { ...(data.datosGenerales || {}), fecha: formatDatePeru(data.datosGenerales?.fecha) }
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           data: {
-            datosGenerales: data.datosGenerales, tema: data.tema, ciclo: data.ciclo,
+            datosGenerales: dgForSend, tema: data.tema, ciclo: data.ciclo,
             horasClase: data.horasClase, competenciasSeleccionadas: data.competenciasSeleccionadas,
             capacidades: data.capacidades, materialesDisponibles: data.materialesDisponibles,
             actividades_previas: data.actividades_previas,
@@ -124,7 +138,8 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
       const blob = await res.blob()
       const link = document.createElement("a")
       link.href = globalThis.URL.createObjectURL(blob)
-      link.download = `sesion-${data.tema?.substring(0, 20) ?? "eduai"}-${new Date().toISOString().split("T")[0]}.pdf`
+      const fileDate = formatDatePeru(dgForSend?.fecha || new Date()).replace(/\//g, "-")
+      link.download = `sesion-${data.tema?.substring(0, 20) ?? "eduai"}-${fileDate}.pdf`
       document.body.appendChild(link); link.click(); link.remove()
       globalThis.URL.revokeObjectURL(link.href)
       toast.success("¡PDF descargado exitosamente!")
