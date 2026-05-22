@@ -2,9 +2,8 @@
 @import "tw-animate-css";
 @import url('https://fonts.googleapis.com/css2?family=Flow+Circular&display=swap');
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
+  color-scheme: light;
   /* Ultra-modern light theme */
   --background: oklch(0.98 0.01 240); /* Light background */
   --foreground: oklch(0.1 0.02 240); /* Dark text */
@@ -55,49 +54,6 @@
   --sidebar-ring: oklch(0.65 0.25 300);
 }
 
-.dark {
-  /* Dark mode uses the same ultra-modern theme */
-  --background: oklch(0.03 0.02 240);
-  --foreground: oklch(0.98 0.01 240);
-  --card: oklch(0.06 0.03 240);
-  --card-foreground: oklch(0.95 0.01 240);
-  --popover: oklch(0.06 0.03 240);
-  --popover-foreground: oklch(0.95 0.01 240);
-
-  --primary: oklch(0.7 0.25 300);
-  --primary-foreground: oklch(0.03 0.02 240);
-
-  --secondary: oklch(0.65 0.2 240);
-  --secondary-foreground: oklch(0.98 0.01 240);
-
-  --accent: oklch(0.75 0.2 140);
-  --accent-foreground: oklch(0.03 0.02 240);
-
-  --muted: oklch(0.1 0.03 240);
-  --muted-foreground: oklch(0.75 0.02 240);
-
-  --destructive: oklch(0.7 0.25 15);
-  --destructive-foreground: oklch(0.98 0.01 240);
-
-  --border: oklch(0.12 0.03 240);
-  --input: oklch(0.1 0.03 240);
-  --ring: oklch(0.7 0.25 300);
-
-  --chart-1: oklch(0.7 0.25 300);
-  --chart-2: oklch(0.65 0.2 240);
-  --chart-3: oklch(0.75 0.2 140);
-  --chart-4: oklch(0.7 0.25 15);
-  --chart-5: oklch(0.7 0.25 330);
-
-  --sidebar: oklch(0.06 0.03 240);
-  --sidebar-foreground: oklch(0.95 0.01 240);
-  --sidebar-primary: oklch(0.7 0.25 300);
-  --sidebar-primary-foreground: oklch(0.03 0.02 240);
-  --sidebar-accent: oklch(0.1 0.03 240);
-  --sidebar-accent-foreground: oklch(0.95 0.01 240);
-  --sidebar-border: oklch(0.12 0.03 240);
-  --sidebar-ring: oklch(0.7 0.25 300);
-}
 
 @theme inline {
   --font-sans: var(--font-geist-sans);

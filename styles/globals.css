@@ -1,9 +1,8 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-/* removed @custom-variant (handled via .dark class below) */
-
 :root {
+  color-scheme: light;
   /* Custom palette provided by user */
   --molten-lava: #780000ff;
   --brick-red: #c1121fff;
@@ -59,55 +58,6 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-.dark {
-  /* Dark theme mappings using the palette */
-  --molten-lava: #780000ff;
-  --brick-red: #c1121fff;
-  --papaya-whip: #fdf0d5ff;
-  --deep-space-blue: #003049ff;
-  --steel-blue: #669bbcff;
-
-  --primary: var(--deep-space-blue);
-  --primary-foreground: var(--papaya-whip);
-  --secondary: var(--steel-blue);
-  --secondary-foreground: var(--papaya-whip);
-  --accent: var(--molten-lava);
-  --accent-foreground: var(--papaya-whip);
-
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  /* Dark theme semantic tokens map to palette */
-  --primary: var(--deep-space-blue);
-  --primary-foreground: var(--papaya-whip);
-  --secondary: var(--steel-blue);
-  --secondary-foreground: var(--papaya-whip);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
-}
 
 /* Expose theme tokens as CSS variables (inline theme emulation) */
 :root {
