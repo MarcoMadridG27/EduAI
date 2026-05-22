@@ -406,6 +406,132 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
         </div>
       </section>
 
+      {/* WhatsApp AI Bot Promotional Section */}
+      <section className="py-20 px-4 lg:px-8 max-w-[1400px] mx-auto overflow-hidden">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={scaleIn}
+          className="relative rounded-[3rem] bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-background border border-emerald-500/20 p-8 lg:p-16 overflow-hidden shadow-2xl"
+        >
+          {/* Neon Glow Blobs */}
+          <div className="absolute -top-12 -right-12 w-64 h-64 bg-emerald-400/20 rounded-full blur-[80px] pointer-events-none" />
+          <div className="absolute -bottom-12 -left-12 w-80 h-80 bg-teal-400/10 rounded-full blur-[100px] pointer-events-none" />
+
+          <div className="grid lg:grid-cols-12 gap-12 items-center relative z-10">
+            {/* Left side: Info & Copy/Chat triggers */}
+            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-1.5 rounded-full text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-wider mb-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                ¡Nuevo! Asistente en tu bolsillo
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black text-[#003049] tracking-tight leading-none">
+                Planifica tus clases por <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-600">WhatsApp</span>
+              </h2>
+              <p className="text-[#003049]/80 text-sm md:text-base font-medium leading-relaxed max-w-xl">
+                ¿Sin tiempo para sentarse a la computadora? Ahora puedes interactuar con nuestro Asistente de IA directo desde tu WhatsApp. Genera secuencias didácticas, propósitos y actividades completas con un solo mensaje.
+              </p>
+
+              {/* Bot Info Cards */}
+              <div className="grid sm:grid-cols-2 gap-4 pt-2 text-left">
+                <div className="bg-card/50 border border-border/60 p-4 rounded-2xl flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 shrink-0">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-[#003049]">Alineado al CNEB</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">Respuestas basadas en el Currículo Nacional vigente.</p>
+                  </div>
+                </div>
+
+                <div className="bg-card/50 border border-border/60 p-4 rounded-2xl flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 shrink-0">
+                    <BookOpen className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-[#003049]">Sin Registros</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">Sin contraseñas. Escribe, chatea y obtén tu planificación.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-4 items-center justify-center lg:justify-start">
+                <Link
+                  href="https://wa.me/51984277478?text=Hola!%20Quiero%20probar%20el%20bot%20de%20IA"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full font-bold px-8 py-4 text-base shadow-lg bg-emerald-500 text-white hover:bg-emerald-600 hover:shadow-xl transition-all hover:scale-105 active:scale-95"
+                >
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.45L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.116-2.887-6.98-1.864-1.864-4.343-2.887-6.984-2.888-5.439 0-9.863 4.42-9.867 9.865-.001 1.757.458 3.473 1.332 4.972l-.988 3.605 3.698-.971zm11.367-5.123c-.302-.15-1.785-.882-2.062-.982-.277-.1-.478-.15-.679.15-.201.3-.778.982-.954 1.183-.176.201-.353.226-.655.076-.302-.15-1.274-.469-2.427-1.498-.897-.8-1.502-1.787-1.678-2.088-.176-.302-.019-.465.132-.614.136-.135.302-.35.453-.526.15-.175.201-.3.302-.5.101-.201.05-.377-.025-.526-.075-.15-.679-1.636-.93-2.24-.244-.59-.493-.51-.679-.52-.176-.01-.377-.012-.578-.012-.201 0-.528.075-.805.377-.277.302-1.056 1.03-1.056 2.512 0 1.48 1.081 2.912 1.232 3.112.15.201 2.128 3.249 5.156 4.557.72.31 1.282.496 1.72.636.724.23 1.382.197 1.902.12.58-.087 1.785-.73 2.037-1.43.252-.7.252-1.3.176-1.43-.076-.13-.277-.205-.578-.356z"/>
+                  </svg>
+                  Chatear con el Bot
+                </Link>
+                <div className="flex flex-col text-slate-700 dark:text-slate-300 font-mono text-sm gap-1 bg-white/40 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-full px-5 py-3 select-all">
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wide leading-none font-bold">Número de WhatsApp:</span>
+                  <span className="font-bold text-base text-emerald-600 dark:text-emerald-400">+51 984 277 478</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right side: Mock WhatsApp Chat Interface */}
+            <div className="lg:col-span-5 relative flex justify-center">
+              <div className="w-full max-w-[340px] bg-slate-950 rounded-[2.5rem] border-8 border-slate-900 shadow-2xl overflow-hidden aspect-[9/16] relative flex flex-col font-sans">
+                {/* Status Bar */}
+                <div className="bg-[#075e54] text-white/90 text-[10px] px-5 py-2.5 flex justify-between items-center shrink-0">
+                  <div className="font-semibold text-white">EduAI Bot</div>
+                  <div className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-white">en línea</span>
+                  </div>
+                </div>
+
+                {/* Chat Background / Bubble Container */}
+                <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#e5ddd5] flex flex-col justify-end text-xs leading-normal">
+                  {/* Message 1: User */}
+                  <div className="self-end bg-[#dcf8c6] text-slate-800 p-2.5 rounded-lg rounded-tr-none shadow-sm max-w-[85%] relative">
+                    <p className="font-semibold text-[10px] text-slate-500 mb-0.5">Tú</p>
+                    <p className="text-slate-800 font-medium">Hola! Necesito una sesión de matemáticas sobre fracciones para 3ro de primaria</p>
+                    <span className="absolute bottom-1 right-2 text-[8px] text-slate-400">10:02 AM ✓✓</span>
+                  </div>
+
+                  {/* Message 2: AI Bot */}
+                  <div className="self-start bg-white text-slate-800 p-2.5 rounded-lg rounded-tl-none shadow-sm max-w-[85%] relative">
+                    <p className="font-black text-[10px] text-emerald-600 mb-0.5">EduAI Bot Asistente</p>
+                    <p className="font-semibold text-slate-800">¡Hola Maestro! Generando sesión de aprendizaje de 90 minutos alineada a la competencia <span className="text-emerald-600 font-extrabold">"Resuelve problemas de cantidad"</span> del CNEB...</p>
+                    <span className="absolute bottom-1 right-2 text-[8px] text-slate-400">10:02 AM</span>
+                  </div>
+
+                  {/* Message 3: AI Bot details */}
+                  <div className="self-start bg-white text-slate-800 p-2.5 rounded-lg rounded-tl-none shadow-sm max-w-[85%] relative">
+                    <p className="font-semibold text-slate-800 mb-1">
+                      📚 <span className="font-bold">Secuencia Didáctica:</span>
+                    </p>
+                    <ul className="list-disc pl-4 space-y-0.5 text-[11px] font-medium text-slate-700">
+                      <li><span className="font-bold text-slate-800">Inicio (15 min):</span> Dinámica "Repartiendo la pizza". Saberes previos y conflicto cognitivo.</li>
+                      <li><span className="font-bold text-slate-800">Desarrollo (60 min):</span> Representación gráfica y simbólica. Ficha de trabajo estructurada.</li>
+                    </ul>
+                    <span className="absolute bottom-1 right-2 text-[8px] text-slate-400">10:03 AM</span>
+                  </div>
+                </div>
+
+                {/* Message input area */}
+                <div className="bg-slate-100 p-2 flex items-center gap-2 border-t border-slate-200 shrink-0">
+                  <div className="flex-1 bg-white rounded-full px-3 py-1.5 text-[10px] text-slate-400 font-medium">
+                    Escribe un mensaje...
+                  </div>
+                  <div className="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-white text-sm font-bold shadow-sm shrink-0">
+                    ➔
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
       {/* Repositorio Section */}
       <section className="px-4 lg:px-8 py-10">
         <motion.div 
@@ -628,6 +754,37 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
            <p className="text-sm text-muted-foreground mb-6">Elige tu tema - Configura tu aula - Genera tu sesión</p>
         </motion.div>
       </footer>
+
+      {/* Floating WhatsApp Chat Bubble */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        {/* Tooltip Notification */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ delay: 3, duration: 0.5 }}
+          className="mb-2 bg-slate-900 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-lg border border-slate-800 flex items-center gap-1.5 max-w-[200px]"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+          <span>¡Chatea con nuestro Bot!</span>
+        </motion.div>
+
+        <motion.a
+          href="https://wa.me/51984277478?text=Hola!%20Quiero%20probar%20el%20bot%20de%20IA"
+          target="_blank"
+          rel="noopener noreferrer"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", bounce: 0.6, duration: 1 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="w-14 h-14 bg-emerald-500 rounded-full flex items-center justify-center shadow-xl hover:bg-emerald-600 transition-colors border-2 border-white cursor-pointer relative"
+          title="Chatear con el bot de WhatsApp"
+        >
+          <svg className="w-7 h-7 text-white fill-current" viewBox="0 0 24 24">
+            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.45L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.116-2.887-6.98-1.864-1.864-4.343-2.887-6.984-2.888-5.439 0-9.863 4.42-9.867 9.865-.001 1.757.458 3.473 1.332 4.972l-.988 3.605 3.698-.971zm11.367-5.123c-.302-.15-1.785-.882-2.062-.982-.277-.1-.478-.15-.679.15-.201.3-.778.982-.954 1.183-.176.201-.353.226-.655.076-.302-.15-1.274-.469-2.427-1.498-.897-.8-1.502-1.787-1.678-2.088-.176-.302-.019-.465.132-.614.136-.135.302-.35.453-.526.15-.175.201-.3.302-.5.101-.201.05-.377-.025-.526-.075-.15-.679-1.636-.93-2.24-.244-.59-.493-.51-.679-.52-.176-.01-.377-.012-.578-.012-.201 0-.528.075-.805.377-.277.302-1.056 1.03-1.056 2.512 0 1.48 1.081 2.912 1.232 3.112.15.201 2.128 3.249 5.156 4.557.72.31 1.282.496 1.72.636.724.23 1.382.197 1.902.12.58-.087 1.785-.73 2.037-1.43.252-.7.252-1.3.176-1.43-.076-.13-.277-.205-.578-.356z"/>
+          </svg>
+        </motion.a>
+      </div>
     </div>
   )
 }
