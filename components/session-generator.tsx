@@ -352,30 +352,49 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
   useEffect(() => {
     if (!editingSession) return
     const {
+      datosGenerales,
       tema = "",
       tituloSesion,
       titulo,
       competenciasSeleccionadas,
+      capacidades,
       contexto = "",
       horasClase = 1,
       enfoqueTransversal = "",
       competenciaTransversal = "",
-    } = editingSession
+      materialesSeleccionados: matsSel,
+      materialesNoEstructurados: matsNoEst = "",
+      instrumentoEvaluacion: instEval = "",
+    } = editingSession as any
+
+    if (datosGenerales) {
+      if (datosGenerales.docente) setNombreDocente(datosGenerales.docente)
+      if (datosGenerales.fecha) setFecha(datosGenerales.fecha)
+      if (datosGenerales.grado) setGrado(datosGenerales.grado)
+      if (datosGenerales.seccion) setSeccion(datosGenerales.seccion)
+    }
     setTema(tema)
     setTituloSesion(tituloSesion ?? titulo ?? tema)
     setCompetenciasSeleccionadas(Array.isArray(competenciasSeleccionadas) ? competenciasSeleccionadas : [])
+    setCapacidadesSeleccionadas(Array.isArray(capacidades) ? capacidades : [])
     setContexto(contexto)
     setHorasClase(horasClase)
     setEnfoqueTransversal(enfoqueTransversal)
     setCompetenciaTransversal(competenciaTransversal)
+    if (Array.isArray(matsSel)) {
+      setMaterialesSeleccionados(matsSel)
+    }
+    setMaterialesNoEstructurados(matsNoEst)
+    if (instEval) setInstrumentoEvaluacion(instEval)
   }, [editingSession])
 
   const contextoBase = getContextoBase(contexto)
 
   useEffect(() => {
+    if (editingSession) return // Don't override restored materials
     const materiales = materialesPorContexto[contextoBase] || []
     setMaterialesSeleccionados(materiales)
-  }, [contextoBase])
+  }, [contextoBase, editingSession])
 
   const addCompetencia = (competencia: string) => {
     setCompetenciasSeleccionadas((prev) => [...prev, competencia])
@@ -421,9 +440,37 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     horasClase
   ].every(Boolean)
 
+  const handleLoginRequired = () => {
+    if (guestMode) {
+      const guestSessionData = {
+        datosGenerales: {
+          docente: nombreDocente,
+          fecha,
+          grado,
+          seccion,
+          ciclo,
+        },
+        tema,
+        titulo: tituloSesion,
+        tituloSesion,
+        competenciasSeleccionadas,
+        capacidades: capacidadesSeleccionadas,
+        contexto,
+        horasClase,
+        enfoqueTransversal,
+        competenciaTransversal,
+        materialesSeleccionados,
+        materialesNoEstructurados,
+        instrumentoEvaluacion,
+      }
+      localStorage.setItem("session_to_edit", JSON.stringify(guestSessionData))
+    }
+    onLoginRequired?.()
+  }
+
   const generateSession = async () => {
     if (guestMode) {
-      onLoginRequired?.()
+      handleLoginRequired()
       return
     }
 
@@ -531,6 +578,7 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     toggleMaterial,
     toggleAccordion,
     generateSession,
+    handleLoginRequired,
     formProgress,
     contextoBase,
     isValid
@@ -1007,6 +1055,7 @@ export function SessionGenerator(props: SessionGeneratorProps) {
     toggleMaterial,
     toggleAccordion,
     generateSession,
+    handleLoginRequired,
     formProgress,
     contextoBase,
     isValid
@@ -1018,7 +1067,7 @@ export function SessionGenerator(props: SessionGeneratorProps) {
       {/* HEADER LUMINOSO Y LIMPIO */}
       <SessionHeader
         guestMode={guestMode}
-        onLoginRequired={onLoginRequired}
+        onLoginRequired={handleLoginRequired}
         onViewDashboard={onViewDashboard}
         onLogout={onLogout}
         user={user}

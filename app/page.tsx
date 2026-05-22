@@ -64,6 +64,7 @@ export type SessionData = {
   duracion_desarrollo?: string
   duracion_cierre?: string
   extension?: string
+  instrumentoEvaluacion?: string
 
   // Recursos Adicionales
   recursosAdicionales?: {

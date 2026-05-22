@@ -137,9 +137,9 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
     )
   }
 
-  const handleSaveSession = async (isPublic = false) => {
+  const handleSaveSession = async (isPublic = false, sessionToSave?: SessionData) => {
     if (isPublic && isPublished) return
-    if (!isPublic && isSaved) return
+    if (!isPublic && isSaved && !sessionToSave) return
     setIsSaving(true)
     try {
       const accessToken = localStorage.getItem("access_token")
@@ -152,7 +152,8 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
 
       const userData = JSON.parse(user)
 
-      const payloadData = { ...editedSession }
+      const activeSession = sessionToSave || editedSession
+      const payloadData = { ...activeSession }
       // Ensure session_id is included so the backend updates the existing record
       if (!payloadData.session_id) {
         payloadData.session_id = `session_${Date.now()}`
@@ -168,7 +169,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
         session_data: payloadData,
       }
 
-      await fetch(`${AUTH_URL}/save-session`, {
+      const res = await fetch(`${AUTH_URL}/save-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -176,6 +177,14 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
         },
         body: JSON.stringify(payload),
       })
+
+      if (!res.ok) {
+        throw new Error(`Error en el servidor al guardar la sesión: ${res.status}`)
+      }
+
+      if (sessionToSave) {
+        setEditedSession(sessionToSave)
+      }
 
       if (isPublic) {
         toast.success("¡Sesión publicada exitosamente!", {
@@ -191,6 +200,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
     } catch (err) {
       console.error("Error guardando sesión:", err)
       toast.error(`Error al guardar: ${err instanceof Error ? err.message : "Error desconocido"}`)
+      throw err
     } finally {
       setIsSaving(false)
     }
@@ -199,7 +209,17 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
   return (
     <>
       {showPreview && (
-        <PdfPreview session={editedSession} onClose={() => setShowPreview(false)} />
+        <PdfPreview
+          session={editedSession}
+          onClose={() => setShowPreview(false)}
+          onUpdateSession={(updatedSession) => {
+            setEditedSession(updatedSession);
+            setIsSaved(false);
+          }}
+          onSaveSession={async (updatedSession) => {
+            await handleSaveSession(false, updatedSession);
+          }}
+        />
       )}
 
       {showPublishModal && (

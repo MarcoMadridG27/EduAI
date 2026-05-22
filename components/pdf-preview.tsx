@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { X, Download, Loader2 } from "lucide-react"
+import { X, Download, Loader2, Save } from "lucide-react"
 import type { SessionData } from "@/app/page"
 import { toast } from "sonner"
 import { EditableField, BlockCard, AddBlockBar, type Block } from "@/components/pdf-preview-blocks"
@@ -10,6 +10,8 @@ import { EditableField, BlockCard, AddBlockBar, type Block } from "@/components/
 interface PdfPreviewProps {
   session: SessionData
   onClose: () => void
+  onUpdateSession?: (updatedSession: SessionData) => void
+  onSaveSession?: (session: SessionData) => Promise<void>
 }
 
 const BAR = "bg-[#1565C0] text-white font-bold text-[9pt] px-3 py-1.5 mt-4 mb-1"
@@ -20,7 +22,12 @@ const PAGE: React.CSSProperties = {
   color: "#212121", lineHeight: 1.4,
 }
 
-export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
+export function PdfPreview({
+  session,
+  onClose,
+  onUpdateSession,
+  onSaveSession,
+}: Readonly<PdfPreviewProps>) {
   const formatDatePeru = (input?: string | Date | null) => {
     const tzOpt = { timeZone: "America/Lima" } as Intl.DateTimeFormatOptions
     if (!input) return new Date().toLocaleDateString("es-PE", tzOpt)
@@ -49,11 +56,95 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
     return sess.actividades_previas
   }
 
-  const initialSession: SessionData = { ...session, actividades_previas: inferActividadesPrevias(session) }
-  const [data, setData] = useState<SessionData>(initialSession)
+  const getInitialSession = (): SessionData => {
+    const sess: SessionData = {
+      ...session,
+      actividades_previas: inferActividadesPrevias(session),
+      recursosAdicionales: session.recursosAdicionales ? { ...session.recursosAdicionales } : {}
+    }
+    
+    const formInstrument = sess.instrumentoEvaluacion || "Lista de cotejo"
+    const existingInst = sess.recursosAdicionales?.instrumentoEvaluacionGenerado
+    
+    if (!existingInst || existingInst.tipo_instrumento !== formInstrument) {
+      let tipo_inst = formInstrument
+      if (tipo_inst.includes("IA") || !tipo_inst) {
+        tipo_inst = "Lista de cotejo"
+      }
+      
+      let crits: string[] = []
+      if (existingInst?.criterios_o_items && existingInst.criterios_o_items.length > 0) {
+        crits = existingInst.criterios_o_items
+      } else {
+        const criteriaRaw = sess.criteriosEvaluacion || ""
+        if (typeof criteriaRaw === "string" && criteriaRaw.trim() !== "") {
+          crits = criteriaRaw
+            .split(/\n|\r\n/)
+            .map(line => line.replace(/^\s*\d+\.\s*/, "").replace(/^\s*•\s*/, "").trim())
+            .filter(Boolean)
+        } else if (Array.isArray(criteriaRaw)) {
+          crits = criteriaRaw
+        }
+      }
+      
+      if (crits.length === 0) {
+        crits = [
+          "Identifica y organiza la información relevante del problema.",
+          "Selecciona y ejecuta estrategias de cálculo apropiadas.",
+          "Comunica sus resultados con claridad utilizando lenguaje matemático.",
+          "Reflexiona sobre sus propios errores y aciertos."
+        ]
+      }
+      
+      let scales: string[] = ["SÍ", "NO"]
+      const tipo_upper = tipo_inst.toUpperCase()
+      if (tipo_upper.includes("COTEJO")) {
+        scales = ["SÍ", "NO"]
+      } else if (tipo_upper.includes("RÚBRICA") || tipo_upper.includes("RUBRICA")) {
+        scales = ["Inicio", "Proceso", "Logrado", "Destacado"]
+      } else if (tipo_upper.includes("VALORACIÓN") || tipo_upper.includes("VALORACION")) {
+        scales = ["Nunca", "A veces", "Siempre"]
+      } else if (tipo_upper.includes("OBSERVACIÓN") || tipo_upper.includes("OBSERVACION")) {
+        scales = ["Sí", "No", "En proceso"]
+      }
+      
+      sess.recursosAdicionales = {
+        ...sess.recursosAdicionales,
+        instrumentoEvaluacionGenerado: {
+          tipo_instrumento: tipo_inst,
+          criterios_o_items: crits,
+          escalas_o_niveles: scales
+        }
+      }
+    }
+    return sess
+  }
+
+  const [data, setData] = useState<SessionData>(getInitialSession)
+  const [isSaving, setIsSaving] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
+  const [isExportingExcel, setIsExportingExcel] = useState(false)
   const [page1Blocks, setPage1Blocks] = useState<Block[]>([])
   const [page2Blocks, setPage2Blocks] = useState<Block[]>([])
+
+  async function handleSave() {
+    if (!onSaveSession) return
+    setIsSaving(true)
+    try {
+      await onSaveSession(data)
+    } catch (err) {
+      console.error("Error al guardar la sesión desde la vista previa:", err)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleClose = () => {
+    if (onUpdateSession) {
+      onUpdateSession(data)
+    }
+    onClose()
+  }
 
   const dg = data.datosGenerales || {}
   const sm = data.secuenciaMetodologica || { inicio: "", desarrollo: "", cierre: "" }
@@ -132,6 +223,8 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
             secuenciaMetodologica: data.secuenciaMetodologica, distribucionHoras: data.distribucionHoras,
             materialesDidacticosSugeridos: data.materialesDidacticosSugeridos,
             recursosAdicionales: data.recursosAdicionales,
+            instrumentoEvaluacion: data.instrumentoEvaluacion,
+            instrumento: data.instrumentoEvaluacion,
           }
         }),
       })
@@ -147,6 +240,17 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
     } catch (err) {
       toast.error(`Error al generar PDF: ${err instanceof Error ? err.message : "Error desconocido"}`)
     } finally { setIsExporting(false) }
+  }
+
+  async function handleExportToExcel() {
+    setIsExportingExcel(true)
+    try {
+      const { exportToExcel } = await import("@/lib/excel-export")
+      await exportToExcel(data)
+      toast.success("¡Excel descargado exitosamente!")
+    } catch (err) {
+      toast.error(`Error al generar Excel: ${err instanceof Error ? err.message : "Error desconocido"}`)
+    } finally { setIsExportingExcel(false) }
   }
 
   let mats: string[] = []
@@ -172,13 +276,27 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
           </span>
         </div>
         <div className="flex items-center gap-2">
+          {onSaveSession && (
+            <Button onClick={handleSave} disabled={isSaving}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-9 px-3 text-sm shadow flex items-center gap-2 transition-all hover:scale-105 duration-300">
+              {isSaving
+                ? <><Loader2 className="h-4 w-4 animate-spin" />Guardando...</>
+                : <><Save className="h-4 w-4" />Actualizar Sesión</>}
+            </Button>
+          )}
           <Button onClick={handleGeneratePDF} disabled={isExporting}
-            className="bg-white text-[#1565C0] hover:bg-blue-50 font-bold h-9 px-4 text-sm shadow">
+            className="bg-white text-[#1565C0] hover:bg-blue-50 font-bold h-9 px-3 text-sm shadow">
             {isExporting
               ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Generando...</>
               : <><Download className="h-4 w-4 mr-2" />Generar PDF</>}
           </Button>
-          <button onClick={onClose} className="ml-1 text-white hover:text-blue-200 transition-colors"><X className="h-5 w-5" /></button>
+          <Button onClick={handleExportToExcel} disabled={isExportingExcel}
+            className="bg-[#2E7D32] hover:bg-[#1B5E20] text-white font-bold h-9 px-3 text-sm shadow flex items-center gap-2">
+            {isExportingExcel
+              ? <><Loader2 className="h-4 w-4 animate-spin" />Generando...</>
+              : <><Download className="h-4 w-4" />Exportar a Excel</>}
+          </Button>
+          <button onClick={handleClose} className="ml-1 text-white hover:text-blue-200 transition-colors"><X className="h-5 w-5" /></button>
         </div>
       </div>
 
