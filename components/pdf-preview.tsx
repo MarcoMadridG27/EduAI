@@ -465,13 +465,13 @@ export function PdfPreview({
 
             {/* V. Extensión eliminado */}
 
-            {/* VI. Instrumento de evaluación */}
+            {/* V. Instrumento de evaluación */}
             {(() => {
               const inst = data.recursosAdicionales?.instrumentoEvaluacionGenerado;
               if (!inst) return null;
               return (
                 <div className="mt-4">
-                  <div className={BAR}>VI.&nbsp;&nbsp;INSTRUMENTO DE EVALUACIÓN: {(inst.tipo_instrumento || "INSTRUMENTO").toUpperCase()}</div>
+                  <div className={BAR}>V.&nbsp;&nbsp;INSTRUMENTO DE EVALUACIÓN: {(inst.tipo_instrumento || "INSTRUMENTO").toUpperCase()}</div>
                   <table className="w-full border-collapse text-[8.5pt]">
                     <thead>
                       <tr className="bg-[#1976D2] text-white">

@@ -494,7 +494,7 @@ export async function exportToExcel(data: SessionData) {
   // BLOQUE V eliminado (EXTENSIÓN/TAREA)
 
   // -------------------------------------------------------------
-  // ─── BLOQUE VI: INSTRUMENTO DE EVALUACIÓN ───
+  // ─── BLOQUE V: INSTRUMENTO DE EVALUACIÓN ───
   // -------------------------------------------------------------
   const inst = data.recursosAdicionales?.instrumentoEvaluacionGenerado
   if (inst) {
@@ -507,7 +507,7 @@ export async function exportToExcel(data: SessionData) {
       fillColor: AZUL_HEADER,
       align: "left",
     })
-    worksheet.getCell(`A${currentRow}`).value = ` VI.  INSTRUMENTO DE EVALUACIÓN: ${tipoInst}`
+    worksheet.getCell(`A${currentRow}`).value = ` V.  INSTRUMENTO DE EVALUACIÓN: ${tipoInst}`
     worksheet.getRow(currentRow).height = 20
     currentRow++
 
