@@ -22,8 +22,9 @@ const PAGE: React.CSSProperties = {
 
 export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
   const formatDatePeru = (input?: string | Date | null) => {
-    if (!input) return new Date().toLocaleDateString("es-PE")
-    if (input instanceof Date) return input.toLocaleDateString("es-PE")
+    const tzOpt = { timeZone: "America/Lima" } as Intl.DateTimeFormatOptions
+    if (!input) return new Date().toLocaleDateString("es-PE", tzOpt)
+    if (input instanceof Date) return input.toLocaleDateString("es-PE", tzOpt)
     const s = String(input).trim()
     // ISO YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS
     const isoMatch = s.match(/^(\d{4})-(\d{2})-(\d{2})/)
@@ -31,7 +32,7 @@ export function PdfPreview({ session, onClose }: Readonly<PdfPreviewProps>) {
     // already dd/mm/yyyy
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s
     const d = new Date(s)
-    if (!isNaN(d.getTime())) return d.toLocaleDateString("es-PE")
+    if (!isNaN(d.getTime())) return d.toLocaleDateString("es-PE", tzOpt)
     return s
   }
   // Asegurar que la vista previa siempre muestre actividades_previas: si vienen vacías,
