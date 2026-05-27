@@ -143,6 +143,10 @@ export default function Home() {
     const storedUser = localStorage.getItem("user")
     const accessToken = localStorage.getItem("access_token")
 
+    // Read view query parameter
+    const params = new URLSearchParams(window.location.search)
+    const viewParam = params.get("view")
+
     if (storedUser && accessToken) {
       try {
         const userData = JSON.parse(storedUser)
@@ -155,17 +159,46 @@ export default function Home() {
           setEditingSession(editData)
           setCurrentView("generator")
           localStorage.removeItem("session_to_edit")
+        } else if (viewParam && ["generator", "dashboard", "results"].includes(viewParam)) {
+          setCurrentView(viewParam as any)
         } else {
-          setCurrentView("repository")
+          // If no specific view is requested, route directly to repository path
+          router.push("/repositorio")
         }
       } catch (e) {
         console.error("Error restaurando sesión:", e)
       }
     } else {
-      setCurrentView("landing")
+      if (viewParam && ["generator", "dashboard", "results"].includes(viewParam)) {
+        setGuestMode(true)
+        setCurrentView(viewParam as any)
+      } else {
+        setCurrentView("landing")
+      }
     }
     setIsCheckingAuth(false)
-  }, [])
+  }, [router])
+
+  // Synchronize currentView state with browser URL
+  useEffect(() => {
+    if (isCheckingAuth) return
+    const params = new URLSearchParams(window.location.search)
+    const currentParam = params.get("view")
+
+    if (currentView === "landing") {
+      if (window.location.pathname !== "/" || currentParam) {
+        router.push("/")
+      }
+    } else if (currentView === "repository") {
+      if (window.location.pathname !== "/repositorio") {
+        router.push("/repositorio")
+      }
+    } else {
+      if (currentParam !== currentView) {
+        router.push(`/?view=${currentView}`)
+      }
+    }
+  }, [currentView, isCheckingAuth, router])
 
 
   const handleLogout = () => {
