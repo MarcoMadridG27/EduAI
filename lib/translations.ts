@@ -72,6 +72,7 @@ export interface TranslationDictionary {
   materialesLabel: string;
   materialesPlaceholder: string;
   evaluacionLabel: string;
+  idiomaLabel: string;
   generateBtn: string;
   generatingStep1: string;
   generatingStep2: string;
@@ -193,6 +194,7 @@ export const translations: Record<Language, TranslationDictionary> = {
     materialesLabel: "Materiales y recursos adicionales en el aula",
     materialesPlaceholder: "Ej. Conchas de mar, semillas locales, laptop, papelote...",
     evaluacionLabel: "Instrumento de evaluación preferido",
+    idiomaLabel: "Idioma de la Sesión",
     generateBtn: "Diseñar mi Sesión con IA",
     generatingStep1: "Iniciando conexión con IA...",
     generatingStep2: "Buscando contexto en el Currículo Nacional...",
@@ -310,6 +312,7 @@ export const translations: Record<Language, TranslationDictionary> = {
     materialesLabel: "Materials and resources in the classroom",
     materialesPlaceholder: "e.g. Seashells, local seeds, laptop, charts...",
     evaluacionLabel: "Preferred assessment tool",
+    idiomaLabel: "Session Language",
     generateBtn: "Design my Session with AI",
     generatingStep1: "Starting AI connection...",
     generatingStep2: "Searching for context in the National Curriculum...",
@@ -427,6 +430,7 @@ export const translations: Record<Language, TranslationDictionary> = {
     materialesLabel: "Yachay wasipi imakuna kapuq",
     materialesPlaceholder: "Ej. Mama qucha conchakuna, mujukuna, laptop...",
     evaluacionLabel: "Chaninchay instrumentu",
+    idiomaLabel: "Yachachiy Rimanapaq",
     generateBtn: "IAwan Yachana K'itita Ruray",
     generatingStep1: "IAwan tinkuchkan...",
     generatingStep2: "Currículo Nacionalpi maskachkan...",
@@ -544,6 +548,7 @@ export const translations: Record<Language, TranslationDictionary> = {
     materialesLabel: "Yatiqañ utap yänaka",
     materialesPlaceholder: "Ej. Kota conchayaka, jathayaka, laptop...",
     evaluacionLabel: "Uñakipaw yänaka",
+    idiomaLabel: "Yatichawi Aru",
     generateBtn: "IA-mpi Yatichawi Luraña",
     generatingStep1: "IA-mpi tinkuskaspam...",
     generatingStep2: "Currículo Nacionalpi maskaskani...",

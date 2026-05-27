@@ -323,6 +323,17 @@ Nota: La IA debe generar automáticamente:
 function useSessionGeneratorState({ user, onSessionGenerated, editingSession, guestMode = false, onLoginRequired }: SessionGeneratorProps) {
   const { t, language } = useLanguage()
   const [nombreDocente, setNombreDocente] = useState("")
+  const [idiomaGeneracion, setIdiomaGeneracion] = useState("español")
+
+  useEffect(() => {
+    const languageNames: Record<string, string> = {
+      es: "español",
+      en: "inglés",
+      qu: "quechua",
+      ay: "aymara"
+    }
+    setIdiomaGeneracion(languageNames[language] || "español")
+  }, [language])
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
   const [grado, setGrado] = useState("")
   const [seccion, setSeccion] = useState("")
@@ -495,14 +506,6 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
       ...(materialesNoEstructurados ? [materialesNoEstructurados] : [])
     ].join(", ")
 
-    const languageNames: Record<string, string> = {
-      es: "español",
-      en: "inglés",
-      qu: "quechua",
-      ay: "aymara"
-    }
-    const idiomaName = languageNames[language] || "español"
-
     const loadingMessages = [
       t("generatingStep2"),
       t("generatingStep3"),
@@ -533,7 +536,7 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
         setProgress,
         setIsGenerating,
         onSessionGenerated,
-        idioma: idiomaName,
+        idioma: idiomaGeneracion,
         loadingMessages,
         formData: {
           datosGenerales: {
@@ -554,7 +557,7 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
           enfoqueTransversal,
           competenciaTransversal,
           materialesDisponibles: materialesCombinados,
-          idioma: idiomaName
+          idioma: idiomaGeneracion
         },
       })
     } catch (err) {
@@ -605,7 +608,9 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     handleLoginRequired,
     formProgress,
     contextoBase,
-    isValid
+    isValid,
+    idiomaGeneracion,
+    setIdiomaGeneracion
   }
 }
 
@@ -1087,7 +1092,9 @@ export function SessionGenerator(props: SessionGeneratorProps) {
     handleLoginRequired,
     formProgress,
     contextoBase,
-    isValid
+    isValid,
+    idiomaGeneracion,
+    setIdiomaGeneracion
   } = useSessionGeneratorState(props)
 
   return (
@@ -1324,7 +1331,7 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                     <h3 className="text-lg font-bold text-slate-800">5. {t("context")} & {t("duration")}</h3>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="contexto" className="text-sm font-semibold text-slate-700">
                         {t("contextoLabel")} <span className="text-red-500">*</span>
@@ -1363,6 +1370,43 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                           </span>
                         </div>
                       </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="idiomaGeneracion" className="text-sm font-semibold text-slate-700">
+                        {t("idiomaLabel")} <span className="text-red-500">*</span>
+                      </Label>
+                      <Select value={idiomaGeneracion} onValueChange={setIdiomaGeneracion}>
+                        <SelectTrigger className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm font-semibold">
+                          <SelectValue placeholder="Selecciona..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border-slate-200 text-slate-900">
+                          <SelectItem value="español">
+                            <span className="flex items-center gap-2">
+                              <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-red-500 via-yellow-400 to-red-500" />
+                              Español
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="inglés">
+                            <span className="flex items-center gap-2">
+                              <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-blue-600 via-white to-red-500" />
+                              English (Inglés)
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="quechua">
+                            <span className="flex items-center gap-2 font-bold text-amber-600">
+                              <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-red-500 via-yellow-400 via-green-500 to-purple-600" />
+                              Runasimi (Quechua) ⭐
+                            </span>
+                          </SelectItem>
+                          <SelectItem value="aymara">
+                            <span className="flex items-center gap-2">
+                              <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-orange-500 via-amber-300 via-emerald-400 to-indigo-600" />
+                              Aymar aru (Aymara)
+                            </span>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </section>

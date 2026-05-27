@@ -288,7 +288,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
         </div>
 
         {/* Header */}
-        <header className="bg-white border border-slate-200 shadow-sm border-b border-slate-200 border-b relative z-10">
+        <header className="fixed top-0 left-0 right-0 w-full bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm z-40">
           <div className="container mx-auto px-4 py-6 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={onBack} className="bg-white border border-slate-200 shadow-sm hover:shadow-sm">
@@ -327,7 +327,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
         </header>
 
 
-        <div className="container mx-auto px-4 py-8 relative z-10">
+        <div className="container mx-auto px-4 py-8 relative z-10 pt-28">
           <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto" ref={contentRef}>
 
             {/* SIDEBAR */}
