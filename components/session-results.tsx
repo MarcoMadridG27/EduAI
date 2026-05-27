@@ -26,6 +26,7 @@ import {
 import type { SessionData } from "@/app/page"
 import { toast } from "sonner"
 import { PdfPreview } from "@/components/pdf-preview"
+import { useLanguage } from "@/lib/LanguageContext"
 
 interface SessionResultsProps {
   readonly session: SessionData
@@ -51,6 +52,7 @@ function getJuegoInstrucciones(juego: any): string[] {
 
 export function SessionResults(props: Readonly<SessionResultsProps>) {
   const { session, isSavedSession, onBack, onViewDashboard } = props
+  const { t } = useLanguage()
   const [isSaving, setIsSaving] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [isSaved, setIsSaved] = useState(isSavedSession || false)
@@ -100,7 +102,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
       return (
         <>
           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          Guardando...
+          {t("loading")}
         </>
       )
     }
@@ -108,14 +110,14 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
       return (
         <>
           <CheckCircle className="h-4 w-4 mr-2" />
-          ¡Sesión Guardada!
+          {t("copied")}
         </>
       )
     }
     return (
       <>
         <CheckCircle className="h-4 w-4 mr-2" />
-        Guardar en Personal
+        {t("save")}
       </>
     )
   }
@@ -125,14 +127,14 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
       return (
         <>
           <CheckCircle className="h-4 w-4 mr-2" />
-          Publicado
+          {t("copied")}
         </>
       )
     }
     return (
       <>
         <Share2 className="h-4 w-4 mr-2" />
-        Publicar en Comunidad
+        {t("exploreRepo")}
       </>
     )
   }
@@ -291,15 +293,15 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
             <div className="flex items-center gap-4">
               <Button variant="ghost" onClick={onBack} className="bg-white border border-slate-200 shadow-sm hover:shadow-sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Volver
+                {t("back")}
               </Button>
               <div className="flex items-center gap-3">
                 <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
                 <div>
                   <h1 className="font-bold text-lg text-blue-800 font-bold">
-                    Sesión Generada
+                    {t("resultsTitle")}
                   </h1>
-                  <p className="text-sm text-slate-500">Con IA y Currículo Nacional</p>
+                  <p className="text-sm text-slate-500">Powered by IA & CNEB</p>
                 </div>
               </div>
             </div>
@@ -310,7 +312,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                 className="bg-white border border-slate-200 shadow-sm border-indigo-500/30 hover:shadow-sm bg-transparent"
               >
                 <BarChart3 className="h-4 w-4 mr-2" />
-                Dashboard
+                {t("dashboard")}
               </Button>
               <Button
                 variant="outline"
@@ -318,7 +320,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                 className={`bg-white border border-slate-200 shadow-sm border-emerald-500/30 hover:shadow-sm bg-transparent ${isEditing ? 'shadow-sm' : ''}`}
               >
                 <Edit3 className="h-4 w-4 mr-2" />
-                {isEditing ? "Vista Previa" : "Editar Contenido"}
+                {isEditing ? "Vista Previa" : t("editSession")}
               </Button>
             </div>
           </div>
@@ -334,9 +336,9 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                 <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4 border-l-4 border-blue-500">
                   <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
                     <BookOpen className="h-5 w-5 text-blue-600" />
-                    Contexto y Entradas
+                    {t("context")}
                   </h3>
-                  <p className="text-xs text-slate-500">Resumen de la información base de la sesión.</p>
+                  <p className="text-xs text-slate-500">{t("newSession")}</p>
                 </div>
 
                 {/* Resumen Rápido */}
@@ -344,28 +346,28 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                   <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                     <CardContent className="p-4 text-center space-y-1">
                       <BookOpen className="h-6 w-6 text-blue-600 mx-auto" />
-                      <p className="text-[10px] text-slate-500 uppercase tracking-wide">Tema</p>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wide">{t("theme")}</p>
                       <p className="font-bold text-sm line-clamp-2">{editedSession.tema}</p>
                     </CardContent>
                   </Card>
                   <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                     <CardContent className="p-4 text-center space-y-1">
                       <GraduationCap className="h-6 w-6 text-indigo-600 mx-auto" />
-                      <p className="text-[10px] text-slate-500 uppercase tracking-wide">Ciclo</p>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wide">{t("grade")}</p>
                       <p className="font-bold text-sm">{editedSession.ciclo}</p>
                     </CardContent>
                   </Card>
                   <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                     <CardContent className="p-4 text-center space-y-1">
                       <Clock className="h-6 w-6 text-emerald-600 mx-auto" />
-                      <p className="text-[10px] text-slate-500 uppercase tracking-wide">Duración</p>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wide">{t("duration")}</p>
                       <p className="font-bold text-sm">{editedSession.horasClase} h</p>
                     </CardContent>
                   </Card>
                   <Card className="bg-white border border-slate-200 shadow-sm border-0 hover:shadow-md transition-all">
                     <CardContent className="p-4 text-center space-y-1">
                       <MapPin className="h-6 w-6 text-blue-600 mx-auto" />
-                      <p className="text-[10px] text-slate-500 uppercase tracking-wide">Contexto</p>
+                      <p className="text-[10px] text-slate-500 uppercase tracking-wide">{t("context")}</p>
                       <p className="font-bold text-xs line-clamp-2">{editedSession.contexto}</p>
                     </CardContent>
                   </Card>
@@ -377,14 +379,14 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
                         <GraduationCap className="h-4 w-4 text-blue-600" />
-                        Datos Generales
+                        {t("tabGeneral")}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2 text-xs">
-                      <p><span className="text-slate-500">Título:</span> {editedSession.datosGenerales.titulo}</p>
-                      <p><span className="text-slate-500">Docente:</span> {editedSession.datosGenerales.docente}</p>
-                      <p><span className="text-slate-500">Fecha:</span> {editedSession.datosGenerales.fecha}</p>
-                      <p><span className="text-slate-500">Grado y Sección:</span> {editedSession.datosGenerales.grado} - {editedSession.datosGenerales.seccion}</p>
+                      <p><span className="text-slate-500">{t("sessionTitle")}:</span> {editedSession.datosGenerales.titulo}</p>
+                      <p><span className="text-slate-500">{t("teacher")}:</span> {editedSession.datosGenerales.docente}</p>
+                      <p><span className="text-slate-500">{t("date")}:</span> {editedSession.datosGenerales.fecha}</p>
+                      <p><span className="text-slate-500">{t("grade")} & {t("section")}:</span> {editedSession.datosGenerales.grado} - {editedSession.datosGenerales.seccion}</p>
                     </CardContent>
                   </Card>
                 )}
@@ -395,7 +397,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
                         <Target className="h-4 w-4 text-indigo-600" />
-                        Competencias
+                        {t("competencies")}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
@@ -415,7 +417,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
                         <Zap className="h-4 w-4 text-emerald-600" />
-                        Capacidades
+                        {t("capacities")}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
@@ -435,7 +437,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
                         <Package className="h-4 w-4 text-blue-600" />
-                        Materiales Disponibles
+                        {t("materials")}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -451,15 +453,15 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
               <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-2 mb-2 flex flex-wrap sm:flex-nowrap overflow-x-auto gap-2 border-b border-slate-200 border-b sticky top-[80px] z-20 backdrop-blur-xl">
                 <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'secuencia' ? 'bg-blue-100 text-blue-600 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'}`} onClick={() => setActiveTab('secuencia')}>
                   <BookOpen className="h-4 w-4 mr-2" />
-                  Secuencia Didáctica
+                  {t("tabSequence")}
                 </Button>
                 <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'evaluacion' ? 'bg-emerald-100 text-emerald-600 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'}`} onClick={() => setActiveTab('evaluacion')}>
                   <CheckCircle className="h-4 w-4 mr-2" />
-                  Evaluación
+                  {t("evaluation")}
                 </Button>
                 <Button variant="ghost" className={`flex-1 min-w-[140px] text-sm ${activeTab === 'recursos' ? 'bg-indigo-100 text-indigo-600 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'}`} onClick={() => setActiveTab('recursos')}>
                   <Package className="h-4 w-4 mr-2" />
-                  Recursos Adicionales
+                  {t("tabResources")}
                 </Button>
               </div>
 
@@ -473,7 +475,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <Target className="h-5 w-5 text-indigo-600" />
-                            Propósito de la Sesión
+                            {t("purpose")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -494,7 +496,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <Brain className="h-5 w-5 text-indigo-600" />
-                            Descripción de la Competencia
+                            {t("competencies")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -515,7 +517,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <BookOpen className="h-5 w-5 text-emerald-600" />
-                            Secuencia Metodológica
+                            {t("secuenciaMetodologica")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -523,7 +525,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                             {/* INICIO */}
                             <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-blue-500">
                               <h4 className="font-bold text-blue-600 mb-2 flex items-center gap-2">
-                                <span className="bg-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">1</span> INICIO
+                                <span className="bg-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">1</span> {t("inicio").toUpperCase()}
                               </h4>
                               {isEditing ? (
                                 <Textarea value={editedSession.secuenciaMetodologica?.inicio ?? ""} onChange={(e) => setEditedSession({ ...editedSession, secuenciaMetodologica: { ...editedSession.secuenciaMetodologica, inicio: e.target.value } })} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
@@ -534,7 +536,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                             {/* DESARROLLO */}
                             <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-indigo-500">
                               <h4 className="font-bold text-indigo-600 mb-2 flex items-center gap-2">
-                                <span className="bg-indigo-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">2</span> DESARROLLO
+                                <span className="bg-indigo-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">2</span> {t("desarrollo").toUpperCase()}
                               </h4>
                               {isEditing ? (
                                 <Textarea value={editedSession.secuenciaMetodologica?.desarrollo ?? ""} onChange={(e) => setEditedSession({ ...editedSession, secuenciaMetodologica: { ...editedSession.secuenciaMetodologica, desarrollo: e.target.value } })} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
@@ -545,7 +547,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                             {/* CIERRE */}
                             <div className="bg-white border border-slate-200 shadow-sm rounded-lg p-4 border-l-4 border-emerald-500">
                               <h4 className="font-bold text-emerald-600 mb-2 flex items-center gap-2">
-                                <span className="bg-emerald-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">3</span> CIERRE
+                                <span className="bg-emerald-600 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold">3</span> {t("cierre").toUpperCase()}
                               </h4>
                               {isEditing ? (
                                 <Textarea value={editedSession.secuenciaMetodologica?.cierre ?? ""} onChange={(e) => setEditedSession({ ...editedSession, secuenciaMetodologica: { ...editedSession.secuenciaMetodologica, cierre: e.target.value } })} className="min-h-[100px] bg-white border border-slate-200 shadow-sm" />
@@ -564,7 +566,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <Clock className="h-5 w-5 text-indigo-600" />
-                            Distribución Horaria
+                            {t("duration")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -622,7 +624,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <BookOpen className="h-5 w-5 text-emerald-600" />
-                            Procesos Didácticos
+                            {t("secuenciaMetodologica")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -644,7 +646,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <Zap className="h-5 w-5 text-indigo-600" />
-                            Actividades Contextualizadas
+                            {t("actividadesDiferenciadas")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -671,7 +673,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <CheckCircle className="h-5 w-5 text-emerald-600" />
-                            Criterios de Evaluación
+                            {t("criterios")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -692,7 +694,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <BarChart3 className="h-5 w-5 text-blue-600" />
-                            Evidencias de Aprendizaje
+                            {t("evidences")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -713,7 +715,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <CheckCircle className="h-5 w-5 text-emerald-600" />
-                            Evaluación Formativa
+                            {t("evaluation")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
@@ -744,7 +746,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <Lightbulb className="h-5 w-5 text-blue-600" />
-                            Materiales Sugeridos
+                            {t("materialesSugeridos")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -766,7 +768,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <Lightbulb className="h-5 w-5 text-indigo-600" />
-                            Actividades de Activación
+                            {t("inicio")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -787,7 +789,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <BookOpen className="h-5 w-5 text-blue-600" />
-                            Fichas de Trabajo
+                            {t("fichasTrabajo")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
@@ -819,7 +821,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <CheckCircle className="h-5 w-5 text-emerald-600" />
-                            Problemas y Ejercicios
+                            {t("problemasEjercicios")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -881,7 +883,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <Target className="h-5 w-5 text-indigo-600" />
-                            Actividades Diferenciadas
+                            {t("actividadesDiferenciadas")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -930,7 +932,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <GraduationCap className="h-5 w-5 text-blue-600" />
-                            Comunicado para Padres
+                            {t("comunicadoPadres")}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -954,7 +956,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                 className="bg-white border border-slate-200 shadow-sm border-blue-500/30 hover:shadow-sm h-12 bg-transparent"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Nueva Sesión
+                {t("newSession")}
               </Button>
               <Button
                 onClick={() => handleSaveSession(false)}

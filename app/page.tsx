@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useLanguage } from "@/lib/LanguageContext"
 import { SessionGenerator } from "@/components/session-generator"
 import { SessionResults } from "@/components/session-results"
 import { TeacherDashboard } from "@/components/teacher-dashboard"
@@ -120,10 +121,12 @@ export type SessionData = {
   dinamicaPrincipal?: string
   estrategiaSocioemocional?: string
   evaluacion?: string
+  idioma?: string
 }
 
 export default function Home() {
   const router = useRouter()
+  const { t } = useLanguage()
   const [currentView, setCurrentView] = useState<"landing" | "repository" | "generator" | "results" | "dashboard">("landing")
   const [user, setUser] = useState<{ name: string; email: string } | null>(null)
   const [guestMode, setGuestMode] = useState<boolean>(false)
@@ -132,6 +135,7 @@ export default function Home() {
   const [sessions, setSessions] = useState<SessionData[]>([])
   const [editingSession, setEditingSession] = useState<SessionData | null>(null)
   const [viewingSavedSession, setViewingSavedSession] = useState(false)
+
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
 
   // Restaurar sesión al cargar y verificar autenticación

@@ -5,6 +5,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { BookOpen, Layers, Users, Sparkles, BrainCircuit, Lightbulb, ChevronRight, ChevronLeft, Target, PlayCircle, Loader } from "lucide-react"
 import { useState, useEffect } from "react"
+import { useLanguage } from "@/lib/LanguageContext"
+import { LanguageSelector } from "@/components/language-selector"
 
 interface LandingPageProps {
   readonly onEnterGeneratorPreview: () => void
@@ -13,6 +15,7 @@ interface LandingPageProps {
 }
 
 export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview, onLogin }: Readonly<LandingPageProps>) {
+  const { t } = useLanguage()
   const [repositorySessions, setRepositorySessions] = useState<any[]>([])
   const [isLoadingSessions, setIsLoadingSessions] = useState(true)
   const [sessionsError, setSessionsError] = useState<string | null>(null)
@@ -117,9 +120,10 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
           </Link>
         </div>
 
-        <div className="flex items-center gap-4 pt-4">
-          <Button onClick={onLogin} className="rounded-full font-bold pt-8 px-8 py-5 shadow-lg transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#5590af', color: 'var(--papaya-whip)' }}>
-            Iniciar Sesión
+        <div className="flex items-center gap-3 pt-4">
+          <LanguageSelector />
+          <Button onClick={onLogin} className="rounded-full font-bold h-9 px-6 shadow-md transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#5590af', color: 'var(--papaya-whip)' }}>
+            {t("login")}
           </Button>
         </div>
       </header>
@@ -151,7 +155,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
               {/* Eyebrow Pill */}
               <div className="inline-flex items-center gap-2 bg-[#003049]/5 backdrop-blur-md px-4 py-1.5 rounded-full text-[#003049] text-xs font-black uppercase tracking-wider mb-6 border border-[#003049]/10">
                 <Sparkles className="w-3.5 h-3.5 text-cyan-500 animate-pulse" />
-                Planificación Inteligente con IA
+                {t("planificationTitle")}
               </div>
 
               {/* Premium Typographic Logo Title */}
@@ -168,7 +172,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
               </motion.h1>
               
               <p className="text-base md:text-xl text-[#003049]/80 font-medium mb-10 max-w-xl leading-relaxed">
-                Genera sesiones de aprendizaje estructuradas en segundos. Alineadas al <span className="font-extrabold text-[#003049]">CNEB</span>, con procesos didácticos exactos y adaptadas al contexto de tu aula.
+                {t("heroSubtitle")}
               </p>
 
               {/* Premium CTA Buttons */}
@@ -182,20 +186,21 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                   onClick={onEnterGeneratorPreview}
                   className="rounded-full font-bold px-8 py-6 text-lg min-w-[220px] shadow-lg bg-[#5590af] text-white hover:bg-[#3d6e88] hover:shadow-xl transition-all hover:scale-105 active:scale-95 border border-[#5590af]/20 flex items-center justify-center gap-2 animate-pulse-slow"
                 >
-                  Comenzar ahora
+                  {t("startNow")}
                   <ChevronRight className="w-5 h-5 animate-pulse" />
                 </Button>
                 <Button 
                   onClick={onEnterRepositoryPreview} 
                   className="rounded-full font-bold px-8 py-6 text-lg min-w-[220px] shadow-lg bg-white/80 hover:bg-white text-[#003049] border border-slate-200 backdrop-blur-sm hover:shadow-xl transition-all hover:scale-105 active:scale-95"
                 >
-                  Explorar Repositorio
+                  {t("exploreRepo")}
                 </Button>
               </motion.div>
             </div>
 
             {/* Right Column - Tech Wireframe Interactive Mockup */}
             <div className="lg:col-span-5 relative w-full flex items-center justify-center">
+
               
               {/* AI Generation Blueprint Mockup Container */}
               <div className="relative w-full max-w-[420px] aspect-[4/5] bg-slate-950/85 backdrop-blur-md rounded-[3rem] p-6 shadow-2xl border border-slate-800/80 overflow-hidden group">
@@ -302,8 +307,8 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
           className="max-w-5xl mx-auto"
         >
           <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-black text-foreground mb-4">Mira cómo funciona</h2>
-            <p className="text-lg text-muted-foreground">Experimenta con nuestra demo interactiva de Sesión + y descubre el poder de la planificación con IA.</p>
+            <h2 className="text-3xl md:text-4xl font-black text-foreground mb-4">{t("interactiveDemo")}</h2>
+            <p className="text-lg text-muted-foreground">{t("interactiveDemoDesc")}</p>
           </div>
           <div 
             className="w-full relative overflow-hidden rounded-[2rem] shadow-2xl border border-border bg-card sl-embed"
@@ -344,10 +349,10 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
           >
             <div>
               <h2 className="text-4xl md:text-5xl font-black text-foreground leading-[1.1] tracking-tight mb-6">
-                Diseñado por y para docentes peruanos
+                {t("whyChooseTitle")}
               </h2>
               <p className="text-lg text-muted-foreground font-medium leading-relaxed">
-                Olvídate de empezar desde cero. Sesión + agiliza tu planificación pedagógica para que te enfoques en lo que realmente importa: enseñar y conectar con tus estudiantes.
+                {t("whyChooseSubtitle")}
               </p>
             </div>
 
@@ -379,8 +384,8 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 <BrainCircuit className="w-8 h-8" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground mb-1">Generador Inteligente</h3>
-                <p className="text-muted-foreground text-xs leading-relaxed font-medium">IA entrenada para estructurar secuencias metodológicas, propósitos y criterios de evaluación exactos.</p>
+                <h3 className="text-lg font-bold text-foreground mb-1">{t("smartGenTitle")}</h3>
+                <p className="text-muted-foreground text-xs leading-relaxed font-medium">{t("smartGenDesc")}</p>
               </div>
             </motion.div>
 
@@ -394,8 +399,8 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 <Lightbulb className="w-8 h-8 text-secondary" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground mb-1">Actividades Contextualizadas</h3>
-                <p className="text-muted-foreground text-xs leading-relaxed font-medium">Ingresa el contexto de tu aula y obtén problemas y dinámicas relevantes para el entorno de tus estudiantes.</p>
+                <h3 className="text-lg font-bold text-foreground mb-1">{t("contextualTitle")}</h3>
+                <p className="text-muted-foreground text-xs leading-relaxed font-medium">{t("contextualDesc")}</p>
               </div>
             </motion.div>
 
@@ -409,8 +414,8 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 <Users className="w-8 h-8 text-accent" />
               </div>
               <div className="z-10 relative">
-                <h3 className="text-lg font-bold text-foreground mb-1">Repositorio Colaborativo</h3>
-                <p className="text-muted-foreground text-xs leading-relaxed font-medium">Accede a una gran base de sesiones creadas por otros docentes. Inspírate, copia y edita para tus clases.</p>
+                <h3 className="text-lg font-bold text-foreground mb-1">{t("repoTitle")}</h3>
+                <p className="text-muted-foreground text-xs leading-relaxed font-medium">{t("repoDesc")}</p>
               </div>
               <motion.img 
                 animate={{ y: [0, -5, 0] }}
@@ -446,10 +451,10 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 ¡Nuevo! Asistente en tu bolsillo
               </div>
               <h2 className="text-4xl md:text-5xl font-black text-[#003049] tracking-tight leading-none">
-                Planifica tus clases por <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-600">WhatsApp</span>
+                {t("whatsAppTitle")}
               </h2>
               <p className="text-[#003049]/80 text-sm md:text-base font-medium leading-relaxed max-w-xl">
-                ¿Sin tiempo para sentarse a la computadora? Ahora puedes interactuar con nuestro Asistente de IA directo desde tu WhatsApp. Genera secuencias didácticas, propósitos y actividades completas con un solo mensaje.
+                {t("whatsAppDesc")}
               </p>
 
               {/* Bot Info Cards */}
@@ -486,10 +491,10 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                   <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                     <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.45L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.116-2.887-6.98-1.864-1.864-4.343-2.887-6.984-2.888-5.439 0-9.863 4.42-9.867 9.865-.001 1.757.458 3.473 1.332 4.972l-.988 3.605 3.698-.971zm11.367-5.123c-.302-.15-1.785-.882-2.062-.982-.277-.1-.478-.15-.679.15-.201.3-.778.982-.954 1.183-.176.201-.353.226-.655.076-.302-.15-1.274-.469-2.427-1.498-.897-.8-1.502-1.787-1.678-2.088-.176-.302-.019-.465.132-.614.136-.135.302-.35.453-.526.15-.175.201-.3.302-.5.101-.201.05-.377-.025-.526-.075-.15-.679-1.636-.93-2.24-.244-.59-.493-.51-.679-.52-.176-.01-.377-.012-.578-.012-.201 0-.528.075-.805.377-.277.302-1.056 1.03-1.056 2.512 0 1.48 1.081 2.912 1.232 3.112.15.201 2.128 3.249 5.156 4.557.72.31 1.282.496 1.72.636.724.23 1.382.197 1.902.12.58-.087 1.785-.73 2.037-1.43.252-.7.252-1.3.176-1.43-.076-.13-.277-.205-.578-.356z"/>
                   </svg>
-                  Chatear con el Bot
+                  {t("whatsAppCTA")}
                 </Link>
                 <div className="flex flex-col text-slate-700 dark:text-slate-300 font-mono text-sm gap-1 bg-white/40 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-full px-5 py-3 select-all">
-                  <span className="text-[10px] text-muted-foreground uppercase tracking-wide leading-none font-bold">Número de WhatsApp:</span>
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wide leading-none font-bold">WhatsApp:</span>
                   <span className="font-bold text-base text-emerald-600 dark:text-emerald-400">+51 984 277 478</span>
                 </div>
               </div>
@@ -503,7 +508,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                   <div className="font-semibold text-white">EduAI Bot</div>
                   <div className="flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-white">en línea</span>
+                    <span className="text-white">{t("generating").toLowerCase()}</span>
                   </div>
                 </div>
 
@@ -511,7 +516,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#e5ddd5] flex flex-col justify-end text-xs leading-normal">
                   {/* Message 1: User */}
                   <div className="self-end bg-[#dcf8c6] text-slate-800 p-2.5 rounded-lg rounded-tr-none shadow-sm max-w-[85%] relative">
-                    <p className="font-semibold text-[10px] text-slate-500 mb-0.5">Tú</p>
+                    <p className="font-semibold text-[10px] text-slate-500 mb-0.5">{t("teacher")}</p>
                     <p className="text-slate-800 font-medium">Hola! Necesito una sesión de matemáticas sobre fracciones para 3ro de primaria</p>
                     <span className="absolute bottom-1 right-2 text-[8px] text-slate-400">10:02 AM ✓✓</span>
                   </div>
@@ -539,7 +544,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 {/* Message input area */}
                 <div className="bg-slate-100 p-2 flex items-center gap-2 border-t border-slate-200 shrink-0">
                   <div className="flex-1 bg-white rounded-full px-3 py-1.5 text-[10px] text-slate-400 font-medium">
-                    Escribe un mensaje...
+                    Escribe...
                   </div>
                   <div className="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-white text-sm font-bold shadow-sm shrink-0">
                     ➔
@@ -562,8 +567,8 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
         >
           <div className="flex flex-col md:flex-row justify-between items-end mb-10 relative z-10">
             <div className="max-w-xl">
-              <h2 className="text-2xl font-black text-foreground mb-2">Explora el Repositorio</h2>
-              <p className="text-muted-foreground text-sm font-medium">Descubre las sesiones más valoradas y utilizadas por la comunidad de profesores de Sesión +.</p>
+              <h2 className="text-2xl font-black text-foreground mb-2">{t("exploreRepo")}</h2>
+              <p className="text-muted-foreground text-sm font-medium">{t("repoDesc")}</p>
             </div>
             
             <div className="flex items-center gap-6 mt-6 md:mt-0">
@@ -584,7 +589,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
               className="flex flex-col items-center justify-center py-16 px-8 rounded-3xl bg-card border border-border relative z-10"
             >
               <Loader className="w-8 h-8 text-muted-foreground/60 mb-4 animate-spin" />
-              <h3 className="text-lg font-bold text-foreground">Cargando sesiones...</h3>
+              <h3 className="text-lg font-bold text-foreground">{t("loading")}</h3>
             </motion.div>
           ) : sessionsError ? (
             <motion.div 
@@ -592,7 +597,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
               className="flex flex-col items-center justify-center py-16 px-8 rounded-3xl bg-card border border-border relative z-10"
             >
               <Layers className="w-16 h-16 text-muted-foreground/40 mb-4" />
-              <h3 className="text-lg font-bold text-foreground">Repositorio en Construcción</h3>
+              <h3 className="text-lg font-bold text-foreground">Repositorio</h3>
               <p className="text-sm text-muted-foreground text-center max-w-md mt-2">
                 Próximamente podrás acceder a sesiones colaborativas creadas por docentes de la comunidad.
               </p>
@@ -646,7 +651,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
 
           <div className="mt-8 flex justify-start relative z-10">
             <Button onClick={onEnterRepositoryPreview} className="rounded-full font-bold px-8 py-2 text-sm shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#5590af', color: 'var(--papaya-whip)' }}>
-              Ir al Repositorio
+              {t("exploreRepo")}
             </Button>
           </div>
 
@@ -680,7 +685,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
             
             <div className="relative z-10">
               <Button onClick={onEnterGeneratorPreview} className="rounded-full font-bold px-6 py-2 text-sm shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#5590af', color: 'var(--papaya-whip)' }}>
-                Generar Documentos
+                {t("newSession")}
               </Button>
             </div>
 
@@ -769,8 +774,8 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
              className="w-24 h-24 mb-4 drop-shadow-xl object-contain"
              alt="Like"
            />
-           <h2 className="text-2xl font-bold text-foreground mb-2 tracking-tight">Planificar nunca fue tan fácil</h2>
-           <p className="text-sm text-muted-foreground mb-6">Elige tu tema - Configura tu aula - Genera tu sesión</p>
+           <h2 className="text-2xl font-bold text-foreground mb-2 tracking-tight">{t("planificationDesc")}</h2>
+           <p className="text-sm text-muted-foreground mb-6">{t("formInstructions")}</p>
         </motion.div>
       </footer>
 
@@ -784,7 +789,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
           className="mb-2 bg-slate-900 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-lg border border-slate-800 flex items-center gap-1.5 max-w-[200px]"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-          <span>¡Chatea con nuestro Bot!</span>
+          <span>WhatsApp Bot</span>
         </motion.div>
 
         <motion.a
@@ -797,7 +802,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           className="w-14 h-14 bg-emerald-500 rounded-full flex items-center justify-center shadow-xl hover:bg-emerald-600 transition-colors border-2 border-white cursor-pointer relative"
-          title="Chatear con el bot de WhatsApp"
+          title="WhatsApp Bot"
         >
           <svg className="w-7 h-7 text-white fill-current" viewBox="0 0 24 24">
             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.45L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.116-2.887-6.98-1.864-1.864-4.343-2.887-6.984-2.888-5.439 0-9.863 4.42-9.867 9.865-.001 1.757.458 3.473 1.332 4.972l-.988 3.605 3.698-.971zm11.367-5.123c-.302-.15-1.785-.882-2.062-.982-.277-.1-.478-.15-.679.15-.201.3-.778.982-.954 1.183-.176.201-.353.226-.655.076-.302-.15-1.274-.469-2.427-1.498-.897-.8-1.502-1.787-1.678-2.088-.176-.302-.019-.465.132-.614.136-.135.302-.35.453-.526.15-.175.201-.3.302-.5.101-.201.05-.377-.025-.526-.075-.15-.679-1.636-.93-2.24-.244-.59-.493-.51-.679-.52-.176-.01-.377-.012-.578-.012-.201 0-.528.075-.805.377-.277.302-1.056 1.03-1.056 2.512 0 1.48 1.081 2.912 1.232 3.112.15.201 2.128 3.249 5.156 4.557.72.31 1.282.496 1.72.636.724.23 1.382.197 1.902.12.58-.087 1.785-.73 2.037-1.43.252-.7.252-1.3.176-1.43-.076-.13-.277-.205-.578-.356z"/>

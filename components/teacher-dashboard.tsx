@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { useLanguage } from "@/lib/LanguageContext"
 import { ArrowLeft, Clock, BookOpen, Users, Target, Brain, Sparkles, Loader2, BarChart3, PieChart as PieChartIcon, Filter, Share2, Heart } from "lucide-react"
 import type { SessionData } from "@/app/page"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
@@ -18,6 +19,7 @@ interface TeacherDashboardProps {
 const COLORS = ['#2563eb', '#4f46e5', '#10b981', '#8b5cf6', '#ec4899', '#f97316'];
 
 export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Readonly<TeacherDashboardProps>) {
+  const { t } = useLanguage()
   const [savedSessions, setSavedSessions] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'overview' | 'sessions'>('overview')
@@ -210,7 +212,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
       return (
         <div className="text-center py-12 bg-white rounded-xl border border-slate-200 shadow-sm">
           <Loader2 className="h-12 w-12 text-blue-600 mx-auto mb-4 animate-spin" />
-          <p className="text-slate-500 font-medium">Cargando repositorio...</p>
+          <p className="text-slate-500 font-medium">{t("loading")}</p>
         </div>
       )
     }
@@ -221,17 +223,17 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
             <img src="/pinguinos/pinguino_chill.png" alt="Pingüino" className="w-32 h-32 object-contain opacity-80" />
           </div>
           <h3 className="text-xl font-bold text-slate-800 mb-2">
-            Aún no tienes sesiones guardadas
+            {t("noSessions")}
           </h3>
           <p className="text-slate-500 mb-8 max-w-md mx-auto">
-            Genera y guarda sesiones de aprendizaje personalizadas con Inteligencia Artificial basadas en el CNEB.
+            {t("dashboardSubtitle")}
           </p>
           <Button
             onClick={onBack}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md rounded-xl h-12 px-6"
           >
             <Sparkles className="h-4 w-4 mr-2" />
-            Crear Primera Sesión
+            {t("newSession")}
           </Button>
         </div>
       )
@@ -285,7 +287,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={onBack} className="hover:bg-slate-100 text-slate-600 font-medium h-10 px-4">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver
+              {t("back")}
             </Button>
             <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
               <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
@@ -293,7 +295,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
                 <h1 className="font-bold text-xl text-slate-800">
                   Dashboard de {user.name.split(' ')[0]}
                 </h1>
-                <p className="text-xs text-slate-500 font-medium">Estadísticas y Sesiones</p>
+                <p className="text-xs text-slate-500 font-medium">{t("dashboardSubtitle")}</p>
               </div>
             </div>
           </div>
@@ -313,14 +315,14 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-lg transition-all ${activeTab === 'overview' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
             >
               <BarChart3 className="w-4 h-4" />
-              Vista General
+              {t("overview")}
             </button>
             <button
               onClick={() => setActiveTab('sessions')}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-lg transition-all ${activeTab === 'sessions' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
             >
               <BookOpen className="w-4 h-4" />
-              Mis Sesiones
+              {t("mySessions")}
             </button>
           </div>
 
@@ -330,7 +332,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-slate-50/50 border-b border-slate-100">
-                    <CardTitle className="text-sm font-semibold text-slate-600">Sesiones Creadas</CardTitle>
+                    <CardTitle className="text-sm font-semibold text-slate-600">{t("createdSessions")}</CardTitle>
                     <div className="bg-blue-100 rounded-full p-2">
                       <BookOpen className="h-4 w-4 text-blue-600" />
                     </div>
@@ -345,7 +347,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
 
                 <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-slate-50/50 border-b border-slate-100">
-                    <CardTitle className="text-sm font-semibold text-slate-600">Tiempo Ahorrado</CardTitle>
+                    <CardTitle className="text-sm font-semibold text-slate-600">{t("timeSaved")}</CardTitle>
                     <div className="bg-indigo-100 rounded-full p-2">
                       <Clock className="h-4 w-4 text-indigo-600" />
                     </div>
@@ -360,7 +362,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
 
                 <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-slate-50/50 border-b border-slate-100">
-                    <CardTitle className="text-sm font-semibold text-slate-600">Competencias</CardTitle>
+                    <CardTitle className="text-sm font-semibold text-slate-600">{t("competencies")}</CardTitle>
                     <div className="bg-emerald-100 rounded-full p-2">
                       <Target className="h-4 w-4 text-emerald-600" />
                     </div>
@@ -375,7 +377,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
 
                 <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-slate-50/50 border-b border-slate-100">
-                    <CardTitle className="text-sm font-semibold text-slate-600">Contextos</CardTitle>
+                    <CardTitle className="text-sm font-semibold text-slate-600">{t("contexts")}</CardTitle>
                     <div className="bg-violet-100 rounded-full p-2">
                       <Users className="h-4 w-4 text-violet-600" />
                     </div>
@@ -393,12 +395,12 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
               <div className="mt-8">
                 <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
                   <Share2 className="h-5 w-5 text-blue-600" />
-                  Tu Impacto en la Comunidad
+                  {t("communityImpact")}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-bold text-blue-800">Aportes al Repositorio</CardTitle>
+                      <CardTitle className="text-sm font-bold text-blue-800">{t("contributions")}</CardTitle>
                       <div className="bg-white rounded-full p-2 shadow-sm">
                         <BookOpen className="h-4 w-4 text-blue-600" />
                       </div>
@@ -413,7 +415,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
 
                   <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-xl overflow-hidden">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-bold text-emerald-800">Docentes Ayudados</CardTitle>
+                      <CardTitle className="text-sm font-bold text-emerald-800">{t("teachersHelped")}</CardTitle>
                       <div className="bg-white rounded-full p-2 shadow-sm">
                         <Heart className="h-4 w-4 text-emerald-600 fill-emerald-100" />
                       </div>
@@ -436,7 +438,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
                   <CardHeader>
                     <CardTitle className="text-lg text-slate-800 flex items-center gap-2">
                       <BarChart3 className="w-5 h-5 text-blue-600" />
-                      Actividad de Generación
+                      {t("generationActivity")}
                     </CardTitle>
                     <CardDescription>Sesiones generadas en los últimos meses</CardDescription>
                   </CardHeader>
@@ -466,7 +468,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
                   <CardHeader>
                     <CardTitle className="text-lg text-slate-800 flex items-center gap-2">
                       <PieChartIcon className="w-5 h-5 text-indigo-600" />
-                      Ciclos con más Actividad
+                      {t("cyclesActivity")}
                     </CardTitle>
                     <CardDescription>Distribución de sesiones por Ciclo/Grado</CardDescription>
                   </CardHeader>
@@ -507,7 +509,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
                   <CardHeader>
                     <CardTitle className="text-lg text-slate-800 flex items-center gap-2">
                       <Target className="w-5 h-5 text-emerald-600" />
-                      Competencias Más Trabajadas
+                      {t("topCompetencies")}
                     </CardTitle>
                     <CardDescription>Top 5 competencias del CNEB integradas en tus sesiones</CardDescription>
                   </CardHeader>
@@ -545,7 +547,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <div className="flex items-center gap-2 text-slate-600 font-medium">
                   <Filter className="w-5 h-5" />
-                  <h2>Organizar Historial</h2>
+                  <h2>{t("organizeHistory")}</h2>
                 </div>
                 <div className="flex gap-2">
                   <Button
@@ -554,7 +556,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
                     className={groupBy === 'recientes' ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 hover:text-blue-600 border-slate-200'}
                     onClick={() => setGroupBy('recientes')}
                   >
-                    Recientes
+                    {t("recent")}
                   </Button>
                   <Button
                     variant={groupBy === 'bimestre' ? 'default' : 'outline'}
@@ -562,7 +564,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
                     className={groupBy === 'bimestre' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 hover:text-indigo-600 border-slate-200'}
                     onClick={() => setGroupBy('bimestre')}
                   >
-                    Por Bimestre
+                    {t("byBimester")}
                   </Button>
 
                 </div>
@@ -580,7 +582,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
               className="bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-600/20 hover:-translate-y-1 transition-all duration-300 h-14 px-8 rounded-2xl font-bold text-lg group"
             >
               <Sparkles className="h-5 w-5 mr-3 group-hover:animate-pulse" />
-              Crear Nueva Sesión con IA
+              {t("createNewSession")}
             </Button>
           </div>
         </div>

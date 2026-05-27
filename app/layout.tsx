@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { Toaster } from "sonner"
+import { LanguageProvider } from "@/lib/LanguageContext"
 // @ts-ignore: Allow importing global css without type declarations
 import "./globals.css"
 
@@ -22,10 +23,13 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-        <Suspense fallback={null}>{children}</Suspense>
-        <Toaster position="top-center" richColors />
-        <Analytics />
+        <LanguageProvider>
+          <Suspense fallback={null}>{children}</Suspense>
+          <Toaster position="top-center" richColors />
+          <Analytics />
+        </LanguageProvider>
       </body>
     </html>
   )
 }
+

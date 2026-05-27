@@ -14,6 +14,8 @@ import {
   ChevronDown, ChevronUp, Info, FileText, BookOpen, GraduationCap
 } from "lucide-react"
 import type { SessionData } from "@/app/page"
+import { useLanguage } from "@/lib/LanguageContext"
+import { LanguageSelector } from "@/components/language-selector"
 
 interface SessionGeneratorProps {
   readonly user?: { readonly name: string; readonly email: string } | null
@@ -218,6 +220,8 @@ interface RunWebSocketGenerationParams {
   setIsGenerating: (isGenerating: boolean) => void
   onSessionGenerated: (session: SessionData) => void
   formData: Partial<SessionData>
+  idioma: string
+  loadingMessages?: string[]
 }
 
 function runWebSocketSessionGeneration(params: RunWebSocketGenerationParams) {
@@ -228,7 +232,8 @@ function runWebSocketSessionGeneration(params: RunWebSocketGenerationParams) {
 
   const evalInst = params.instrumentoEvaluacion === instrumentosEvaluacion[0] ? "A decisión de la IA" : params.instrumentoEvaluacion
 
-  const message = `Tema de la Sesión: ${params.tema}
+  const message = `Idioma: ${params.idioma}
+Tema de la Sesión: ${params.tema}
 Título: ${params.tituloSesion}
 Docente: ${params.nombreDocente}
 Fecha: ${params.fecha}
@@ -266,7 +271,7 @@ Nota: La IA debe generar automáticamente:
   const ws = new WebSocket(wsUrl)
   let currentProgress = 0
 
-  const loadingMessages = [
+  const loadingMessages = params.loadingMessages || [
     "Analizando el currículo nacional...",
     "Diseñando la secuencia didáctica...",
     "Preparando las evidencias y criterios...",
@@ -316,6 +321,7 @@ Nota: La IA debe generar automáticamente:
 }
 
 function useSessionGeneratorState({ user, onSessionGenerated, editingSession, guestMode = false, onLoginRequired }: SessionGeneratorProps) {
+  const { t, language } = useLanguage()
   const [nombreDocente, setNombreDocente] = useState("")
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
   const [grado, setGrado] = useState("")
@@ -482,12 +488,27 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
 
     setIsGenerating(true)
     setProgress(0)
-    setCurrentStep("Iniciando conexión con IA...")
+    setCurrentStep(t("generatingStep1"))
 
     const materialesCombinados = [
       ...materialesSeleccionados,
       ...(materialesNoEstructurados ? [materialesNoEstructurados] : [])
     ].join(", ")
+
+    const languageNames: Record<string, string> = {
+      es: "español",
+      en: "inglés",
+      qu: "quechua",
+      ay: "aymara"
+    }
+    const idiomaName = languageNames[language] || "español"
+
+    const loadingMessages = [
+      t("generatingStep2"),
+      t("generatingStep3"),
+      t("generatingStep4"),
+      t("generating")
+    ]
 
     try {
       runWebSocketSessionGeneration({
@@ -512,6 +533,8 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
         setProgress,
         setIsGenerating,
         onSessionGenerated,
+        idioma: idiomaName,
+        loadingMessages,
         formData: {
           datosGenerales: {
             docente: nombreDocente,
@@ -531,6 +554,7 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
           enfoqueTransversal,
           competenciaTransversal,
           materialesDisponibles: materialesCombinados,
+          idioma: idiomaName
         },
       })
     } catch (err) {
@@ -600,6 +624,7 @@ function SessionHeader({
   onLogout,
   user
 }: Readonly<SessionHeaderProps>) {
+  const { t } = useLanguage()
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
       <div className="container mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -613,15 +638,16 @@ function SessionHeader({
           )}
           <div>
             <h1 className="font-bold text-xl md:text-2xl text-slate-800 flex items-center gap-2">
-              Genera tu Sesión de Aprendizaje
+              {t("generatorTitle")}
             </h1>
             <div className="flex items-center gap-2">
-              <p className="text-xs md:text-sm text-slate-500 font-medium">Asistente para docentes de matemática</p>
+              <p className="text-xs md:text-sm text-slate-500 font-medium">{t("generatorSubtitle")}</p>
               <span className="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full border border-indigo-100 font-semibold">Powered by IA</span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+          <LanguageSelector />
           <Button
             variant="outline"
             onClick={() => {
@@ -634,14 +660,14 @@ function SessionHeader({
             className="bg-white border-slate-300 hover:bg-slate-50 text-slate-700 transition-all h-9 text-sm font-medium shadow-sm"
           >
             <BarChart3 className="h-4 w-4 mr-2 text-slate-500" />
-            <span className="hidden sm:inline">Dashboard</span>
+            <span className="hidden sm:inline">{t("dashboard")}</span>
           </Button>
           {guestMode ? (
             <Button
               onClick={onLoginRequired}
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-9 px-4 rounded-full text-sm shadow-sm transition-all hover:scale-105 active:scale-95"
             >
-              Iniciar Sesión
+              {t("login")}
             </Button>
           ) : (
             <>
@@ -655,10 +681,10 @@ function SessionHeader({
                 variant="ghost"
                 onClick={onLogout}
                 className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-2 sm:px-3 font-medium"
-                title="Cerrar Sesión"
+                title={t("logout")}
               >
                 <X className="h-4 w-4 sm:mr-1" />
-                <span className="hidden sm:inline">Salir</span>
+                <span className="hidden sm:inline">{t("exit")}</span>
               </Button>
             </>
           )}
@@ -675,6 +701,7 @@ interface ProgressModalProps {
 }
 
 function ProgressModal({ isGenerating, currentStep, progress }: Readonly<ProgressModalProps>) {
+  const { t } = useLanguage()
   if (!isGenerating) return null
   return (
     <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
@@ -688,7 +715,7 @@ function ProgressModal({ isGenerating, currentStep, progress }: Readonly<Progres
             />
           </div>
           <CardTitle className="text-2xl text-slate-800 font-bold">
-            Diseñando tu Sesión
+            {t("generating")}
           </CardTitle>
           <CardDescription className="text-base text-blue-600 font-medium mt-1">
             {currentStep}
@@ -727,32 +754,33 @@ function SessionSidebarSummary({
   competenciasSeleccionadas,
   formProgress
 }: Readonly<SessionSidebarSummaryProps>) {
+  const { t } = useLanguage()
   return (
     <div className="hidden lg:block lg:col-span-4 sticky top-24 space-y-6">
       <div className="mb-2">
-        <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Nueva Sesión</h2>
-        <p className="text-slate-500 mt-1">Completa el formulario para generar tu clase con Inteligencia Artificial.</p>
+        <h2 className="text-3xl font-bold text-slate-800 tracking-tight">{t("newSession")}</h2>
+        <p className="text-slate-500 mt-1">{t("formInstructions")}</p>
       </div>
 
       <Card className="bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden">
         <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
           <CardTitle className="text-sm font-semibold flex items-center gap-2 text-slate-700">
             <BookOpen className="h-4 w-4 text-blue-600" />
-            Resumen de la Sesión
+            {t("newSession")}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-5 space-y-4">
           <div className="space-y-1">
-            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Docente</p>
+            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">{t("teacher")}</p>
             <p className="text-sm font-medium text-slate-800">{nombreDocente || <span className="text-slate-300 italic">No especificado</span>}</p>
           </div>
 
           <div className="space-y-1">
-            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Grado y Ciclo</p>
+            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">{t("grade")}</p>
             <p className="text-sm font-medium text-slate-800">
               {grado ? (
                 <span>
-                  {grado}º Secundaria {ciclo && `(Ciclo ${ciclo})`}
+                  {grado}º {t("grade").toLowerCase()} {ciclo && `(Ciclo ${ciclo})`}
                 </span>
               ) : (
                 <span className="text-slate-300 italic">No especificado</span>
@@ -761,12 +789,12 @@ function SessionSidebarSummary({
           </div>
 
           <div className="space-y-1">
-            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Tema Central</p>
+            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">{t("theme")}</p>
             <p className="text-sm font-medium text-slate-800 line-clamp-2">{tema || <span className="text-slate-300 italic">No especificado</span>}</p>
           </div>
 
           <div className="space-y-1">
-            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Competencias ({competenciasSeleccionadas.length})</p>
+            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">{t("competencies")} ({competenciasSeleccionadas.length})</p>
             {competenciasSeleccionadas.length > 0 ? (
               <ul className="text-xs text-slate-700 space-y-1 list-disc list-inside">
                 {competenciasSeleccionadas.map(c => <li key={c} className="truncate">{c}</li>)}
@@ -778,7 +806,7 @@ function SessionSidebarSummary({
 
           <div className="space-y-1 pt-2 border-t border-slate-100">
             <div className="flex justify-between items-center text-xs mb-1">
-              <span className="font-semibold text-slate-600">Progreso general</span>
+              <span className="font-semibold text-slate-600">{t("formProgress")}</span>
               <span className="text-blue-600 font-bold">{Math.round(formProgress)}%</span>
             </div>
             <div className="relative h-2 w-full overflow-hidden rounded-full bg-slate-100">
@@ -1026,6 +1054,7 @@ function MaterialesSection({
 
 export function SessionGenerator(props: SessionGeneratorProps) {
   const { user, onViewDashboard, onLogout, guestMode = false, onLoginRequired, editingSession } = props
+  const { t } = useLanguage()
   const {
     nombreDocente, setNombreDocente,
     fecha, setFecha,
@@ -1099,8 +1128,8 @@ export function SessionGenerator(props: SessionGeneratorProps) {
 
             {/* Título en Móvil */}
             <div className="lg:hidden mb-6">
-              <h2 className="text-2xl font-bold text-slate-800">Nueva Sesión</h2>
-              <p className="text-slate-500 text-sm mt-1">Completa el formulario para generar tu clase con IA.</p>
+              <h2 className="text-2xl font-bold text-slate-800">{t("newSession")}</h2>
+              <p className="text-slate-500 text-sm mt-1">{t("formInstructions")}</p>
             </div>
 
             <Card className="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden">
@@ -1112,17 +1141,17 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                     <div className="bg-indigo-100 p-1.5 rounded-md">
                       <GraduationCap className="h-5 w-5 text-indigo-600" />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-800">1. Datos Generales</h3>
+                    <h3 className="text-lg font-bold text-slate-800">1. {t("welcome").replace("!", "")} ({t("teacher")})</h3>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div className="space-y-2">
                       <Label htmlFor="nombreDocente" className="text-sm font-semibold text-slate-700">
-                        Nombre del Docente <span className="text-red-500">*</span>
+                        {t("docenteLabel")} <span className="text-red-500">*</span>
                       </Label>
                       <Input
                         id="nombreDocente"
-                        placeholder="Ej: María García"
+                        placeholder={t("docentePlaceholder")}
                         value={nombreDocente}
                         onChange={(e) => setNombreDocente(e.target.value)}
                         className={`h-11 bg-white border-${showErrors && !nombreDocente ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm transition-all`}
@@ -1131,7 +1160,7 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="fecha" className="text-sm font-semibold text-slate-700">Fecha</Label>
+                      <Label htmlFor="fecha" className="text-sm font-semibold text-slate-700">{t("fechaLabel")}</Label>
                       <Input
                         id="fecha"
                         type="date"
@@ -1143,11 +1172,11 @@ export function SessionGenerator(props: SessionGeneratorProps) {
 
                     <div className="space-y-2">
                       <Label htmlFor="grado" className="text-sm font-semibold text-slate-700">
-                        Grado <span className="text-red-500">*</span>
+                        {t("gradoLabel")} <span className="text-red-500">*</span>
                       </Label>
                       <Select value={grado} onValueChange={setGrado}>
                         <SelectTrigger className={`h-11 bg-white border-${showErrors && !grado ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm`}>
-                          <SelectValue placeholder="Selecciona el grado" />
+                          <SelectValue placeholder={t("gradoLabel")} />
                         </SelectTrigger>
                         <SelectContent className="bg-white border-slate-200 text-slate-900">
                           <SelectItem value="1">1º Secundaria</SelectItem>
@@ -1168,10 +1197,10 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="seccion" className="text-sm font-semibold text-slate-700">Sección</Label>
+                      <Label htmlFor="seccion" className="text-sm font-semibold text-slate-700">{t("seccionLabel")}</Label>
                       <Input
                         id="seccion"
-                        placeholder="Ej: A, B, Única"
+                        placeholder={t("seccionPlaceholder")}
                         value={seccion}
                         onChange={(e) => setSeccion(e.target.value)}
                         className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm"
@@ -1199,17 +1228,17 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                     <div className="bg-emerald-100 p-1.5 rounded-md">
                       <FileText className="h-5 w-5 text-emerald-600" />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-800">3. Contenido de la Sesión</h3>
+                    <h3 className="text-lg font-bold text-slate-800">3. {t("theme")}</h3>
                   </div>
 
                   <div className="space-y-5">
                     <div className="space-y-2">
                       <Label htmlFor="tema" className="text-sm font-semibold text-slate-700">
-                        Tema central de la sesión <span className="text-red-500">*</span>
+                        {t("temaLabel")} <span className="text-red-500">*</span>
                       </Label>
                       <Input
                         id="tema"
-                        placeholder="Ej: Fracciones, Porcentajes, Ecuaciones lineales, Área de figuras..."
+                        placeholder={t("temaPlaceholder")}
                         value={tema}
                         onChange={(e) => setTema(e.target.value)}
                         className={`h-11 bg-white border-${showErrors && !tema ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm`}
@@ -1222,11 +1251,11 @@ export function SessionGenerator(props: SessionGeneratorProps) {
 
                     <div className="space-y-2">
                       <Label htmlFor="tituloSesion" className="text-sm font-semibold text-slate-700">
-                        Título de la Sesión <span className="text-red-500">*</span>
+                        {t("tituloLabel")} <span className="text-red-500">*</span>
                       </Label>
                       <Input
                         id="tituloSesion"
-                        placeholder="Ej: Calculando el IGV en compras usando porcentajes"
+                        placeholder={t("tituloPlaceholder")}
                         value={tituloSesion}
                         onChange={(e) => setTituloSesion(e.target.value)}
                         className={`h-11 bg-white border-${showErrors && !tituloSesion ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm`}
@@ -1246,16 +1275,16 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                       <div className="bg-amber-100 p-1.5 rounded-md">
                         <Sparkles className="h-5 w-5 text-amber-600" />
                       </div>
-                      <h3 className="text-lg font-bold text-slate-800">4. Enfoques Transversales</h3>
+                      <h3 className="text-lg font-bold text-slate-800">4. {t("enfoqueTransversalLabel")}</h3>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="enfoqueTransversal" className="text-sm font-semibold text-slate-700">Enfoque Transversal</Label>
+                      <Label htmlFor="enfoqueTransversal" className="text-sm font-semibold text-slate-700">{t("enfoqueTransversalLabel")}</Label>
                       <Select value={enfoqueTransversal} onValueChange={setEnfoqueTransversal}>
                         <SelectTrigger className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm">
-                          <SelectValue placeholder="Selecciona un enfoque" />
+                          <SelectValue placeholder="Selecciona..." />
                         </SelectTrigger>
                         <SelectContent className="bg-white border-slate-200 text-slate-900">
                           {enfoquesTransversales.map((enfoque) => (
@@ -1271,10 +1300,10 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="competenciaTransversal" className="text-sm font-semibold text-slate-700">Competencia Transversal</Label>
+                      <Label htmlFor="competenciaTransversal" className="text-sm font-semibold text-slate-700">{t("competenciaTransversalLabel")}</Label>
                       <Select value={competenciaTransversal} onValueChange={setCompetenciaTransversal}>
                         <SelectTrigger className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm">
-                          <SelectValue placeholder="Selecciona una competencia" />
+                          <SelectValue placeholder="Selecciona..." />
                         </SelectTrigger>
                         <SelectContent className="bg-white border-slate-200 text-slate-900">
                           {competenciasTransversales.map((comp) => (
@@ -1292,17 +1321,17 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                     <div className="bg-rose-100 p-1.5 rounded-md">
                       <Clock className="h-5 w-5 text-rose-600" />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-800">5. Contexto y Duración</h3>
+                    <h3 className="text-lg font-bold text-slate-800">5. {t("context")} & {t("duration")}</h3>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="contexto" className="text-sm font-semibold text-slate-700">
-                        Contexto Social <span className="text-red-500">*</span>
+                        {t("contextoLabel")} <span className="text-red-500">*</span>
                       </Label>
                       <Select value={contexto} onValueChange={setContexto}>
                         <SelectTrigger className={`h-11 bg-white border-${showErrors && !contexto ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm`}>
-                          <SelectValue placeholder="Selecciona el contexto" />
+                          <SelectValue placeholder="Selecciona..." />
                         </SelectTrigger>
                         <SelectContent className="bg-white border-slate-200 text-slate-900">
                           {contextosLocales.map((ctx) => (
@@ -1315,7 +1344,7 @@ export function SessionGenerator(props: SessionGeneratorProps) {
 
                     <div className="space-y-2">
                       <Label htmlFor="horas" className="text-sm font-semibold text-slate-700">
-                        Horas de Clase <span className="text-red-500">*</span>
+                        {t("horasLabel")} <span className="text-red-500">*</span>
                       </Label>
                       <div className="flex items-center gap-3">
                         <Input
@@ -1353,14 +1382,14 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                     <div className="bg-fuchsia-100 p-1.5 rounded-md">
                       <Award className="h-5 w-5 text-fuchsia-600" />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-800">7. Evaluación</h3>
+                    <h3 className="text-lg font-bold text-slate-800">6. {t("evaluation")}</h3>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="instrumentoEvaluacion" className="text-sm font-semibold text-slate-700">Instrumento de evaluación (opcional)</Label>
+                    <Label htmlFor="instrumentoEvaluacion" className="text-sm font-semibold text-slate-700">{t("evaluacionLabel")}</Label>
                     <Select value={instrumentoEvaluacion} onValueChange={setInstrumentoEvaluacion}>
                       <SelectTrigger className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm">
-                        <SelectValue placeholder="Selecciona un instrumento" />
+                        <SelectValue placeholder="Selecciona..." />
                       </SelectTrigger>
                       <SelectContent className="bg-white border-slate-200 text-slate-900">
                         {instrumentosEvaluacion.map((inst) => (
@@ -1368,9 +1397,6 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                         ))}
                       </SelectContent>
                     </Select>
-                    <p className="text-xs text-slate-500">
-                      La IA generará automáticamente los criterios de evaluación y evidencias basados en este instrumento.
-                    </p>
                   </div>
                 </section>
               </CardContent>
@@ -1389,12 +1415,12 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                 {isGenerating ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-3 animate-spin text-slate-400" />
-                    Generando sesión...
+                    {t("generating")}
                   </>
                 ) : (
                   <>
                     <Brain className="h-6 w-6 mr-3 text-white" />
-                    {editingSession ? "Actualizar Sesión" : "Generar Sesión con IA"}
+                    {editingSession ? t("save") : t("generateBtn")}
                   </>
                 )}
               </Button>
