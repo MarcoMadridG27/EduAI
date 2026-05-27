@@ -15,7 +15,161 @@ interface LandingPageProps {
 }
 
 export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview, onLogin }: Readonly<LandingPageProps>) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
+
+  const localTranslations: Record<string, Record<string, string>> = {
+    es: {
+      newAsistant: "¡Nuevo! Asistente en tu bolsillo",
+      cnebAligned: "Alineado al CNEB",
+      cnebAlignedDesc: "Respuestas basadas en el Currículo Nacional vigente.",
+      noRegister: "Sin Registros",
+      noRegisterDesc: "Sin contraseñas. Escribe, chatea y obtén tu planificación.",
+      whatsAppPrompt: "WhatsApp:",
+      teacherTools: "Herramientas Docentes",
+      teacherToolsDesc: "Todo lo que necesitas para tu clase: evaluación formativa, rúbricas y actividades diferenciadas.",
+      pedagogicInnovation: "Innovación Pedagógica",
+      pedagogicInnovationDesc: "Aplica metodologías activas sugeridas por la IA para mantener la atención de tus estudiantes.",
+      officialDownload: "Descarga en Formato Oficial",
+      officialDownloadDesc: "Obtén tus sesiones en documentos listos para presentar, siguiendo el formato exigido.",
+      whatsappInput: "Escribe...",
+      whatsappAuthor: "EduAI Bot Asistente",
+      whatsappInitialText: "¡Hola Maestro! Generando sesión de aprendizaje de 90 minutos alineada a la competencia 'Resuelve problemas de cantidad' del CNEB...",
+      whatsappSecuencia: "Secuencia Didáctica:",
+      whatsappInicio: "Inicio (15 min): Dinámica 'Repartiendo la pizza'. Saberes previos y conflicto cognitivo.",
+      whatsappDesarrollo: "Desarrollo (60 min): Representación gráfica y simbólica. Ficha de trabajo estructurada.",
+      whatsappTeacherPrompt: "¡Hola! Necesito una sesión de matemáticas sobre fracciones para 3ro de primaria.",
+      bpPlan: "I. PLANIFICACIÓN MATEMÁTICA",
+      bpTema: "Tema:",
+      bpTemaVal: "Sistemas de Ecuaciones Lineales",
+      bpGrado: "Grado:",
+      bpGradoVal: "2do de Secundaria - CNEB",
+      bpPropositos: "II. PROPÓSITOS Y EVIDENCIAS",
+      bpAnalizando: "Analizando CNEB...",
+      bpComp: "Competencia resuelve problemas de regularidad equivalencia.",
+      bpCap: "Capacidades traduce datos y condiciones a expresiones algebraicas.",
+      bpCrit: "Criterios formula sistemas de ecuaciones y modela situaciones.",
+      bpSecuencia: "III. SECUENCIA DIDÁCTICA",
+      bpInicio: "Inicio",
+      bpInicioVal: "Planteamiento de situación lúdica mediante balanzas equilibradas.",
+      bpDesarrollo: "Desarrollo formal del método de reducción y sustitución.",
+      bpPrompt: 'Prompt: "ecuaciones con balanzas didácticas"',
+      bpGenerando: "GENERANDO"
+    },
+    en: {
+      newAsistant: "New! Pocket Assistant",
+      cnebAligned: "CNEB Aligned",
+      cnebAlignedDesc: "Responses based on the current National Curriculum.",
+      noRegister: "No Registration",
+      noRegisterDesc: "No passwords. Write, chat, and get your planning.",
+      whatsAppPrompt: "WhatsApp:",
+      teacherTools: "Teacher Tools",
+      teacherToolsDesc: "Everything you need for your class: formative assessment, rubrics, and differentiated activities.",
+      pedagogicInnovation: "Pedagogical Innovation",
+      pedagogicInnovationDesc: "Apply active methodologies suggested by AI to keep your students' attention.",
+      officialDownload: "Official Format Download",
+      officialDownloadDesc: "Get your sessions in documents ready to present, following the required format.",
+      whatsappInput: "Type a message...",
+      whatsappAuthor: "EduAI Assistant Bot",
+      whatsappInitialText: "Hello Teacher! Generating a 90-minute learning session aligned with the CNEB 'Solve quantity problems' competency...",
+      whatsappSecuencia: "Lesson Sequence:",
+      whatsappInicio: "Introduction (15 min): 'Sharing the pizza' dynamic. Prior knowledge and cognitive conflict.",
+      whatsappDesarrollo: "Development (60 min): Graphic and symbolic representation. Structured worksheet.",
+      whatsappTeacherPrompt: "Hello! I need a math lesson plan about fractions for 3rd grade.",
+      bpPlan: "I. MATHEMATICAL PLANNING",
+      bpTema: "Topic:",
+      bpTemaVal: "Systems of Linear Equations",
+      bpGrado: "Grade:",
+      bpGradoVal: "8th Grade - CNEB",
+      bpPropositos: "II. PURPOSES AND EVIDENCE",
+      bpAnalizando: "Analyzing CNEB...",
+      bpComp: "Competency solves problems of regularity & equivalence.",
+      bpCap: "Capacities translate data and conditions to algebraic terms.",
+      bpCrit: "Criteria formulate systems of equations and model scenarios.",
+      bpSecuencia: "III. DIDACTIC SEQUENCE",
+      bpInicio: "Introduction",
+      bpInicioVal: "Ludic situation proposal using balanced scales.",
+      bpDesarrollo: "Formal development of reduction and substitution methods.",
+      bpPrompt: 'Prompt: "equations with educational scales"',
+      bpGenerando: "GENERATING"
+    },
+    qu: {
+      newAsistant: "¡Musuq! Yanapaq bolsilloykipi",
+      cnebAligned: "CNEBman tupachisqa",
+      cnebAlignedDesc: "Currículo Nacionalman hina kutichiykuna.",
+      noRegister: "Mana qillqakuna",
+      noRegisterDesc: "Mana contraseñayuq. Qillqay, rimay hinaspa planificacionniykita chaskiy.",
+      whatsAppPrompt: "WhatsApp:",
+      teacherTools: "Amauta Yanapakuykuna",
+      teacherToolsDesc: "Tukuy yachachiykunapaq yanapakuykuna: chaninchay, rúbricas hinaspa t'aqasqa ruraykuna.",
+      pedagogicInnovation: "Pedagogic Musuqyachiy",
+      pedagogicInnovationDesc: "IApa yanapakuyninwan musuq yachachiy ñankunata wawakunapaq llamkay.",
+      officialDownload: "Allin Willakuypi Uranchay",
+      officialDownloadDesc: "Yachachiy planikunata allin willakuypaq taqichasqa chaskiy.",
+      whatsappInput: "Qillqay...",
+      whatsappAuthor: "EduAI Yanapaq Bot",
+      whatsappInitialText: "¡Allillachu Amauta! 90 minutuyuq yachachiyta rurachkani CNEB 'Yupay problemakunata allichay' atipakuywan...",
+      whatsappSecuencia: "Yachachiy Ñan:",
+      whatsappInicio: "Qallariy (15 min): 'Pizzata t'aqanchik' pukllay. Ñawpa yachaykuna allichay.",
+      whatsappDesarrollo: "Desarrollo (60 min): Siq'ikunawan unanchakunawan ruray. Llamkana ficha.",
+      whatsappTeacherPrompt: "Allillachu! T'aqanakunamanta yachachiyta munani yachay wasi kimsa ñiqipaq.",
+      bpPlan: "I. YUPAY YACHACHIY ÑAN",
+      bpTema: "Tema:",
+      bpTemaVal: "Allin yupay llankaykuna",
+      bpGrado: "Grado:",
+      bpGradoVal: "Secundariapa iskay ñiqin - CNEB",
+      bpPropositos: "II. PROPÓSITOS Y EVIDENCIAS",
+      bpAnalizando: "CNEBta allichaspa...",
+      bpComp: "Atipakuy problemakunata allichay.",
+      bpCap: "Atiykuna yupaykunata t'ikray.",
+      bpCrit: "Kaqllachay yupaykunata qillqay.",
+      bpSecuencia: "III. SECUENCIA DIDÁCTICA",
+      bpInicio: "Qallariy",
+      bpInicioVal: "Aysanawan pukllaspa problemakuna riqsichiy.",
+      bpDesarrollo: "Yupay allichay t'aqata ruray.",
+      bpPrompt: 'Prompt: "aysanakunawan yupana pukllay"',
+      bpGenerando: "RURACHKAN"
+    },
+    ay: {
+      newAsistant: "Machaq! Yanapiri bolsilluna",
+      cnebAligned: "CNEB uñtasqa",
+      cnebAlignedDesc: "National Curriculum uñtasqa thakhinakap.",
+      noRegister: "Janiw mantiriñakiti",
+      noRegisterDesc: "Janiw contraseñanaka. Qillqaña, rimt'aña yatichawi chaskiñataki.",
+      whatsAppPrompt: "WhatsApp:",
+      teacherTools: "Yatichirin Yatichañapataki",
+      teacherToolsDesc: "Yatichaw taqinakampi: chaninchawi uñakipawi ukhamarak lurañanaka ch'axwata.",
+      pedagogicInnovation: "Yatichawi Ch'amanchawi",
+      pedagogicInnovationDesc: "IA-mpi machaq yatichawi pukllay lurañanaka wawanakataki.",
+      officialDownload: "Thakhinchata Uranchaña",
+      officialDownloadDesc: "Yatichawi thakhinakap documents churaña yatiqañ uta thakhimarjama.",
+      whatsappInput: "Qillqt'aña...",
+      whatsappAuthor: "EduAI Yanapiri Bot",
+      whatsappInitialText: "¡Suma Yatichiri! 90 minutu yatichawi thakhinakap luraskani CNEB 'Yupanakampi problemak ch'amañcht'aña' lurañampi...",
+      whatsappSecuencia: "Yatichawi sequence:",
+      whatsappInicio: "Qalltaña (15 min): 'Pizzat t'aqaskañani' pukllawi. Ñawpa yatiñanaka.",
+      whatsappDesarrollo: "Desarrollo (60 min): Uñtasqa luraña siqinakampi. Yatichaw llamkana ficha.",
+      whatsappTeacherPrompt: "Kamisaki! Yupay t'aqanakapat yatichaw munta yatiqaña uta kimsa taqitaki.",
+      bpPlan: "I. YUPANAKAMP YATICHAW",
+      bpTema: "Tema:",
+      bpTemaVal: "Yupay lurañanaka",
+      bpGrado: "Grado:",
+      bpGradoVal: "Secundariana payïri taqi - CNEB",
+      bpPropositos: "II. PROPÓSITOS Y EVIDENCIAS",
+      bpAnalizando: "CNEB uñakipasa...",
+      bpComp: "Lurañampi problemak ch'amañcht'aña.",
+      bpCap: "Yatinaka yupay luraña.",
+      bpCrit: "Uñakipaña yupaykunata.",
+      bpSecuencia: "III. SECUENCIA DIDÁCTICA",
+      bpInicio: "Qalltaña",
+      bpInicioVal: "Balanzampi pukllat yupana problemak uñachayaña.",
+      bpDesarrollo: "Yupawi luraña thakhinakap.",
+      bpPrompt: 'Prompt: "balanzanakampi yupa pukllawi"',
+      bpGenerando: "LURASKANI"
+    }
+  }
+
+  const lt = localTranslations[language] || localTranslations.es
+
   const [repositorySessions, setRepositorySessions] = useState<any[]>([])
   const [isLoadingSessions, setIsLoadingSessions] = useState(true)
   const [sessionsError, setSessionsError] = useState<string | null>(null)
@@ -228,27 +382,27 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                   {/* Card 1: Header info */}
                   <div className="bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm rounded-2xl p-4 shadow-md transition-all duration-300 group-hover:-translate-y-0.5">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-[9px] font-black text-cyan-400 tracking-wider">I. PLANIFICACIÓN MATEMÁTICA</span>
+                      <span className="text-[9px] font-black text-cyan-400 tracking-wider">{lt.bpPlan}</span>
                       <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-[11px] text-slate-300 font-bold">Tema: <span className="text-slate-400 font-normal">Sistemas de Ecuaciones Lineales</span></div>
-                      <div className="text-[11px] text-slate-300 font-bold">Grado: <span className="text-slate-400 font-normal">2do de Secundaria - CNEB</span></div>
+                      <div className="text-[11px] text-slate-300 font-bold">{lt.bpTema} <span className="text-slate-400 font-normal">{lt.bpTemaVal}</span></div>
+                      <div className="text-[11px] text-slate-300 font-bold">{lt.bpGrado} <span className="text-slate-400 font-normal">{lt.bpGradoVal}</span></div>
                     </div>
                   </div>
 
                   {/* Card 2: Flow Circular wireframe representing raw structured thoughts! */}
                   <div className="bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm rounded-2xl p-4 shadow-md transition-all duration-300 group-hover:-translate-y-1">
                     <div className="flex justify-between items-center mb-2.5">
-                      <span className="text-[9px] font-black text-emerald-400 tracking-wider">II. PROPÓSITOS Y EVIDENCIAS</span>
-                      <span className="text-[9px] font-mono text-slate-500 font-semibold uppercase">Analizando CNEB...</span>
+                      <span className="text-[9px] font-black text-emerald-400 tracking-wider">{lt.bpPropositos}</span>
+                      <span className="text-[9px] font-mono text-slate-500 font-semibold uppercase">{lt.bpAnalizando}</span>
                     </div>
                     
                     {/* Render text with Flow Circular font, acting as a wireframe layout */}
                     <div className="space-y-2 font-flow text-[10px] text-slate-600/80 leading-relaxed select-none tracking-widest">
-                      Competencia resuelve problemas de regularidad equivalencia.
-                      Capacidades traduce datos y condiciones a expresiones algebraicas.
-                      Criterios formula sistemas de ecuaciones y modela situaciones.
+                      {lt.bpComp}
+                      {lt.bpCap}
+                      {lt.bpCrit}
                     </div>
                   </div>
 
@@ -256,21 +410,21 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                   <div className="bg-[#003049]/35 border border-[#5590af]/20 rounded-2xl p-4 shadow-md relative overflow-hidden transition-all duration-300 group-hover:-translate-y-1.5">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/5 to-transparent pointer-events-none"></div>
                     <div className="flex justify-between items-center mb-3">
-                      <span className="text-[9px] font-black text-indigo-400 tracking-wider">III. SECUENCIA DIDÁCTICA</span>
+                      <span className="text-[9px] font-black text-indigo-400 tracking-wider">{lt.bpSecuencia}</span>
                       <Sparkles className="w-3.5 h-3.5 text-indigo-400 animate-spin" style={{ animationDuration: '6s' }} />
                     </div>
                     <div className="space-y-2">
                       <div className="flex gap-2 items-start">
-                        <span className="bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wide">Inicio</span>
+                        <span className="bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wide">{lt.bpInicio}</span>
                         <p className="text-[10px] text-slate-300 leading-snug">
-                          Planteamiento de situación lúdica mediante balanzas equilibradas.
+                          {lt.bpInicioVal}
                         </p>
                       </div>
                       
                       {/* Flow Circular representing raw content being formatted under the hood */}
                       <div className="space-y-1.5 pl-11">
                         <div className="font-flow text-[10px] text-slate-600/80 leading-relaxed select-none tracking-widest">
-                          Desarrollo formal del metodo de reduccion y sustitucion.
+                          {lt.bpDesarrollo}
                         </div>
                       </div>
                     </div>
@@ -282,10 +436,10 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 <div className="absolute bottom-4 left-4 right-4 bg-slate-900/90 border border-slate-800 backdrop-blur-md py-2.5 px-3 rounded-2xl flex items-center justify-between shadow-xl">
                   <div className="flex items-center gap-2 overflow-hidden">
                     <BrainCircuit className="w-4 h-4 text-cyan-400 shrink-0" />
-                    <span className="text-[10px] font-black text-slate-400 truncate">Prompt: "ecuaciones con balanzas didácticas"</span>
+                    <span className="text-[10px] font-black text-slate-400 truncate">{lt.bpPrompt}</span>
                   </div>
                   <span className="text-[8px] font-mono bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded-full font-black uppercase shrink-0 animate-pulse">
-                    GENERANDO
+                    {lt.bpGenerando}
                   </span>
                 </div>
 
@@ -447,8 +601,8 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
             {/* Left side: Info & Copy/Chat triggers */}
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-1.5 rounded-full text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-wider mb-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                ¡Nuevo! Asistente en tu bolsillo
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                {lt.newAsistant}
               </div>
               <h2 className="text-4xl md:text-5xl font-black text-[#003049] tracking-tight leading-none">
                 {t("whatsAppTitle")}
@@ -464,8 +618,8 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                     <Sparkles className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-[#003049]">Alineado al CNEB</h4>
-                    <p className="text-xs text-muted-foreground mt-0.5">Respuestas basadas en el Currículo Nacional vigente.</p>
+                    <h4 className="font-bold text-sm text-[#003049]">{lt.cnebAligned}</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">{lt.cnebAlignedDesc}</p>
                   </div>
                 </div>
 
@@ -474,8 +628,8 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                     <BookOpen className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-[#003049]">Sin Registros</h4>
-                    <p className="text-xs text-muted-foreground mt-0.5">Sin contraseñas. Escribe, chatea y obtén tu planificación.</p>
+                    <h4 className="font-bold text-sm text-[#003049]">{lt.noRegister}</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">{lt.noRegisterDesc}</p>
                   </div>
                 </div>
               </div>
@@ -517,25 +671,25 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                   {/* Message 1: User */}
                   <div className="self-end bg-[#dcf8c6] text-slate-800 p-2.5 rounded-lg rounded-tr-none shadow-sm max-w-[85%] relative">
                     <p className="font-semibold text-[10px] text-slate-500 mb-0.5">{t("teacher")}</p>
-                    <p className="text-slate-800 font-medium">Hola! Necesito una sesión de matemáticas sobre fracciones para 3ro de primaria</p>
+                    <p className="text-slate-800 font-medium">{lt.whatsappTeacherPrompt}</p>
                     <span className="absolute bottom-1 right-2 text-[8px] text-slate-400">10:02 AM ✓✓</span>
                   </div>
 
                   {/* Message 2: AI Bot */}
                   <div className="self-start bg-white text-slate-800 p-2.5 rounded-lg rounded-tl-none shadow-sm max-w-[85%] relative">
-                    <p className="font-black text-[10px] text-emerald-600 mb-0.5">EduAI Bot Asistente</p>
-                    <p className="font-semibold text-slate-800">¡Hola Maestro! Generando sesión de aprendizaje de 90 minutos alineada a la competencia <span className="text-emerald-600 font-extrabold">"Resuelve problemas de cantidad"</span> del CNEB...</p>
+                    <p className="font-black text-[10px] text-emerald-600 mb-0.5">{lt.whatsappAuthor}</p>
+                    <p className="font-semibold text-slate-800">{lt.whatsappInitialText}</p>
                     <span className="absolute bottom-1 right-2 text-[8px] text-slate-400">10:02 AM</span>
                   </div>
 
                   {/* Message 3: AI Bot details */}
                   <div className="self-start bg-white text-slate-800 p-2.5 rounded-lg rounded-tl-none shadow-sm max-w-[85%] relative">
                     <p className="font-semibold text-slate-800 mb-1">
-                      📚 <span className="font-bold">Secuencia Didáctica:</span>
+                      📚 <span className="font-bold">{lt.whatsappSecuencia}</span>
                     </p>
                     <ul className="list-disc pl-4 space-y-0.5 text-[11px] font-medium text-slate-700">
-                      <li><span className="font-bold text-slate-800">Inicio (15 min):</span> Dinámica "Repartiendo la pizza". Saberes previos y conflicto cognitivo.</li>
-                      <li><span className="font-bold text-slate-800">Desarrollo (60 min):</span> Representación gráfica y simbólica. Ficha de trabajo estructurada.</li>
+                      <li>{lt.whatsappInicio}</li>
+                      <li>{lt.whatsappDesarrollo}</li>
                     </ul>
                     <span className="absolute bottom-1 right-2 text-[8px] text-slate-400">10:03 AM</span>
                   </div>
@@ -544,7 +698,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 {/* Message input area */}
                 <div className="bg-slate-100 p-2 flex items-center gap-2 border-t border-slate-200 shrink-0">
                   <div className="flex-1 bg-white rounded-full px-3 py-1.5 text-[10px] text-slate-400 font-medium">
-                    Escribe...
+                    {lt.whatsappInput}
                   </div>
                   <div className="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-white text-sm font-bold shadow-sm shrink-0">
                     ➔
@@ -677,9 +831,9 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
             className="bg-primary/5 border border-primary/20 rounded-[2rem] p-10 flex flex-col justify-between h-[450px] relative overflow-hidden group cursor-pointer shadow-md"
           >
             <div className="relative z-10">
-              <h2 className="text-3xl font-bold text-foreground mb-4">Herramientas<br/>Docentes</h2>
+              <h2 className="text-3xl font-bold text-foreground mb-4">{lt.teacherTools}</h2>
               <p className="text-muted-foreground font-medium text-sm max-w-xs leading-relaxed">
-                Todo lo que necesitas para tu clase: evaluación formativa, rúbricas y actividades diferenciadas.
+                {lt.teacherToolsDesc}
               </p>
             </div>
             
@@ -716,14 +870,14 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 <div className="flex items-center justify-center flex-1 py-6">
                   <img
                     src="/innovacion.jpg"
-                    alt="Innovación pedagógica"
+                    alt={lt.pedagogicInnovation}
                     className="w-52 h-52 object-contain drop-shadow-lg"
                   />
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2 leading-tight">Innovación<br/>Pedagógica</h3>
-                  <p className="text-xs text-muted-foreground font-medium leading-relaxed">Aplica metodologías activas sugeridas por la IA para mantener la atención de tus estudiantes.</p>
+                  <h3 className="text-xl font-bold text-foreground mb-2 leading-tight">{lt.pedagogicInnovation}</h3>
+                  <p className="text-xs text-muted-foreground font-medium leading-relaxed">{lt.pedagogicInnovationDesc}</p>
                 </div>
              </motion.div>
 
@@ -744,14 +898,14 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 <div className="flex items-center justify-center flex-1 py-6">
                   <img
                     src="/sesion_ap_doc.png"
-                    alt="Sesión en documento"
+                    alt={lt.officialDownload}
                     className="w-52 h-52 object-contain drop-shadow-lg"
                   />
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2 leading-tight">Descarga en<br/>Formato Oficial</h3>
-                  <p className="text-xs text-muted-foreground font-medium leading-relaxed">Obtén tus sesiones en documentos listos para presentar, siguiendo el formato exigido.</p>
+                  <h3 className="text-xl font-bold text-foreground mb-2 leading-tight">{lt.officialDownload}</h3>
+                  <p className="text-xs text-muted-foreground font-medium leading-relaxed">{lt.officialDownloadDesc}</p>
                 </div>
              </motion.div>
           </div>
