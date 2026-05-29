@@ -1,0 +1,63 @@
+POLÍTICA DE COOKIES
+Sesión+ | sesionmas.online
+Última actualización: mayo de 2025
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. ¿QUÉ SON LAS COOKIES?
+
+Las cookies son pequeños archivos de texto que se almacenan en su dispositivo cuando visita un sitio web. Permiten que el sitio recuerde sus acciones y preferencias durante un período de tiempo.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2. COOKIES QUE UTILIZAMOS
+
+Sesión+ utiliza los siguientes tipos de cookies:
+
+a) COOKIES ESTRICTAMENTE NECESARIAS
+   Finalidad: Garantizan el funcionamiento básico de la plataforma.
+   Ejemplos: token de autenticación, sesión de usuario, seguridad CSRF.
+   ¿Se pueden desactivar?: No. Sin estas cookies la plataforma no funciona correctamente.
+
+b) COOKIES DE RENDIMIENTO Y ANÁLISIS
+   Finalidad: Recopilan información anónima sobre cómo los usuarios interactúan con la plataforma para ayudarnos a mejorarla.
+   Ejemplos: páginas más visitadas, tiempo de permanencia, errores encontrados.
+   ¿Se pueden desactivar?: Sí, desde la configuración de su navegador.
+
+c) COOKIES DE PREFERENCIAS
+   Finalidad: Recuerdan sus configuraciones personales para mejorar su experiencia.
+   Ejemplos: idioma seleccionado, preferencias de visualización.
+   ¿Se pueden desactivar?: Sí, aunque puede afectar su experiencia de uso.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3. COOKIES DE TERCEROS
+
+Algunos servicios externos utilizados por Sesión+ pueden instalar sus propias cookies. Estos pueden incluir herramientas de análisis de tráfico web. Sesión+ no controla estas cookies; consulte las políticas de privacidad de dichos terceros para más información.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4. ¿CÓMO GESTIONAR LAS COOKIES?
+
+Puede configurar su navegador para aceptar, rechazar o eliminar cookies. A continuación encontrará las instrucciones para los navegadores más comunes:
+
+- Google Chrome: Configuración > Privacidad y seguridad > Cookies
+- Mozilla Firefox: Opciones > Privacidad y seguridad > Cookies
+- Safari: Preferencias > Privacidad > Cookies
+- Microsoft Edge: Configuración > Privacidad > Cookies
+
+Tenga en cuenta que deshabilitar ciertas cookies puede afectar la funcionalidad de Sesión+.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5. ACTUALIZACIONES DE ESTA POLÍTICA
+
+Podemos actualizar esta Política de Cookies para reflejar cambios en las tecnologías que utilizamos. Le recomendamos revisarla periódicamente.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6. CONTACTO
+
+Si tiene preguntas sobre el uso de cookies:
+Correo: privacidad@sesionmas.online
+Sitio web: https://sesionmas.online/

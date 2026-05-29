@@ -930,6 +930,30 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
            />
            <h2 className="text-2xl font-bold text-foreground mb-2 tracking-tight">{t("planificationDesc")}</h2>
            <p className="text-sm text-muted-foreground mb-6">{t("formInstructions")}</p>
+
+           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-8 text-xs text-muted-foreground max-w-2xl border-t border-border/60 pt-6">
+             <a href="/legal/aviso_legal.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[#5590af] transition-colors hover:underline">
+               Aviso Legal
+             </a>
+             <a href="/legal/politica_privacidad.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[#5590af] transition-colors hover:underline">
+               Política de Privacidad
+             </a>
+             <a href="/legal/politica_cookies.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[#5590af] transition-colors hover:underline">
+               Política de Cookies
+             </a>
+             <a href="/legal/politica_proteccion_datos.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[#5590af] transition-colors hover:underline">
+               Protección de Datos
+             </a>
+             <a href="/legal/politica_seguridad_encriptacion.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[#5590af] transition-colors hover:underline">
+               Seguridad y Encriptación
+             </a>
+             <a href="/legal/terminos_y_condiciones.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[#5590af] transition-colors hover:underline">
+               Términos y Condiciones
+             </a>
+           </div>
+           <p className="text-[10px] text-muted-foreground/60 mt-6 font-mono">
+             © {new Date().getFullYear()} Sesión+. Todos los derechos reservados.
+           </p>
         </motion.div>
       </footer>
 

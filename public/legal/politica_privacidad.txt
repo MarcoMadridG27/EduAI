@@ -1,0 +1,108 @@
+POLÍTICA DE PRIVACIDAD
+Sesión+ | sesionmas.online
+Última actualización: mayo de 2025
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+En Sesión+ nos comprometemos a proteger su privacidad. Esta Política de Privacidad explica de forma clara cómo recopilamos, usamos y protegemos su información cuando utiliza nuestra plataforma educativa con inteligencia artificial para docentes de Matemática.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. ¿QUÉ INFORMACIÓN RECOPILAMOS?
+
+1.1 Información que usted nos proporciona directamente:
+   - Al crear una cuenta: nombre, correo electrónico, institución educativa, región.
+   - Al usar la plataforma: sesiones de clase, actividades y contenidos generados.
+   - Al contactarnos: mensajes y consultas enviadas a soporte.
+
+1.2 Información recopilada automáticamente:
+   - Datos de navegación: páginas visitadas, duración de sesión, clics.
+   - Datos técnicos: dirección IP, tipo de navegador, sistema operativo.
+   - Cookies y tecnologías similares (ver sección de Cookies más abajo).
+
+1.3 Información generada por el uso de IA:
+   - Los prompts e instrucciones que introduce en la herramienta de IA para generar contenido educativo pueden ser procesados por nuestros proveedores de IA. No asociamos este contenido con datos de identificación personal más allá de lo necesario para ofrecer el servicio.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2. ¿CÓMO USAMOS SU INFORMACIÓN?
+
+Usamos su información para:
+- Crear y administrar su cuenta de usuario.
+- Proporcionarle las funcionalidades de la plataforma.
+- Personalizar su experiencia según su perfil docente.
+- Enviarle comunicaciones relacionadas con el servicio.
+- Mejorar la plataforma mediante análisis de uso agregado.
+- Responder a sus consultas y brindar soporte.
+- Cumplir con obligaciones legales.
+
+No utilizamos sus datos para publicidad de terceros ni los vendemos a ninguna empresa.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3. COOKIES Y TECNOLOGÍAS DE SEGUIMIENTO
+
+Sesión+ utiliza cookies y tecnologías similares para:
+
+- Cookies esenciales: necesarias para el funcionamiento de la plataforma (autenticación, seguridad de sesión). No pueden desactivarse.
+
+- Cookies de rendimiento: recopilan información anónima sobre el uso de la plataforma para ayudarnos a mejorarla (ej. páginas más visitadas, errores).
+
+- Cookies de preferencias: recuerdan sus configuraciones y preferencias personales.
+
+Puede gestionar sus preferencias de cookies desde la configuración de su navegador. Tenga en cuenta que desactivar ciertas cookies puede afectar el funcionamiento de la plataforma.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4. ¿CON QUIÉN COMPARTIMOS SU INFORMACIÓN?
+
+Compartimos datos únicamente con:
+
+- Proveedores de infraestructura tecnológica (hosting, bases de datos en la nube) bajo acuerdos de confidencialidad.
+- Proveedores de modelos de IA para la generación de contenido educativo.
+- Herramientas de análisis de uso (datos anonimizados o agregados).
+- Autoridades legales o regulatorias cuando sea requerido por ley.
+
+Nunca compartimos su información con anunciantes, brokers de datos ni terceros con fines de marketing sin su consentimiento expreso.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5. ¿CÓMO PROTEGEMOS SU INFORMACIÓN?
+
+Aplicamos medidas de seguridad que incluyen:
+- Conexiones cifradas mediante HTTPS/TLS.
+- Almacenamiento de contraseñas con hash seguro.
+- Acceso restringido a datos por parte de nuestro equipo.
+- Revisiones periódicas de seguridad.
+
+Aunque aplicamos altos estándares de seguridad, ningún sistema es 100% infalible. Le recomendamos usar contraseñas seguras y no compartir sus credenciales.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6. SUS OPCIONES Y DERECHOS
+
+Usted puede:
+- Actualizar su información desde su perfil de usuario.
+- Solicitar acceso, rectificación o eliminación de sus datos escribiendo a privacidad@sesionmas.online.
+- Darse de baja de comunicaciones comerciales desde el enlace de cancelación en nuestros correos.
+- Solicitar la eliminación de su cuenta en cualquier momento.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+7. RETENCIÓN DE DATOS
+
+Conservamos sus datos mientras su cuenta esté activa. Al eliminar su cuenta, sus datos serán suprimidos en un plazo de 30 días hábiles, excepto los que debamos retener por obligación legal.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+8. CAMBIOS EN ESTA POLÍTICA
+
+Podemos actualizar esta Política de Privacidad ocasionalmente. Si realizamos cambios significativos, se lo notificaremos por correo electrónico o mediante un aviso destacado en la plataforma antes de que entren en vigor.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+9. CONTACTO
+
+Si tiene preguntas sobre esta política o sobre cómo tratamos sus datos:
+Correo: privacidad@sesionmas.online
+Sitio web: https://sesionmas.online/

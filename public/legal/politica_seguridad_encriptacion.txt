@@ -1,0 +1,148 @@
+POLÍTICA DE SEGURIDAD Y ENCRIPTACIÓN
+Sesión+ | sesionmas.online
+Última actualización: mayo de 2025
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. INTRODUCCIÓN Y ALCANCE
+
+Sesión+ se compromete a proteger la confidencialidad, integridad y disponibilidad de los datos de sus usuarios mediante la implementación de medidas técnicas de seguridad y estándares de encriptación reconocidos internacionalmente.
+
+Esta política aplica a:
+- Todos los datos transmitidos entre el usuario y la plataforma.
+- Todos los datos almacenados en los sistemas de Sesión+.
+- Los procesos internos de autenticación y gestión de accesos.
+- Los datos procesados por servicios de terceros integrados a la plataforma.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2. ENCRIPTACIÓN EN TRÁNSITO
+
+2.1 Protocolo HTTPS/TLS
+Toda comunicación entre el navegador del usuario y los servidores de Sesión+ se realiza exclusivamente mediante HTTPS, utilizando el protocolo TLS (Transport Layer Security) en su versión 1.2 o superior.
+
+2.2 Certificados digitales
+Sesión+ utiliza certificados SSL/TLS emitidos por autoridades de certificación confiables, garantizando la autenticidad del dominio sesionmas.online.
+
+2.3 Comunicación con servicios externos
+Las integraciones con proveedores de inteligencia artificial, servicios de pago y otros terceros se realizan únicamente mediante conexiones cifradas. No se transmite información sensible por canales no seguros.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3. ENCRIPTACIÓN EN REPOSO
+
+3.1 Bases de datos
+Los datos almacenados en las bases de datos de Sesión+ están protegidos mediante encriptación a nivel de almacenamiento, usando estándares AES-256 (Advanced Encryption Standard de 256 bits) o equivalente, según lo provisto por la infraestructura en la nube utilizada.
+
+3.2 Copias de seguridad (backups)
+Las copias de seguridad de datos son generadas periódicamente y almacenadas en formato cifrado, con acceso restringido al personal autorizado de Sesión+.
+
+3.3 Archivos y documentos
+Los archivos cargados por usuarios en la plataforma son almacenados en entornos de almacenamiento en la nube con encriptación en reposo activada por defecto.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4. GESTIÓN DE CONTRASEÑAS Y CREDENCIALES
+
+4.1 Hash de contraseñas
+Las contraseñas de los usuarios nunca se almacenan en texto plano. Se aplican funciones de hash seguras con salt (como bcrypt o Argon2) para proteger las credenciales frente a accesos no autorizados incluso en caso de brecha en la base de datos.
+
+4.2 Tokens de sesión
+Los tokens de autenticación de sesión son generados con valores aleatorios de alta entropía, tienen tiempo de expiración definido y se invalidan al cerrar sesión.
+
+4.3 Claves de API y secretos internos
+Las claves de API de servicios externos y demás secretos del sistema son gestionados mediante variables de entorno seguras o servicios de gestión de secretos, nunca almacenados en el código fuente.
+
+4.4 Recomendaciones al usuario
+Se recomienda a los usuarios:
+- Utilizar contraseñas de al menos 8 caracteres combinando letras, números y símbolos.
+- No reutilizar contraseñas de otros servicios.
+- No compartir sus credenciales de acceso.
+- Cerrar sesión al usar dispositivos compartidos.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5. CONTROL DE ACCESO
+
+5.1 Principio de mínimo privilegio
+El personal interno de Sesión+ tiene acceso únicamente a los datos necesarios para cumplir sus funciones. Los permisos se asignan de forma granular y son revisados periódicamente.
+
+5.2 Autenticación de usuarios
+La plataforma implementa mecanismos de autenticación segura. Se recomienda y puede requerirse el uso de autenticación de dos factores (2FA) para el acceso a cuentas.
+
+5.3 Registro de accesos
+Se mantienen registros (logs) de accesos y operaciones críticas sobre los datos, para fines de auditoría y detección de actividades sospechosas.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6. INFRAESTRUCTURA Y PROVEEDORES EN LA NUBE
+
+6.1 Sesión+ opera sobre infraestructura de proveedores de nube de nivel empresarial que cuentan con certificaciones de seguridad reconocidas (como ISO 27001, SOC 2 Type II).
+
+6.2 Los centros de datos utilizados implementan controles físicos de seguridad, redundancia de energía, control de temperatura y sistemas de detección de intrusiones.
+
+6.3 Sesión+ revisa periódicamente las políticas de seguridad de sus proveedores de infraestructura para asegurar su cumplimiento con los estándares aplicables.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+7. GESTIÓN DE VULNERABILIDADES Y ACTUALIZACIONES
+
+7.1 Sesión+ mantiene actualizados sus componentes de software, librerías y dependencias para mitigar vulnerabilidades conocidas.
+
+7.2 Se realizan revisiones de seguridad periódicas sobre el código y la infraestructura de la plataforma.
+
+7.3 Ante el descubrimiento de una vulnerabilidad de seguridad, Sesión+ aplicará parches correctivos en el menor tiempo posible, priorizando aquellos que afecten datos de usuarios.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+8. GESTIÓN DE INCIDENTES DE SEGURIDAD
+
+8.1 Detección y respuesta
+Sesión+ cuenta con procedimientos internos para la detección, contención y resolución de incidentes de seguridad.
+
+8.2 Notificación a usuarios
+En caso de una brecha de seguridad que comprometa datos personales de los usuarios, Sesión+ notificará a los afectados en el menor plazo posible conforme a lo establecido por la Ley N° 29733 y su reglamento, indicando:
+- La naturaleza del incidente.
+- Los datos potencialmente comprometidos.
+- Las medidas adoptadas para mitigar el impacto.
+- Las acciones recomendadas al usuario.
+
+8.3 Reporte de vulnerabilidades
+Si usted identifica una vulnerabilidad de seguridad en nuestra plataforma, le pedimos reportarla de forma responsable a: seguridad@sesionmas.online
+
+Nos comprometemos a investigar el reporte y responder en un plazo de 5 días hábiles.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+9. INTELIGENCIA ARTIFICIAL Y SEGURIDAD DE DATOS
+
+9.1 Los datos enviados a los modelos de IA para la generación de contenido educativo son transmitidos de forma cifrada.
+
+9.2 Sesión+ no envía datos de identificación personal innecesarios a los proveedores de IA. Los prompts son procesados con el mínimo de contexto personal requerido para la funcionalidad.
+
+9.3 Los proveedores de IA utilizados por Sesión+ están sujetos a sus propias políticas de seguridad y privacidad, las cuales son evaluadas antes de su integración.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+10. CUMPLIMIENTO NORMATIVO
+
+Las medidas de seguridad implementadas por Sesión+ están alineadas con:
+- Ley N° 29733 – Ley de Protección de Datos Personales del Perú
+- Decreto Supremo N° 003-2013-JUS – Reglamento de la Ley N° 29733
+- Buenas prácticas del estándar ISO/IEC 27001 (Gestión de Seguridad de la Información)
+- Recomendaciones del OWASP (Open Web Application Security Project)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+11. REVISIÓN DE ESTA POLÍTICA
+
+Esta política será revisada al menos una vez al año o cuando ocurran cambios significativos en la infraestructura, los servicios o la normativa aplicable. Los cambios serán publicados en la plataforma con indicación de la fecha de actualización.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+12. CONTACTO
+
+Para consultas sobre seguridad:
+Correo: seguridad@sesionmas.online
+Para reporte de vulnerabilidades: seguridad@sesionmas.online
+Sitio web: https://sesionmas.online/

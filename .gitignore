@@ -84,6 +84,7 @@ firebase-debug.log
 # ✅ Debug & temporary files
 # ============================================
 *.txt
+!public/legal/*.txt
 *prompt*
 *debug*
 *test*
