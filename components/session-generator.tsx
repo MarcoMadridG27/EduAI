@@ -16,6 +16,7 @@ import {
 import type { SessionData } from "@/app/page"
 import { useLanguage } from "@/lib/LanguageContext"
 import { LanguageSelector } from "@/components/language-selector"
+import { toast } from "sonner"
 
 interface SessionGeneratorProps {
   readonly user?: { readonly name: string; readonly email: string } | null
@@ -636,10 +637,10 @@ function SessionHeader({
         <div className="flex items-center gap-3">
           {guestMode ? (
             <Link href="/" aria-label="Ir a la página principal">
-              <img src="/educa.png" alt="Educa +" className="h-16 w-auto object-contain drop-shadow-sm" />
+              <img src="/educa-logo.png" alt="Educa +" className="h-10 md:h-12 w-auto object-contain drop-shadow-sm" />
             </Link>
           ) : (
-            <img src="/educa.png" alt="Educa +" className="h-16 w-auto object-contain drop-shadow-sm" />
+            <img src="/educa-logo.png" alt="Educa +" className="h-10 md:h-12 w-auto object-contain drop-shadow-sm" />
           )}
           <div>
             <h1 className="font-bold text-xl md:text-2xl text-slate-800 flex items-center gap-2">

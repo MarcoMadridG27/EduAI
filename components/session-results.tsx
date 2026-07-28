@@ -296,7 +296,7 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
                 {t("back")}
               </Button>
               <div className="flex items-center gap-3">
-                <img src="/educa.png" alt="Educa +" className="h-16 w-auto object-contain drop-shadow-sm" />
+                <img src="/educa-logo.png" alt="Educa +" className="h-10 md:h-12 w-auto object-contain drop-shadow-sm" />
                 <div>
                   <h1 className="font-bold text-lg text-blue-800 font-bold">
                     {t("resultsTitle")}

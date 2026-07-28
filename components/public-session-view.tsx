@@ -456,7 +456,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
 
               {/* End of Doc watermark */}
               <div className="mt-16 pt-8 border-t border-slate-100 text-center opacity-50 flex flex-col items-center">
-                <img src="/educa.png" className="h-6 w-auto grayscale mb-2" alt="Educa +" />
+                <img src="/educa-logo.png" className="h-6 w-auto grayscale mb-2" alt="Educa +" />
                 <p className="text-xs font-semibold">{lt.docWatermark}</p>
               </div>
 

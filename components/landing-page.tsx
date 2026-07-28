@@ -7,6 +7,7 @@ import { BookOpen, Layers, Users, Sparkles, BrainCircuit, Lightbulb, ChevronRigh
 import { useState, useEffect } from "react"
 import { useLanguage } from "@/lib/LanguageContext"
 import { LanguageSelector } from "@/components/language-selector"
+import { toast } from "sonner"
 
 interface LandingPageProps {
   readonly onEnterGeneratorPreview: () => void
@@ -267,14 +268,14 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground pb-20 pt-12 overflow-x-hidden">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 w-full bg-background/80 backdrop-blur-md pb-6 px-6 lg:px-12 h-12 md:h-14 lg:h-16 flex items-center justify-between z-50 border-b border-border">
+      <header className="fixed top-0 left-0 right-0 w-full bg-background/80 backdrop-blur-md px-6 lg:px-12 h-16 flex items-center justify-between z-50 border-b border-border">
         <div className="flex items-center">
           <Link href="/" aria-label="Ir a la página principal">
-            <img src="/educa.png" alt="Educa +" className="h-20 md:h-24 lg:h-28 w-auto object-contain drop-shadow-sm translate-y-2 md:translate-y-3 lg:translate-y-4" />
+            <img src="/educa-logo.png" alt="Educa +" className="h-10 md:h-12 w-auto object-contain drop-shadow-sm" />
           </Link>
         </div>
 
-        <div className="flex items-center gap-3 pt-4">
+        <div className="flex items-center gap-3">
           <LanguageSelector />
           <Button onClick={onLogin} className="rounded-full font-bold h-9 px-6 shadow-md transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#5590af', color: 'var(--papaya-whip)' }}>
             {t("login")}
@@ -319,7 +320,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 transition={{ delay: 0.3, type: "spring", bounce: 0.5 }}
                 className="text-5xl md:text-7xl lg:text-[6.5rem] font-black tracking-tight leading-none mb-6 select-none"
               >
-                <span className="text-[#003049] lowercase">sesion</span>
+                <span className="text-[#003049] lowercase">educa</span>
                 <span className="relative inline-block ml-1 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-indigo-600 drop-shadow-[0_2px_10px_rgba(6,182,212,0.3)] font-bold scale-110 translate-y-[-0.03em] select-none">
                   +
                 </span>
@@ -633,25 +634,6 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                   </div>
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-4 items-center justify-center lg:justify-start">
-                <Link
-                  href="https://wa.me/51984277478?text=Hola!%20Quiero%20probar%20el%20bot%20de%20IA"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full font-bold px-8 py-4 text-base shadow-lg bg-emerald-500 text-white hover:bg-emerald-600 hover:shadow-xl transition-all hover:scale-105 active:scale-95"
-                >
-                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.45L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.116-2.887-6.98-1.864-1.864-4.343-2.887-6.984-2.888-5.439 0-9.863 4.42-9.867 9.865-.001 1.757.458 3.473 1.332 4.972l-.988 3.605 3.698-.971zm11.367-5.123c-.302-.15-1.785-.882-2.062-.982-.277-.1-.478-.15-.679.15-.201.3-.778.982-.954 1.183-.176.201-.353.226-.655.076-.302-.15-1.274-.469-2.427-1.498-.897-.8-1.502-1.787-1.678-2.088-.176-.302-.019-.465.132-.614.136-.135.302-.35.453-.526.15-.175.201-.3.302-.5.101-.201.05-.377-.025-.526-.075-.15-.679-1.636-.93-2.24-.244-.59-.493-.51-.679-.52-.176-.01-.377-.012-.578-.012-.201 0-.528.075-.805.377-.277.302-1.056 1.03-1.056 2.512 0 1.48 1.081 2.912 1.232 3.112.15.201 2.128 3.249 5.156 4.557.72.31 1.282.496 1.72.636.724.23 1.382.197 1.902.12.58-.087 1.785-.73 2.037-1.43.252-.7.252-1.3.176-1.43-.076-.13-.277-.205-.578-.356z"/>
-                  </svg>
-                  {t("whatsAppCTA")}
-                </Link>
-                <div className="flex flex-col text-slate-700 dark:text-slate-300 font-mono text-sm gap-1 bg-white/40 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-full px-5 py-3 select-all">
-                  <span className="text-[10px] text-muted-foreground uppercase tracking-wide leading-none font-bold">WhatsApp:</span>
-                  <span className="font-bold text-base text-emerald-600 dark:text-emerald-400">+51 984 277 478</span>
-                </div>
-              </div>
             </div>
 
             {/* Right side: Mock WhatsApp Chat Interface */}
@@ -954,41 +936,8 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
            <p className="text-[10px] text-muted-foreground/60 mt-6 font-mono">
              © {new Date().getFullYear()} Educa +. Todos los derechos reservados.
            </p>
-        </motion.div>
-      </footer>
-
-      {/* Floating WhatsApp Chat Bubble */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-        {/* Tooltip Notification */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ delay: 3, duration: 0.5 }}
-          className="mb-2 bg-slate-900 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-lg border border-slate-800 flex items-center gap-1.5 max-w-[200px]"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-          <span>WhatsApp Bot</span>
-        </motion.div>
-
-        <motion.a
-          href="https://wa.me/51984277478?text=Hola!%20Quiero%20probar%20el%20bot%20de%20IA"
-          target="_blank"
-          rel="noopener noreferrer"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", bounce: 0.6, duration: 1 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          className="w-14 h-14 bg-emerald-500 rounded-full flex items-center justify-center shadow-xl hover:bg-emerald-600 transition-colors border-2 border-white cursor-pointer relative"
-          title="WhatsApp Bot"
-        >
-          <svg className="w-7 h-7 text-white fill-current" viewBox="0 0 24 24">
-            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.45L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.864-9.864.002-2.637-1.023-5.116-2.887-6.98-1.864-1.864-4.343-2.887-6.984-2.888-5.439 0-9.863 4.42-9.867 9.865-.001 1.757.458 3.473 1.332 4.972l-.988 3.605 3.698-.971zm11.367-5.123c-.302-.15-1.785-.882-2.062-.982-.277-.1-.478-.15-.679.15-.201.3-.778.982-.954 1.183-.176.201-.353.226-.655.076-.302-.15-1.274-.469-2.427-1.498-.897-.8-1.502-1.787-1.678-2.088-.176-.302-.019-.465.132-.614.136-.135.302-.35.453-.526.15-.175.201-.3.302-.5.101-.201.05-.377-.025-.526-.075-.15-.679-1.636-.93-2.24-.244-.59-.493-.51-.679-.52-.176-.01-.377-.012-.578-.012-.201 0-.528.075-.805.377-.277.302-1.056 1.03-1.056 2.512 0 1.48 1.081 2.912 1.232 3.112.15.201 2.128 3.249 5.156 4.557.72.31 1.282.496 1.72.636.724.23 1.382.197 1.902.12.58-.087 1.785-.73 2.037-1.43.252-.7.252-1.3.176-1.43-.076-.13-.277-.205-.578-.356z"/>
-          </svg>
-        </motion.a>
-      </div>
+         </motion.div>
+       </footer>
     </div>
   )
 }
-
-

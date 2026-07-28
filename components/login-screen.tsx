@@ -146,7 +146,7 @@ export function LoginScreen({ onLogin }: Readonly<LoginScreenProps>) {
                 className="mx-auto flex items-center justify-center mb-6"
               >
                 <Link href="/" aria-label="Ir a la página principal">
-                  <img src="/educa.png" alt="Educa + Logo" className="h-40 w-auto object-contain drop-shadow-sm" />
+                  <img src="/educa-logo.png" alt="Educa + Logo" className="h-24 md:h-28 w-auto object-contain drop-shadow-sm" />
                 </Link>
               </motion.div>
               

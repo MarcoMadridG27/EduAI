@@ -313,7 +313,7 @@ export function PdfPreview({
           <div className="bg-white shadow-2xl rounded-sm" style={PAGE}>
             {/* Header */}
             <div className="flex items-center justify-between border-b-2 border-[#1565C0] pb-2 mb-3">
-              <div><img src="/educa.png" alt="Educa +" className="h-8 w-auto" /></div>
+              <div><img src="/educa-logo.png" alt="Educa +" className="h-8 w-auto" /></div>
               <div className="text-center flex-1 px-4">
                 <div className="text-[#1565C0] font-bold text-[12pt]">SESIÓN DE APRENDIZAJE</div>
                 <div className="text-[#1976D2] text-[8.5pt]">
@@ -426,7 +426,7 @@ export function PdfPreview({
           <div className="bg-white shadow-2xl rounded-sm" style={PAGE}>
             {/* Mini-header */}
             <div className="flex items-center justify-between border-b border-slate-200 pb-2 mb-3">
-              <div><img src="/educa.png" alt="Educa +" className="h-4 w-auto" /></div>
+              <div><img src="/educa-logo.png" alt="Educa +" className="h-4 w-auto" /></div>
               <div className="flex-1 text-center text-slate-500 text-[8pt]">
                 Continuación · <span className="font-semibold text-slate-700">{dg.titulo||data.tema}</span>
               </div>

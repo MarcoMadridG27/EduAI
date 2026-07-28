@@ -290,7 +290,7 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
               {t("back")}
             </Button>
             <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
-              <img src="/educa.png" alt="Educa +" className="h-16 w-auto object-contain drop-shadow-sm" />
+              <img src="/educa-logo.png" alt="Educa +" className="h-10 md:h-12 w-auto object-contain drop-shadow-sm" />
               <div>
                 <h1 className="font-bold text-xl text-slate-800">
                   Dashboard de {user.name.split(' ')[0]}
