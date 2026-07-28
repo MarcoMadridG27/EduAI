@@ -207,7 +207,7 @@ export function PublicRepository({
       {/* Header flotante */}
       <header className="fixed top-0 left-0 right-0 w-full bg-white/90 backdrop-blur-lg py-3 px-6 lg:px-12 flex items-center justify-between z-50 border-b border-slate-200/60 shadow-sm">
         <Link href="/" className="flex items-center gap-2">
-          <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
+          <img src="/educa.png" alt="Educa +" className="h-16 w-auto object-contain drop-shadow-sm" />
           <span className="font-extrabold text-slate-700 text-lg tracking-tight hidden sm:inline">{lt.community}</span>
         </Link>
         <div className="flex-1 max-w-xl px-6 hidden md:block">

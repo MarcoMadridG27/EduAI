@@ -48,7 +48,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
       login: "Iniciar Sesión",
       likesText: "valoraciones",
       likeText: "valoración",
-      docWatermark: "Documento publicado en la Comunidad Sesión+",
+      docWatermark: "Documento publicado en la Comunidad Educa +",
       propTitle: "Propósito de la Sesión",
       compTitle: "Competencia y Desempeños",
       seqTitle: "Secuencia Metodológica",
@@ -88,7 +88,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
       login: "Log In",
       likesText: "ratings",
       likeText: "rating",
-      docWatermark: "Document published in the Sesión+ Community",
+      docWatermark: "Document published in the Educa + Community",
       propTitle: "Purpose of the Session",
       compTitle: "Competency and Performance",
       seqTitle: "Methodological Sequence",
@@ -128,7 +128,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
       login: "Qillqakuy",
       likesText: "chaninchaykuna",
       likeText: "chaninchay",
-      docWatermark: "Sesión+ Ayllupi churasqa qillqa",
+      docWatermark: "Educa + Ayllupi churasqa qillqa",
       propTitle: "Yachachiypa propósiton",
       compTitle: "Atipakuy desempeñokunapas",
       seqTitle: "Pedagógico sequence",
@@ -168,7 +168,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
       login: "Mantaña",
       likesText: "uñakipawinaka",
       likeText: "uñakipawi",
-      docWatermark: "Qillqata Sesión+ Tamana uñachayata",
+      docWatermark: "Qillqata Educa + Tamana uñachayata",
       propTitle: "Yatichawin propósito",
       compTitle: "Lurañanak uñt'ata",
       seqTitle: "Yatichawi sequence",
@@ -456,7 +456,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
 
               {/* End of Doc watermark */}
               <div className="mt-16 pt-8 border-t border-slate-100 text-center opacity-50 flex flex-col items-center">
-                <img src="/sesion_+.png" className="h-6 w-auto grayscale mb-2" alt="Sesión+" />
+                <img src="/educa.png" className="h-6 w-auto grayscale mb-2" alt="Educa +" />
                 <p className="text-xs font-semibold">{lt.docWatermark}</p>
               </div>
 

@@ -1,12 +1,12 @@
 POLÍTICA DE PROTECCIÓN DE DATOS PERSONALES
-Sesión+ | sesionmas.online
+Educa + | sesionmas.online
 Última actualización: mayo de 2025
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 1. RESPONSABLE DEL TRATAMIENTO
 
-La presente política es emitida por el equipo de Sesión+ (en adelante "Sesión+", "nosotros" o "la Plataforma"), titular y responsable del sitio web https://sesionmas.online/.
+La presente política es emitida por el equipo de Educa + (en adelante "Educa +", "nosotros" o "la Plataforma"), titular y responsable del sitio web https://sesionmas.online/.
 
 Para consultas relacionadas con el tratamiento de sus datos personales puede contactarnos en:
 Correo electrónico: privacidad@sesionmas.online
@@ -16,7 +16,7 @@ País de operación: Perú
 
 2. MARCO LEGAL APLICABLE
 
-El tratamiento de datos personales realizado por Sesión+ se rige por:
+El tratamiento de datos personales realizado por Educa + se rige por:
 - Ley N° 29733 – Ley de Protección de Datos Personales del Perú
 - Decreto Supremo N° 003-2013-JUS – Reglamento de la Ley N° 29733
 - Demás disposiciones emitidas por la Autoridad Nacional de Protección de Datos Personales (ANPDP)
@@ -76,26 +76,26 @@ f) Comunicaciones comerciales: únicamente con su consentimiento previo, enviarl
 El tratamiento de sus datos se sustenta en:
 - Ejecución del contrato de servicio aceptado al registrarse
 - Cumplimiento de obligaciones legales aplicables
-- Interés legítimo de Sesión+ para mejorar sus servicios
+- Interés legítimo de Educa + para mejorar sus servicios
 - Consentimiento del titular, cuando así se requiera
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 6. TRANSFERENCIA DE DATOS A TERCEROS
 
-Sesión+ no vende ni cede sus datos personales a terceros con fines comerciales. Podemos compartir datos con:
+Educa + no vende ni cede sus datos personales a terceros con fines comerciales. Podemos compartir datos con:
 
 - Proveedores de servicios tecnológicos (alojamiento, infraestructura en la nube) que actúan como encargados del tratamiento y están sujetos a obligaciones de confidencialidad.
 - Proveedores de inteligencia artificial utilizados para generar contenido educativo, únicamente los datos necesarios para la prestación del servicio.
 - Autoridades públicas o judiciales cuando sea requerido por ley.
 
-En caso de transferencia internacional de datos, Sesión+ adoptará las medidas necesarias para garantizar un nivel de protección adecuado conforme a la normativa peruana.
+En caso de transferencia internacional de datos, Educa + adoptará las medidas necesarias para garantizar un nivel de protección adecuado conforme a la normativa peruana.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 7. PLAZO DE CONSERVACIÓN
 
-Sus datos personales serán conservados mientras mantenga una cuenta activa en Sesión+. Una vez que solicite la eliminación de su cuenta, procederemos a eliminar o anonimizar sus datos en un plazo máximo de 30 días hábiles, salvo que exista obligación legal de conservarlos por un período mayor.
+Sus datos personales serán conservados mientras mantenga una cuenta activa en Educa +. Una vez que solicite la eliminación de su cuenta, procederemos a eliminar o anonimizar sus datos en un plazo máximo de 30 días hábiles, salvo que exista obligación legal de conservarlos por un período mayor.
 
 Los datos de facturación o transacciones se conservarán por el plazo exigido por la legislación tributaria vigente.
 
@@ -119,7 +119,7 @@ Responderemos en un plazo máximo de 20 días hábiles contados desde la recepci
 
 9. SEGURIDAD DE LOS DATOS
 
-Sesión+ implementa medidas técnicas y organizativas para proteger sus datos personales frente a accesos no autorizados, pérdidas, alteraciones o divulgaciones indebidas, incluyendo:
+Educa + implementa medidas técnicas y organizativas para proteger sus datos personales frente a accesos no autorizados, pérdidas, alteraciones o divulgaciones indebidas, incluyendo:
 
 - Cifrado de datos en tránsito (HTTPS/TLS)
 - Control de acceso basado en roles
@@ -132,13 +132,13 @@ En caso de una brecha de seguridad que afecte sus derechos, le notificaremos con
 
 10. MENORES DE EDAD
 
-Sesión+ está dirigida a docentes y profesionales de la educación. No recopilamos de manera intencionada datos personales de menores de 18 años. Si detectamos que hemos recopilado datos de un menor sin autorización, los eliminaremos de inmediato.
+Educa + está dirigida a docentes y profesionales de la educación. No recopilamos de manera intencionada datos personales de menores de 18 años. Si detectamos que hemos recopilado datos de un menor sin autorización, los eliminaremos de inmediato.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 11. CAMBIOS EN ESTA POLÍTICA
 
-Podemos actualizar esta política periódicamente. Le notificaremos los cambios significativos mediante un aviso en la plataforma o por correo electrónico. El uso continuado de Sesión+ tras la publicación de los cambios implica su aceptación.
+Podemos actualizar esta política periódicamente. Le notificaremos los cambios significativos mediante un aviso en la plataforma o por correo electrónico. El uso continuado de Educa + tras la publicación de los cambios implica su aceptación.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

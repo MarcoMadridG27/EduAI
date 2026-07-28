@@ -636,10 +636,10 @@ function SessionHeader({
         <div className="flex items-center gap-3">
           {guestMode ? (
             <Link href="/" aria-label="Ir a la página principal">
-              <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
+              <img src="/educa.png" alt="Educa +" className="h-16 w-auto object-contain drop-shadow-sm" />
             </Link>
           ) : (
-            <img src="/sesion_+.png" alt="Sesión+" className="h-16 w-auto object-contain drop-shadow-sm" />
+            <img src="/educa.png" alt="Educa +" className="h-16 w-auto object-contain drop-shadow-sm" />
           )}
           <div>
             <h1 className="font-bold text-xl md:text-2xl text-slate-800 flex items-center gap-2">

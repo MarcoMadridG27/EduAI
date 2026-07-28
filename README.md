@@ -1,6 +1,6 @@
-# EduAI - Sesión+ (Frontend)
+# Educa + (Frontend)
 
-Sesión+ es una plataforma web moderna e interactiva diseñada para docentes peruanos. Permite generar sesiones de aprendizaje estructuradas en segundos, totalmente alineadas al **Currículo Nacional de la Educación Básica (CNEB)**, adaptadas al contexto de cada aula y con procesos didácticos exactos.
+Educa + es una plataforma web moderna e interactiva diseñada para docentes peruanos. Permite generar sesiones de aprendizaje estructuradas en segundos, totalmente alineadas al **Currículo Nacional de la Educación Básica (CNEB)**, adaptadas al contexto de cada aula y con procesos didácticos exactos.
 
 ## 🚀 Tecnologías Core
 

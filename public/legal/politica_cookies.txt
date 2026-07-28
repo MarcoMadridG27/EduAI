@@ -1,5 +1,5 @@
 POLÍTICA DE COOKIES
-Sesión+ | sesionmas.online
+Educa + | sesionmas.online
 Última actualización: mayo de 2025
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -12,7 +12,7 @@ Las cookies son pequeños archivos de texto que se almacenan en su dispositivo c
 
 2. COOKIES QUE UTILIZAMOS
 
-Sesión+ utiliza los siguientes tipos de cookies:
+Educa + utiliza los siguientes tipos de cookies:
 
 a) COOKIES ESTRICTAMENTE NECESARIAS
    Finalidad: Garantizan el funcionamiento básico de la plataforma.
@@ -33,7 +33,7 @@ c) COOKIES DE PREFERENCIAS
 
 3. COOKIES DE TERCEROS
 
-Algunos servicios externos utilizados por Sesión+ pueden instalar sus propias cookies. Estos pueden incluir herramientas de análisis de tráfico web. Sesión+ no controla estas cookies; consulte las políticas de privacidad de dichos terceros para más información.
+Algunos servicios externos utilizados por Educa + pueden instalar sus propias cookies. Estos pueden incluir herramientas de análisis de tráfico web. Educa + no controla estas cookies; consulte las políticas de privacidad de dichos terceros para más información.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -46,7 +46,7 @@ Puede configurar su navegador para aceptar, rechazar o eliminar cookies. A conti
 - Safari: Preferencias > Privacidad > Cookies
 - Microsoft Edge: Configuración > Privacidad > Cookies
 
-Tenga en cuenta que deshabilitar ciertas cookies puede afectar la funcionalidad de Sesión+.
+Tenga en cuenta que deshabilitar ciertas cookies puede afectar la funcionalidad de Educa +.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

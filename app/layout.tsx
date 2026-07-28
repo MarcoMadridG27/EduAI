@@ -10,9 +10,14 @@ import { LanguageProvider } from "@/lib/LanguageContext"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Sesion +",
+  title: "Educa +",
   description: "Software educativo con IA para docentes de Matemática en Perú",
   generator: "v0.app",
+  icons: {
+    icon: "/icon-educamas.png",
+    shortcut: "/icon-educamas.png",
+    apple: "/icon-educamas.png",
+  },
 }
 
 export default function RootLayout({

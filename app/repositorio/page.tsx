@@ -1,7 +1,7 @@
 import { PublicRepository } from "@/components/public-repository"
 
 export const metadata = {
-  title: 'Repositorio Global - Sesión+',
+  title: 'Repositorio Global - Educa +',
   description: 'Explora y comparte sesiones de aprendizaje generadas por la comunidad.',
 }
 

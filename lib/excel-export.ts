@@ -139,7 +139,7 @@ export async function exportToExcel(data: SessionData) {
     align: "center",
     border: { bottom: true },
   })
-  worksheet.getCell("A2").value = `Área: ${dg.area || data.tema || "Matemática"}   ·   Unidad: ${dg.unidad || "—"}   ·   Sesión+`
+  worksheet.getCell("A2").value = `Área: ${dg.area || data.tema || "Matemática"}   ·   Unidad: ${dg.unidad || "—"}   ·   Educa +`
   worksheet.getRow(2).height = 20
 
   let currentRow = 4
