@@ -513,6 +513,34 @@ export function SubscriptionsSection({
           </motion.div>
         </div>
       )}
+      {/* Legal Footer */}
+      <footer className="border-t border-slate-200 bg-white py-8 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-xs text-slate-500 mb-3">
+            © {new Date().getFullYear()} Educa+ / EduAI. Todos los derechos reservados.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-600 font-medium">
+            <a href="/legal/terminos_y_condiciones.txt" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors hover:underline">
+              Términos y Condiciones
+            </a>
+            <a href="/legal/politica_privacidad.txt" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors hover:underline">
+              Política de Privacidad
+            </a>
+            <a href="/legal/politica_proteccion_datos.txt" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors hover:underline">
+              Protección de Datos (Ley N° 29733)
+            </a>
+            <a href="/legal/politica_seguridad_encriptacion.txt" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors hover:underline">
+              Seguridad y Cifrado
+            </a>
+            <a href="/legal/aviso_legal.txt" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors hover:underline">
+              Aviso Legal
+            </a>
+            <a href="/legal/politica_cookies.txt" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors hover:underline">
+              Política de Cookies
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
