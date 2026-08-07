@@ -939,6 +939,9 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
              <a href="/legal/terminos_y_condiciones.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[#5590af] transition-colors hover:underline">
                Términos y Condiciones
              </a>
+             <Link href="/libro-de-reclamaciones" className="hover:text-[#5590af] transition-colors hover:underline font-bold text-amber-600 flex items-center gap-1">
+               📖 Libro de Reclamaciones
+             </Link>
            </div>
            <p className="text-[10px] text-muted-foreground/60 mt-6 font-mono">
              © {new Date().getFullYear()} Educa +. Todos los derechos reservados.

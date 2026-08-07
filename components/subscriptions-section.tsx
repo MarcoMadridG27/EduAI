@@ -538,6 +538,9 @@ export function SubscriptionsSection({
             <a href="/legal/politica_cookies.txt" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors hover:underline">
               Política de Cookies
             </a>
+            <Link href="/libro-de-reclamaciones" className="hover:text-blue-600 transition-colors hover:underline font-bold text-amber-600">
+              📖 Libro de Reclamaciones
+            </Link>
           </div>
         </div>
       </footer>
