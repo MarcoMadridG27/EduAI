@@ -223,6 +223,15 @@ export function PublicRepository({
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {/* Suscripciones Button */}
+          <Link
+            href="/suscripciones"
+            className="text-slate-600 hover:text-blue-600 font-bold text-sm h-9 px-3 flex items-center gap-1.5 transition-colors"
+          >
+            <Sparkles className="h-4 w-4 text-blue-600" />
+            Suscripciones
+          </Link>
+
           {/* Dashboard Button */}
           <Button
             variant="ghost"

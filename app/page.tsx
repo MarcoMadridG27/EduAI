@@ -8,6 +8,7 @@ import { SessionResults } from "@/components/session-results"
 import { TeacherDashboard } from "@/components/teacher-dashboard"
 import { LandingPage } from "@/components/landing-page"
 import { PublicRepository } from "@/components/public-repository"
+import { SubscriptionsSection } from "@/components/subscriptions-section"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
 import { toast } from "sonner"
@@ -128,7 +129,7 @@ export type SessionData = {
 export default function Home() {
   const router = useRouter()
   const { t } = useLanguage()
-  const [currentView, setCurrentView] = useState<"landing" | "repository" | "generator" | "results" | "dashboard">("landing")
+  const [currentView, setCurrentView] = useState<"landing" | "repository" | "generator" | "results" | "dashboard" | "subscriptions">("landing")
   const [user, setUser] = useState<{ name: string; email: string } | null>(null)
   const [guestMode, setGuestMode] = useState<boolean>(false)
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false)
@@ -160,7 +161,7 @@ export default function Home() {
           setEditingSession(editData)
           setCurrentView("generator")
           localStorage.removeItem("session_to_edit")
-        } else if (viewParam && ["generator", "dashboard", "results"].includes(viewParam)) {
+        } else if (viewParam && ["generator", "dashboard", "results", "subscriptions"].includes(viewParam)) {
           setCurrentView(viewParam as any)
         } else {
           // If no specific view is requested, route directly to repository path
@@ -170,7 +171,7 @@ export default function Home() {
         console.error("Error restaurando sesión:", e)
       }
     } else {
-      if (viewParam && ["generator", "dashboard", "results"].includes(viewParam)) {
+      if (viewParam && ["generator", "dashboard", "results", "subscriptions"].includes(viewParam)) {
         setGuestMode(true)
         setCurrentView(viewParam as any)
       } else {
@@ -319,6 +320,15 @@ export default function Home() {
           sessions={sessions}
           onBack={handleBackFromDashboard}
           onOpenSession={handleOpenSavedSession}
+        />
+      )}
+
+      {currentView === "subscriptions" && (
+        <SubscriptionsSection
+          user={user}
+          onNavigateToGenerator={() => setCurrentView("generator")}
+          onNavigateToRepo={() => router.push("/repositorio")}
+          onBack={() => setCurrentView("landing")}
         />
       )}
 

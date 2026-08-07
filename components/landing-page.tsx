@@ -276,6 +276,13 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
         </div>
 
         <div className="flex items-center gap-3">
+          <Link
+            href="/suscripciones"
+            className="text-slate-700 hover:text-blue-600 font-bold text-sm h-9 px-3 flex items-center gap-1.5 transition-colors"
+          >
+            <Sparkles className="h-4 w-4 text-blue-600" />
+            Suscripciones
+          </Link>
           <LanguageSelector />
           <Button onClick={onLogin} className="rounded-full font-bold h-9 px-6 shadow-md transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#5590af', color: 'var(--papaya-whip)' }}>
             {t("login")}
