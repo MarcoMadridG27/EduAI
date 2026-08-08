@@ -981,7 +981,7 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     }
     setIsAnalyzingCopilot(true)
     try {
-      const endpoint = "https://api.sesionmas.online/recommend-curriculum"
+      const endpoint = "https://api.sesionmas.online/core/recommend-curriculum"
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
