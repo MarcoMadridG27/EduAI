@@ -918,8 +918,8 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
   }, [language])
 
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
-  const [nivel, setNivel] = useState("secundaria")
-  const [area, setArea] = useState("Matemática")
+  const [nivel, setNivel] = useState("")
+  const [area, setArea] = useState("")
   const [grado, setGrado] = useState("")
   const [seccion, setSeccion] = useState("")
 
@@ -927,9 +927,7 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
   const handleNivelChange = (nuevoNivel: string) => {
     setNivel(nuevoNivel)
     setGrado("")
-    const areas = Object.keys(cnebEstructura[nuevoNivel] || {})
-    const primeraArea = areas[0] || "Matemática"
-    setArea(primeraArea)
+    setArea("")
     setCompetenciasSeleccionadas([])
     setCapacidadesSeleccionadas([])
     setCompetenciaExpandida(null)
