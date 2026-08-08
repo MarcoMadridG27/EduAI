@@ -981,8 +981,8 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     }
     setIsAnalyzingCopilot(true)
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_CORE_API_URL || "https://api.sesionmas.online"
-      const endpoint = `${backendUrl.replace(/\/+$/, "")}/api/core/recommend-curriculum`
+      const base = (process.env.NEXT_PUBLIC_CORE_API_URL || "https://api.sesionmas.online").replace(/\/+$/, "")
+      const endpoint = base.includes("/api/core") ? `${base}/recommend-curriculum` : `${base}/api/core/recommend-curriculum`
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
