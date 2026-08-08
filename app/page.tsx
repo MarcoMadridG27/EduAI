@@ -19,9 +19,10 @@ export type SessionData = {
     titulo?: string
     docente?: string
     fecha?: string
+    nivel?: string
+    area?: string
     grado?: string
     seccion?: string
-    area?: string
     unidad?: string
     sesion_num?: string
     ie?: string
@@ -32,6 +33,8 @@ export type SessionData = {
   }
 
   // Inputs del formulario
+  nivel?: string
+  area?: string
   tema: string
   titulo?: string // Título de la sesión - kept for compatibility
   tituloSesion?: string // Legacy field

@@ -28,6 +28,67 @@ interface SessionGeneratorProps {
   readonly onLoginRequired?: () => void
 }
 
+const nivelesEducativos = [
+  { id: "inicial", name: "Educación Inicial" },
+  { id: "primaria", name: "Educación Primaria" },
+  { id: "secundaria", name: "Educación Secundaria" }
+]
+
+const gradosPorNivel: Record<string, { id: string; label: string; ciclo: string }[]> = {
+  inicial: [
+    { id: "3", label: "3 años", ciclo: "II" },
+    { id: "4", label: "4 años", ciclo: "II" },
+    { id: "5", label: "5 años", ciclo: "II" }
+  ],
+  primaria: [
+    { id: "1", label: "1º Primaria", ciclo: "III" },
+    { id: "2", label: "2º Primaria", ciclo: "III" },
+    { id: "3", label: "3º Primaria", ciclo: "IV" },
+    { id: "4", label: "4º Primaria", ciclo: "IV" },
+    { id: "5", label: "5º Primaria", ciclo: "V" },
+    { id: "6", label: "6º Primaria", ciclo: "V" }
+  ],
+  secundaria: [
+    { id: "1", label: "1º Secundaria", ciclo: "VI" },
+    { id: "2", label: "2º Secundaria", ciclo: "VI" },
+    { id: "3", label: "3º Secundaria", ciclo: "VII" },
+    { id: "4", label: "4º Secundaria", ciclo: "VII" },
+    { id: "5", label: "5º Secundaria", ciclo: "VII" }
+  ]
+}
+
+const areasPorNivel: Record<string, string[]> = {
+  inicial: [
+    "Matemática",
+    "Comunicación",
+    "Personal Social",
+    "Psicomotricidad",
+    "Ciencia y Tecnología"
+  ],
+  primaria: [
+    "Matemática",
+    "Comunicación",
+    "Ciencia y Tecnología",
+    "Personal Social",
+    "Arte y Cultura",
+    "Educación Física",
+    "Educación Religiosa",
+    "Inglés"
+  ],
+  secundaria: [
+    "Matemática",
+    "Comunicación",
+    "Ciencia y Tecnología",
+    "Ciencias Sociales",
+    "Desarrollo Personal, Ciudadanía y Cívica",
+    "Educación Física",
+    "Arte y Cultura",
+    "Educación para el Trabajo",
+    "Inglés",
+    "Educación Religiosa"
+  ]
+}
+
 const competenciasData = [
   { name: "Resuelve problemas de cantidad", icon: Calculator },
   { name: "Resuelve problemas de regularidad, equivalencia y cambio", icon: LineChart },
@@ -199,6 +260,8 @@ function calculateFormProgress(
 }
 
 interface RunWebSocketGenerationParams {
+  nivel: string
+  area: string
   tema: string
   tituloSesion: string
   nombreDocente: string
@@ -234,11 +297,13 @@ function runWebSocketSessionGeneration(params: RunWebSocketGenerationParams) {
   const evalInst = params.instrumentoEvaluacion === instrumentosEvaluacion[0] ? "A decisión de la IA" : params.instrumentoEvaluacion
 
   const message = `Idioma: ${params.idioma}
+Nivel: ${params.nivel}
+Área Curricular: ${params.area}
 Tema de la Sesión: ${params.tema}
 Título: ${params.tituloSesion}
 Docente: ${params.nombreDocente}
 Fecha: ${params.fecha}
-Grado: ${params.grado}º Secundaria
+Grado: ${params.grado}
 Sección: ${params.seccion}
 Competencias: ${params.competenciasSeleccionadas.join(", ")}
 Capacidades: ${params.capacidadesSeleccionadas.join(", ")}
@@ -335,14 +400,26 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     }
     setIdiomaGeneracion(languageNames[language] || "español")
   }, [language])
+
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
+  const [nivel, setNivel] = useState("secundaria")
+  const [area, setArea] = useState("Matemática")
   const [grado, setGrado] = useState("")
   const [seccion, setSeccion] = useState("")
 
+  // Resetear grado y area al cambiar de nivel
+  const handleNivelChange = (nuevoNivel: string) => {
+    setNivel(nuevoNivel)
+    setGrado("")
+    const areas = areasPorNivel[nuevoNivel] || []
+    setArea(areas[0] || "Matemática")
+  }
+
   const ciclo = useMemo(() => {
-    const cicloMap: Record<string, string> = { "1": "VI", "2": "VI", "3": "VII", "4": "VII", "5": "VII" }
-    return cicloMap[grado] ?? ""
-  }, [grado])
+    const listaGrados = gradosPorNivel[nivel] || []
+    const gradoObj = listaGrados.find(g => g.id === grado)
+    return gradoObj ? gradoObj.ciclo : ""
+  }, [nivel, grado])
 
   const [competenciasSeleccionadas, setCompetenciasSeleccionadas] = useState<string[]>([])
   const [capacidadesSeleccionadas, setCapacidadesSeleccionadas] = useState<string[]>([])
@@ -516,6 +593,8 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
 
     try {
       runWebSocketSessionGeneration({
+        nivel,
+        area,
         tema,
         tituloSesion,
         nombreDocente,
@@ -543,11 +622,15 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
           datosGenerales: {
             docente: nombreDocente,
             fecha,
+            nivel,
+            area,
             grado,
             seccion,
             ciclo,
             titulo: tituloSesion,
           },
+          nivel,
+          area,
           tema,
           titulo: tituloSesion,
           tituloSesion,
@@ -580,6 +663,8 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
   return {
     nombreDocente, setNombreDocente,
     fecha, setFecha,
+    nivel, setNivel, handleNivelChange,
+    area, setArea,
     grado, setGrado,
     seccion, setSeccion,
     ciclo,
@@ -745,6 +830,8 @@ function ProgressModal({ isGenerating, currentStep, progress }: Readonly<Progres
 
 interface SessionSidebarSummaryProps {
   readonly nombreDocente: string
+  readonly nivel: string
+  readonly area: string
   readonly grado: string
   readonly ciclo: string
   readonly tema: string
@@ -754,6 +841,8 @@ interface SessionSidebarSummaryProps {
 
 function SessionSidebarSummary({
   nombreDocente,
+  nivel,
+  area,
   grado,
   ciclo,
   tema,
@@ -761,6 +850,9 @@ function SessionSidebarSummary({
   formProgress
 }: Readonly<SessionSidebarSummaryProps>) {
   const { t } = useLanguage()
+  const nivelNombre = nivelesEducativos.find(n => n.id === nivel)?.name || nivel
+  const gradoObj = (gradosPorNivel[nivel] || []).find(g => g.id === grado)
+
   return (
     <div className="hidden lg:block lg:col-span-4 sticky top-24 space-y-6">
       <div className="mb-2">
@@ -782,11 +874,18 @@ function SessionSidebarSummary({
           </div>
 
           <div className="space-y-1">
+            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Nivel / Área</p>
+            <p className="text-sm font-medium text-slate-800">
+              {nivelNombre} • {area}
+            </p>
+          </div>
+
+          <div className="space-y-1">
             <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">{t("grade")}</p>
             <p className="text-sm font-medium text-slate-800">
-              {grado ? (
+              {gradoObj ? (
                 <span>
-                  {grado}º {t("grade").toLowerCase()} {ciclo && `(Ciclo ${ciclo})`}
+                  {gradoObj.label} {ciclo && `(Ciclo ${ciclo})`}
                 </span>
               ) : (
                 <span className="text-slate-300 italic">No especificado</span>
@@ -1064,6 +1163,8 @@ export function SessionGenerator(props: SessionGeneratorProps) {
   const {
     nombreDocente, setNombreDocente,
     fecha, setFecha,
+    nivel, setNivel, handleNivelChange,
+    area, setArea,
     grado, setGrado,
     seccion, setSeccion,
     ciclo,
@@ -1124,6 +1225,8 @@ export function SessionGenerator(props: SessionGeneratorProps) {
           {/* SIDEBAR - RESUMEN (Pegajoso en Desktop) */}
           <SessionSidebarSummary
             nombreDocente={nombreDocente}
+            nivel={nivel}
+            area={area}
             grado={grado}
             ciclo={ciclo}
             tema={tema}
@@ -1178,20 +1281,59 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                       />
                     </div>
 
+                    {/* SELECTOR DE NIVEL EDUCATIVO */}
+                    <div className="space-y-2">
+                      <Label htmlFor="nivel" className="text-sm font-semibold text-slate-700">
+                        Nivel Educativo <span className="text-red-500">*</span>
+                      </Label>
+                      <Select value={nivel} onValueChange={handleNivelChange}>
+                        <SelectTrigger className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm">
+                          <SelectValue placeholder="Selecciona Nivel..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border-slate-200 text-slate-900">
+                          {nivelesEducativos.map((n) => (
+                            <SelectItem key={n.id} value={n.id}>
+                              {n.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* SELECTOR DE ÁREA CURRICULAR */}
+                    <div className="space-y-2">
+                      <Label htmlFor="area" className="text-sm font-semibold text-slate-700">
+                        Área Curricular <span className="text-red-500">*</span>
+                      </Label>
+                      <Select value={area} onValueChange={setArea}>
+                        <SelectTrigger className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm">
+                          <SelectValue placeholder="Selecciona Área..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border-slate-200 text-slate-900">
+                          {(areasPorNivel[nivel] || []).map((a) => (
+                            <SelectItem key={a} value={a}>
+                              {a}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* SELECTOR DINÁMICO DE GRADO */}
                     <div className="space-y-2">
                       <Label htmlFor="grado" className="text-sm font-semibold text-slate-700">
-                        {t("gradoLabel")} <span className="text-red-500">*</span>
+                        {t("gradoLabel")} / Edad <span className="text-red-500">*</span>
                       </Label>
                       <Select value={grado} onValueChange={setGrado}>
                         <SelectTrigger className={`h-11 bg-white border-${showErrors && !grado ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm`}>
-                          <SelectValue placeholder={t("gradoLabel")} />
+                          <SelectValue placeholder="Selecciona Grado/Edad..." />
                         </SelectTrigger>
                         <SelectContent className="bg-white border-slate-200 text-slate-900">
-                          <SelectItem value="1">1º Secundaria</SelectItem>
-                          <SelectItem value="2">2º Secundaria</SelectItem>
-                          <SelectItem value="3">3º Secundaria</SelectItem>
-                          <SelectItem value="4">4º Secundaria</SelectItem>
-                          <SelectItem value="5">5º Secundaria</SelectItem>
+                          {(gradosPorNivel[nivel] || []).map((g) => (
+                            <SelectItem key={g.id} value={g.id}>
+                              {g.label}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       {showErrors && !grado && <p className="text-xs text-red-500 font-medium">Selecciona un grado</p>}
