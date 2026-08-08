@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { 
   Check, 
@@ -46,18 +46,38 @@ export function SubscriptionsSection({
   const [cardToken, setCardToken] = useState("TEST_CARD_TOKEN_992182")
   const [paymentStatus, setPaymentStatus] = useState<"authorized" | "processed" | "waiting for gateway" | "recycling">("authorized")
 
+  const [currentUser, setCurrentUser] = useState<{ name: string; email: string } | null>(user || null)
+
+  useEffect(() => {
+    if (user) {
+      setCurrentUser(user)
+    } else {
+      try {
+        const saved = localStorage.getItem("user")
+        if (saved) {
+          setCurrentUser(JSON.parse(saved))
+        }
+      } catch (e) {
+        console.error("Error restaurando usuario en suscripciones:", e)
+      }
+    }
+  }, [user])
+
   const handleRealCheckout = () => {
-    if (!user) {
+    const effectiveUser = user || currentUser
+    if (!effectiveUser) {
       toast.error("Debes iniciar sesión para suscribirte", {
         description: "Inicia sesión con tu cuenta de Google para vincular tu suscripción."
       })
       if (onLoginRequired) {
         onLoginRequired()
+      } else {
+        window.location.href = "/?view=generator"
       }
       return
     }
     const baseUrl = process.env.NEXT_PUBLIC_PAYMENTS_API_URL || "https://api.sesionmas.online/payments"
-    const checkoutUrl = `${baseUrl}/checkout/${billingCycle}?email=${encodeURIComponent(user.email)}`
+    const checkoutUrl = `${baseUrl}/checkout/${billingCycle}?email=${encodeURIComponent(effectiveUser.email)}`
     
     toast.loading("Redirigiendo a la pasarela segura de Mercado Pago...")
     window.location.href = checkoutUrl
