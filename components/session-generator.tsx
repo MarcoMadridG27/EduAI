@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Input } from "@/components/ui/input"
@@ -973,17 +973,19 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
   // ESTADOS DEL COPILOTO CURRICULAR
   const [copilotData, setCopilotData] = useState<CopilotResponse | null>(null)
   const [isAnalyzingCopilot, setIsAnalyzingCopilot] = useState(false)
+  const lastRequestId = useRef(0)
 
-  const analizarTemaCopiloto = async (temaInput: string) => {
-    if (!temaInput || temaInput.trim().length < 3) {
+  const analizarTemaCopiloto = useCallback(async (temaInput: string) => {
+    if (!temaInput || temaInput.trim().length < 3 || !nivel || !area) {
       setCopilotData(null)
       return
     }
+
+    const requestId = ++lastRequestId.current
     setIsAnalyzingCopilot(true)
     try {
       const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL || "https://api.sesionmas.online/core/webhook"
       // Derivar la base del core desde NEXT_PUBLIC_WEBHOOK_URL
-      // ej: https://api.sesionmas.online/core/webhook -> https://api.sesionmas.online/core
       const coreBase = webhookUrl.replace(/\/webhook.*$/, "").replace(/\/$/, "")
       const endpoint = `${coreBase}/recommend-curriculum`
 
@@ -998,6 +1000,10 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
           tema: temaInput
         })
       })
+
+      // Guard de condición de carrera: si se disparó otra petición más reciente, ignorar este resultado
+      if (requestId !== lastRequestId.current) return
+
       if (res.ok) {
         const data: CopilotResponse = await res.json()
         setCopilotData(data)
@@ -1006,12 +1012,28 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
         setCopilotData(null)
       }
     } catch (e) {
-      console.error("Error conectando a backend RAG:", e)
-      setCopilotData(null)
+      if (requestId === lastRequestId.current) {
+        console.error("Error conectando a backend RAG:", e)
+        setCopilotData(null)
+      }
     } finally {
-      setIsAnalyzingCopilot(false)
+      if (requestId === lastRequestId.current) {
+        setIsAnalyzingCopilot(false)
+      }
     }
-  }
+  }, [nivel, grado, area, competenciasSeleccionadas])
+
+  // Análisis automático con debounce cuando el tema, nivel o área cambien
+  useEffect(() => {
+    if (!tema || tema.trim().length < 3 || !nivel || !area) {
+      setCopilotData(null)
+      return
+    }
+    const timer = setTimeout(() => {
+      analizarTemaCopiloto(tema)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [tema, nivel, area, analizarTemaCopiloto])
 
   const aplicarSugerenciaCopiloto = (sug: SugerenciaCopiloto) => {
     setArea(sug.area)
@@ -2129,15 +2151,7 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                           placeholder={t("temaPlaceholder")}
                           value={tema}
                           disabled={!nivel || !area}
-                          onChange={(e) => {
-                            const val = e.target.value
-                            setTema(val)
-                            if (val.trim().length >= 4) {
-                              analizarTemaCopiloto(val)
-                            } else {
-                              descartarSugerenciaCopiloto()
-                            }
-                          }}
+                          onChange={(e) => setTema(e.target.value)}
                           className={`h-11 bg-white border-${showErrors && !tema ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm`}
                         />
                       )}
