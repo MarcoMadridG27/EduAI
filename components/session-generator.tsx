@@ -734,7 +734,9 @@ function handleWebSocketMessage(event: MessageEvent, config: WebSocketMessageCon
     } else if (data.status === 'error') {
       clearInterval(config.intervalId)
       config.setIsGenerating(false)
-      alert("Error de IA: " + (data.message || "desconocido"))
+      toast.error("Filtro de Contenido / Seguridad", {
+        description: data.message || "Error al procesar la sesión."
+      })
       config.socket.close()
     }
   } catch (e) {
