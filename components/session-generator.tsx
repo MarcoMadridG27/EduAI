@@ -2260,29 +2260,34 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                     <h3 className="text-lg font-bold text-slate-800">5. {t("context")} & {t("duration")}</h3>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-2">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                    {/* Campo 1: Contexto Sociocultural (6 cols en desktop para dar espacio suficiente al texto largo) */}
+                    <div className="space-y-2 lg:col-span-6">
                       <Label htmlFor="contexto" className="text-sm font-semibold text-slate-700">
                         {t("contextoLabel")} <span className="text-red-500">*</span>
                       </Label>
                       <Select value={contexto} onValueChange={setContexto}>
-                        <SelectTrigger className={`h-11 bg-white border-${showErrors && !contexto ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm`}>
-                          <SelectValue placeholder="Selecciona..." />
+                        <SelectTrigger className={`h-11 w-full bg-white border-${showErrors && !contexto ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm text-sm font-medium rounded-xl`}>
+                          <SelectValue placeholder="Selecciona el contexto..." />
                         </SelectTrigger>
-                        <SelectContent className="bg-white border-slate-200 text-slate-900">
+                        <SelectContent className="bg-white border-slate-200 text-slate-900 z-50">
                           {contextosLocales.map((ctx) => (
-                            <SelectItem key={ctx} value={ctx}>{ctx}</SelectItem>
+                            <SelectItem key={ctx} value={ctx} className="py-2.5 text-sm">{ctx}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      <p className="text-[11px] text-slate-500">
+                        La IA adaptará las situaciones significativas y materiales al entorno real.
+                      </p>
                       {showErrors && !contexto && <p className="text-xs text-red-500 font-medium">Selecciona el contexto social</p>}
                     </div>
 
-                    <div className="space-y-2">
+                    {/* Campo 2: Horas pedagógicas (3 cols en desktop) */}
+                    <div className="space-y-2 lg:col-span-3">
                       <Label htmlFor="horas" className="text-sm font-semibold text-slate-700">
                         {t("horasLabel")} <span className="text-red-500">*</span>
                       </Label>
-                      <div className="flex items-center gap-3">
+                      <div className="space-y-1.5">
                         <Input
                           id="horas"
                           type="number"
@@ -2290,26 +2295,25 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                           max="8"
                           value={horasClase}
                           onChange={(e) => setHorasClase(Number.parseInt(e.target.value) || 1)}
-                          className="w-20 h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 text-center font-bold shadow-sm"
+                          className="h-11 w-full bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 text-center font-bold shadow-sm rounded-xl"
                         />
-                        <div className="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-lg flex-1">
-                          <span className="text-sm text-slate-700 font-medium flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-slate-400" />
-                            {horasClase === 1 ? "1 hora = 45 min" : `${horasClase} horas = ${horasClase * 45} min`}
-                          </span>
+                        <div className="bg-indigo-50/80 border border-indigo-100 px-3 py-1.5 rounded-lg flex items-center justify-center gap-1.5 text-xs text-indigo-800 font-semibold">
+                          <Clock className="h-3.5 w-3.5 text-indigo-600 shrink-0" />
+                          <span>{horasClase === 1 ? "1 hora (45 min)" : `${horasClase} horas (${horasClase * 45} min)`}</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    {/* Campo 3: Idioma de la Sesión (3 cols en desktop) */}
+                    <div className="space-y-2 lg:col-span-3">
                       <Label htmlFor="idiomaGeneracion" className="text-sm font-semibold text-slate-700">
                         {t("idiomaLabel")} <span className="text-red-500">*</span>
                       </Label>
                       <Select value={idiomaGeneracion} onValueChange={setIdiomaGeneracion}>
-                        <SelectTrigger className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm font-semibold">
+                        <SelectTrigger className="h-11 w-full bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm font-semibold rounded-xl">
                           <SelectValue placeholder="Selecciona..." />
                         </SelectTrigger>
-                        <SelectContent className="bg-white border-slate-200 text-slate-900">
+                        <SelectContent className="bg-white border-slate-200 text-slate-900 z-50">
                           <SelectItem value="español">
                             <span className="flex items-center gap-2">
                               <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-red-500 via-yellow-400 to-red-500" />
@@ -2336,6 +2340,9 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                           </SelectItem>
                         </SelectContent>
                       </Select>
+                      <p className="text-[11px] text-slate-500">
+                        Idioma oficial del entregable.
+                      </p>
                     </div>
                   </div>
                 </section>
