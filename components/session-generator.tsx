@@ -57,44 +57,560 @@ const gradosPorNivel: Record<string, { id: string; label: string; ciclo: string 
   ]
 }
 
-const areasPorNivel: Record<string, string[]> = {
-  inicial: [
-    "Matemática",
-    "Comunicación",
-    "Personal Social",
-    "Psicomotricidad",
-    "Ciencia y Tecnología"
-  ],
-  primaria: [
-    "Matemática",
-    "Comunicación",
-    "Ciencia y Tecnología",
-    "Personal Social",
-    "Arte y Cultura",
-    "Educación Física",
-    "Educación Religiosa",
-    "Inglés"
-  ],
-  secundaria: [
-    "Matemática",
-    "Comunicación",
-    "Ciencia y Tecnología",
-    "Ciencias Sociales",
-    "Desarrollo Personal, Ciudadanía y Cívica",
-    "Educación Física",
-    "Arte y Cultura",
-    "Educación para el Trabajo",
-    "Inglés",
-    "Educación Religiosa"
-  ]
+export interface CompetenciaCneb {
+  name: string
+  capacidades: string[]
 }
 
-const competenciasData = [
-  { name: "Resuelve problemas de cantidad", icon: Calculator },
-  { name: "Resuelve problemas de regularidad, equivalencia y cambio", icon: LineChart },
-  { name: "Resuelve problemas de forma, movimiento y localización", icon: Ruler },
-  { name: "Resuelve problemas de gestión de datos e incertidumbre", icon: BarChart }
-]
+export const cnebEstructura: Record<string, Record<string, CompetenciaCneb[]>> = {
+  inicial: {
+    "Personal Social": [
+      {
+        name: "Construye su identidad",
+        capacidades: [
+          "Se valora a sí mismo",
+          "Autorregula sus emociones"
+        ]
+      },
+      {
+        name: "Convive y participa democráticamente en la búsqueda del bien común",
+        capacidades: [
+          "Interactúa con todas las personas",
+          "Construye normas, y asume acuerdos y leyes",
+          "Participa en acciones que promueven el bienestar común"
+        ]
+      },
+      {
+        name: "Construye su identidad, como persona humana, amada por Dios, digna, libre y trascendente",
+        capacidades: [
+          "Conoce a Dios y asume su identidad religiosa y espiritual",
+          "Cultiva y valora las manifestaciones religiosas de su entorno"
+        ]
+      }
+    ],
+    "Psicomotricidad": [
+      {
+        name: "Se desenvuelve de manera autónoma a través de su motricidad",
+        capacidades: [
+          "Comprende su cuerpo",
+          "Se expresa corporalmente"
+        ]
+      }
+    ],
+    "Comunicación": [
+      {
+        name: "Se comunica oralmente en su lengua materna",
+        capacidades: [
+          "Obtiene información del texto oral",
+          "Infiere e interpreta información del texto oral",
+          "Adecúa, organiza y desarrolla el texto de forma coherente y cohesionada",
+          "Utiliza recursos no verbales y paraverbales de forma estratégica",
+          "Interactúa estratégicamente con distintos interlocutores",
+          "Reflexiona y evalúa la forma, el contenido y contexto del texto oral"
+        ]
+      },
+      {
+        name: "Lee diversos tipos de textos escritos en su lengua materna",
+        capacidades: [
+          "Obtiene información del texto escrito",
+          "Infiere e interpreta información del texto",
+          "Reflexiona y evalúa la forma, el contenido y contexto del texto"
+        ]
+      },
+      {
+        name: "Crea proyectos desde los lenguajes artísticos",
+        capacidades: [
+          "Explora y experimenta los lenguajes del arte",
+          "Aplica procesos creativos",
+          "Socializa sus procesos y proyectos"
+        ]
+      }
+    ],
+    "Descubrimiento del Mundo": [
+      {
+        name: "Indaga mediante métodos científicos para construir sus conocimientos",
+        capacidades: [
+          "Problematiza situaciones para hacer indagación",
+          "Diseña estrategias para hacer indagación",
+          "Genera y registra datos o información",
+          "Analiza datos e información",
+          "Evalúa y comunica el proceso y resultado de su indagación"
+        ]
+      }
+    ],
+    "Matemática": [
+      {
+        name: "Resuelve problemas de cantidad",
+        capacidades: [
+          "Traduce cantidades a expresiones numéricas",
+          "Comunica su comprensión sobre los números y las operaciones",
+          "Usa estrategias y procedimientos de estimación y cálculo"
+        ]
+      },
+      {
+        name: "Resuelve problemas de forma, movimiento y localización",
+        capacidades: [
+          "Modela objetos con formas geométricas y sus transformaciones",
+          "Comunica su comprensión sobre las formas y relaciones geométricas",
+          "Usa estrategias y procedimientos para orientarse en el espacio"
+        ]
+      }
+    ],
+    "Ciencia y Tecnología": [
+      {
+        name: "Indaga mediante métodos científicos para construir sus conocimientos",
+        capacidades: [
+          "Problematiza situaciones para hacer indagación",
+          "Diseña estrategias para hacer indagación",
+          "Genera y registra datos o información",
+          "Analiza datos e información",
+          "Evalúa y comunica el proceso y resultado de su indagación"
+        ]
+      }
+    ]
+  },
+  primaria: {
+    "Personal Social": [
+      {
+        name: "Construye su identidad",
+        capacidades: [
+          "Se valora a sí mismo",
+          "Autorregula sus emociones",
+          "Reflexiona y argumenta éticamente",
+          "Vive su sexualidad de manera integral y responsable"
+        ]
+      },
+      {
+        name: "Convive y participa democráticamente en la búsqueda del bien común",
+        capacidades: [
+          "Interactúa con todas las personas",
+          "Construye normas y asume acuerdos y leyes",
+          "Maneja conflictos de manera constructiva",
+          "Delibera sobre asuntos públicos",
+          "Participa en acciones que promueven el bienestar común"
+        ]
+      },
+      {
+        name: "Construye interpretaciones históricas",
+        capacidades: [
+          "Interpreta críticamente fuentes diversas",
+          "Comprende el tiempo histórico",
+          "Elabora explicaciones sobre procesos históricos"
+        ]
+      },
+      {
+        name: "Gestiona responsablemente el espacio y el ambiente",
+        capacidades: [
+          "Comprende las relaciones entre los elementos naturales y sociales",
+          "Maneja fuentes de información para comprender el espacio geográfico y el ambiente",
+          "Genera acciones para conservar el ambiente local y global"
+        ]
+      },
+      {
+        name: "Gestiona responsablemente los recursos económicos",
+        capacidades: [
+          "Comprende las relaciones entre los elementos del sistema económico y financiero",
+          "Toma decisiones económicas y financieras"
+        ]
+      }
+    ],
+    "Educación Física": [
+      {
+        name: "Se desenvuelve de manera autónoma a través de su motricidad",
+        capacidades: [
+          "Comprende su cuerpo",
+          "Se expresa corporalmente"
+        ]
+      },
+      {
+        name: "Asume una vida saludable",
+        capacidades: [
+          "Comprende las relaciones entre la actividad física, alimentación, postura e higiene personal y del ambiente, y la salud",
+          "Incorpora prácticas que mejoran su calidad de vida"
+        ]
+      },
+      {
+        name: "Interactúa a través de sus habilidades sociomotrices",
+        capacidades: [
+          "Se relaciona utilizando sus habilidades sociomotrices",
+          "Crea y aplica estrategias y tácticas de juego"
+        ]
+      }
+    ],
+    "Arte y Cultura": [
+      {
+        name: "Aprecia de manera crítica manifestaciones artístico-culturales",
+        capacidades: [
+          "Percibe manifestaciones artístico-culturales",
+          "Contextualiza manifestaciones artístico-culturales",
+          "Reflexiona creativa y críticamente sobre manifestaciones artístico-culturales"
+        ]
+      },
+      {
+        name: "Crea proyectos desde los lenguajes artísticos",
+        capacidades: [
+          "Explora y experimenta los lenguajes artísticos",
+          "Aplica procesos creativos",
+          "Evalúa y comunica sus procesos y proyectos"
+        ]
+      }
+    ],
+    "Comunicación": [
+      {
+        name: "Se comunica oralmente en su lengua materna",
+        capacidades: [
+          "Obtiene información del texto oral",
+          "Infiere e interpreta información del texto oral",
+          "Adecúa, organiza y desarrolla las ideas de forma coherente y cohesionada",
+          "Utiliza recursos no verbales y paraverbales de forma estratégica",
+          "Interactúa estratégicamente con distintos interlocutores",
+          "Reflexiona y evalúa la forma, el contenido y contexto del texto oral"
+        ]
+      },
+      {
+        name: "Lee diversos tipos de textos escritos en su lengua materna",
+        capacidades: [
+          "Obtiene información del texto escrito",
+          "Infiere e interpreta información del texto",
+          "Reflexiona y evalúa la forma, el contenido y contexto del texto"
+        ]
+      },
+      {
+        name: "Escribe diversos tipos de textos en su lengua materna",
+        capacidades: [
+          "Adecúa el texto a la situación comunicativa",
+          "Organiza y desarrolla las ideas de forma coherente y cohesionada",
+          "Utiliza convenciones del lenguaje escrito de forma pertinente",
+          "Reflexiona y evalúa la forma, el contenido y contexto del texto escrito"
+        ]
+      }
+    ],
+    "Matemática": [
+      {
+        name: "Resuelve problemas de cantidad",
+        capacidades: [
+          "Traduce cantidades a expresiones numéricas",
+          "Comunica su comprensión sobre los números y las operaciones",
+          "Usa estrategias y procedimientos de estimación y cálculo",
+          "Argumenta afirmaciones sobre las relaciones numéricas y las operaciones"
+        ]
+      },
+      {
+        name: "Resuelve problemas de regularidad, equivalencia y cambio",
+        capacidades: [
+          "Traduce datos y condiciones a expresiones algebraicas y gráficas",
+          "Comunica su comprensión sobre las relaciones algebraicas",
+          "Usa estrategias y procedimientos para encontrar equivalencias y reglas generales",
+          "Argumenta afirmaciones sobre relaciones de cambio y equivalencia"
+        ]
+      },
+      {
+        name: "Resuelve problemas de forma, movimiento y localización",
+        capacidades: [
+          "Modela objetos con formas geométricas y sus transformaciones",
+          "Comunica su comprensión sobre las formas y relaciones geométricas",
+          "Usa estrategias y procedimientos para orientarse en el espacio",
+          "Argumenta afirmaciones sobre relaciones geométricas"
+        ]
+      },
+      {
+        name: "Resuelve problemas de gestión de datos e incertidumbre",
+        capacidades: [
+          "Representa datos con gráficos y medidas estadísticas o probabilísticas",
+          "Comunica su comprensión de los conceptos estadísticos y probabilísticos",
+          "Usa estrategias y procedimientos para recopilar y procesar datos",
+          "Sustenta conclusiones o decisiones con base en la información obtenida"
+        ]
+      }
+    ],
+    "Ciencia y Tecnología": [
+      {
+        name: "Indaga mediante métodos científicos para construir sus conocimientos",
+        capacidades: [
+          "Problematiza situaciones para hacer indagación",
+          "Diseña estrategias para hacer indagación",
+          "Genera y registra datos e información",
+          "Analiza datos e información",
+          "Evalúa y comunica el proceso y resultados de su indagación"
+        ]
+      },
+      {
+        name: "Explica el mundo físico basándose en conocimientos sobre los seres vivos, materia y energía, biodiversidad, Tierra y universo",
+        capacidades: [
+          "Comprende y usa conocimientos sobre los seres vivos, materia y energía, biodiversidad, Tierra y universo",
+          "Evalúa las implicancias del saber y del quehacer científico y tecnológico"
+        ]
+      },
+      {
+        name: "Diseña y construye soluciones tecnológicas para resolver problemas de su entorno",
+        capacidades: [
+          "Determina una alternativa de solución tecnológica",
+          "Diseña la alternativa de solución tecnológica",
+          "Implementa y valida la alternativa de solución tecnológica",
+          "Evalúa y comunica el funcionamiento y los impactos de su alternativa de solución tecnológica"
+        ]
+      }
+    ],
+    "Educación Religiosa": [
+      {
+        name: "Construye su identidad como persona humana, amada por Dios, digna, libre y trascendente",
+        capacidades: [
+          "Conoce a Dios y asume su identidad religiosa y espiritual como persona digna, libre y trascendente",
+          "Cultiva y valora las manifestaciones religiosas de su entorno argumentando su fe de manera comprensible y respetuosa"
+        ]
+      },
+      {
+        name: "Asume la experiencia del encuentro personal y comunitario con Dios en su proyecto de vida",
+        capacidades: [
+          "Transforma su entorno desde el encuentro personal y comunitario con Dios y desde la fe que profesa",
+          "Actúa coherentemente en razón de su fe según los principios de su conciencia moral en situaciones concretas de la vida"
+        ]
+      }
+    ]
+  },
+  secundaria: {
+    "Desarrollo Personal, Ciudadanía y Cívica": [
+      {
+        name: "Construye su identidad",
+        capacidades: [
+          "Se valora a sí mismo",
+          "Autorregula sus emociones",
+          "Reflexiona y argumenta éticamente",
+          "Vive su sexualidad de manera integral y responsable de acuerdo a su etapa de desarrollo y madurez"
+        ]
+      },
+      {
+        name: "Convive y participa democráticamente en la búsqueda del bien común",
+        capacidades: [
+          "Interactúa con todas las personas",
+          "Construye normas y asume acuerdos y leyes",
+          "Maneja conflictos de manera constructiva",
+          "Delibera sobre asuntos públicos",
+          "Participa en acciones que promueven el bienestar común"
+        ]
+      }
+    ],
+    "Ciencias Sociales": [
+      {
+        name: "Construye interpretaciones históricas",
+        capacidades: [
+          "Interpreta críticamente fuentes diversas",
+          "Comprende el tiempo histórico",
+          "Elabora explicaciones sobre procesos históricos"
+        ]
+      },
+      {
+        name: "Gestiona responsablemente el espacio y el ambiente",
+        capacidades: [
+          "Comprende las relaciones entre los elementos naturales y sociales",
+          "Maneja fuentes de información para comprender el espacio geográfico y el ambiente",
+          "Genera acciones para conservar el ambiente local y global"
+        ]
+      },
+      {
+        name: "Gestiona responsablemente los recursos económicos",
+        capacidades: [
+          "Comprende las relaciones entre los elementos del sistema económico y financiero",
+          "Toma decisiones económicas y financieras"
+        ]
+      }
+    ],
+    "Educación Física": [
+      {
+        name: "Se desenvuelve de manera autónoma a través de su motricidad",
+        capacidades: [
+          "Comprende su cuerpo",
+          "Se expresa corporalmente"
+        ]
+      },
+      {
+        name: "Asume una vida saludable",
+        capacidades: [
+          "Comprende las relaciones entre la actividad física, alimentación, postura e higiene personal y del ambiente, y la salud",
+          "Incorpora prácticas que mejoran su calidad de vida"
+        ]
+      },
+      {
+        name: "Interactúa a través de sus habilidades sociomotrices",
+        capacidades: [
+          "Se relaciona utilizando sus habilidades sociomotrices",
+          "Crea y aplica estrategias y tácticas de juego"
+        ]
+      }
+    ],
+    "Arte y Cultura": [
+      {
+        name: "Aprecia de manera crítica manifestaciones artístico-culturales",
+        capacidades: [
+          "Percibe manifestaciones artístico-culturales",
+          "Contextualiza manifestaciones artístico-culturales",
+          "Reflexiona creativa y críticamente sobre manifestaciones artístico-culturales"
+        ]
+      },
+      {
+        name: "Crea proyectos desde los lenguajes artísticos",
+        capacidades: [
+          "Explora y experimenta los lenguajes artísticos",
+          "Aplica procesos creativos",
+          "Evalúa y comunica sus procesos y proyectos"
+        ]
+      }
+    ],
+    "Comunicación": [
+      {
+        name: "Se comunica oralmente en su lengua materna",
+        capacidades: [
+          "Obtiene información del texto oral",
+          "Infiere e interpreta información del texto oral",
+          "Adecúa, organiza y desarrolla las ideas de forma coherente y cohesionada",
+          "Utiliza recursos no verbales y paraverbales de forma estratégica",
+          "Interactúa estratégicamente con distintos interlocutores",
+          "Reflexiona y evalúa la forma, el contenido y contexto del texto oral"
+        ]
+      },
+      {
+        name: "Lee diversos tipos de textos escritos en su lengua materna",
+        capacidades: [
+          "Obtiene información del texto escrito",
+          "Infiere e interpreta información del texto",
+          "Reflexiona y evalúa la forma, el contenido y contexto del texto"
+        ]
+      },
+      {
+        name: "Escribe diversos tipos de textos en su lengua materna",
+        capacidades: [
+          "Adecúa el texto a la situación comunicativa",
+          "Organiza y desarrolla las ideas de forma coherente y cohesionada",
+          "Utiliza convenciones del lenguaje escrito de forma pertinente",
+          "Reflexiona y evalúa la forma, el contenido y contexto del texto escrito"
+        ]
+      }
+    ],
+    "Inglés como Lengua Extranjera": [
+      {
+        name: "Se comunica oralmente en inglés como lengua extranjera",
+        capacidades: [
+          "Obtiene información del texto oral",
+          "Infiere e interpreta información del texto oral",
+          "Adecúa, organiza y desarrolla las ideas de forma coherente y cohesionada",
+          "Utiliza recursos no verbales y paraverbales de forma estratégica",
+          "Interactúa estratégicamente con distintos interlocutores",
+          "Reflexiona y evalúa la forma, el contenido y contexto del texto oral"
+        ]
+      },
+      {
+        name: "Lee diversos tipos de textos en inglés como lengua extranjera",
+        capacidades: [
+          "Obtiene información del texto escrito",
+          "Infiere e interpreta información del texto",
+          "Reflexiona y evalúa la forma, el contenido y contexto del texto"
+        ]
+      },
+      {
+        name: "Escribe diversos tipos de textos en inglés como lengua extranjera",
+        capacidades: [
+          "Adecúa el texto a la situación comunicativa",
+          "Organiza y desarrolla las ideas de forma coherente y cohesionada",
+          "Utiliza convenciones del lenguaje escrito de forma pertinente",
+          "Reflexiona y evalúa la forma, el contenido y contexto del texto escrito"
+        ]
+      }
+    ],
+    "Matemática": [
+      {
+        name: "Resuelve problemas de cantidad",
+        capacidades: [
+          "Traduce cantidades a expresiones numéricas",
+          "Comunica su comprensión sobre los números y las operaciones",
+          "Usa estrategias y procedimientos de estimación y cálculo",
+          "Argumenta afirmaciones sobre las relaciones numéricas y las operaciones"
+        ]
+      },
+      {
+        name: "Resuelve problemas de regularidad, equivalencia y cambio",
+        capacidades: [
+          "Traduce datos y condiciones a expresiones algebraicas y gráficas",
+          "Comunica su comprensión sobre las relaciones algebraicas",
+          "Usa estrategias y procedimientos para encontrar equivalencias y reglas generales",
+          "Argumenta afirmaciones sobre relaciones de cambio y equivalencia"
+        ]
+      },
+      {
+        name: "Resuelve problemas de forma, movimiento y localización",
+        capacidades: [
+          "Modela objetos con formas geométricas y sus transformaciones",
+          "Comunica su comprensión sobre las formas y relaciones geométricas",
+          "Usa estrategias y procedimientos para orientarse en el espacio",
+          "Argumenta afirmaciones sobre relaciones geométricas"
+        ]
+      },
+      {
+        name: "Resuelve problemas de gestión de datos e incertidumbre",
+        capacidades: [
+          "Representa datos con gráficos y medidas estadísticas o probabilísticas",
+          "Comunica su comprensión de los conceptos estadísticos y probabilísticos",
+          "Usa estrategias y procedimientos para recopilar y procesar datos",
+          "Sustenta conclusiones o decisiones con base en la información obtenida"
+        ]
+      }
+    ],
+    "Ciencia y Tecnología": [
+      {
+        name: "Indaga mediante métodos científicos para construir sus conocimientos",
+        capacidades: [
+          "Problematiza situaciones para hacer indagación",
+          "Diseña estrategias para hacer indagación",
+          "Genera y registra datos e información",
+          "Analiza datos e información",
+          "Evalúa y comunica el proceso y resultados de su indagación"
+        ]
+      },
+      {
+        name: "Explica el mundo físico basándose en conocimientos sobre los seres vivos, materia y energía, biodiversidad, Tierra y universo",
+        capacidades: [
+          "Comprende y usa conocimientos sobre los seres vivos, materia y energía, biodiversidad, Tierra y universo",
+          "Evalúa las implicancias del saber y del quehacer científico y tecnológico"
+        ]
+      },
+      {
+        name: "Diseña y construye soluciones tecnológicas para resolver problemas de su entorno",
+        capacidades: [
+          "Determina una alternativa de solución tecnológica",
+          "Diseña la alternativa de solución tecnológica",
+          "Implementa y valida la alternativa de solución tecnológica",
+          "Evalúa y comunica el funcionamiento y los impactos de su alternativa de solución tecnológica"
+        ]
+      }
+    ],
+    "Educación para el Trabajo": [
+      {
+        name: "Gestiona proyectos de emprendimiento económico o social",
+        capacidades: [
+          "Crea propuestas de valor",
+          "Aplica habilidades técnicas",
+          "Trabaja cooperativamente para lograr objetivos y metas",
+          "Evalúa los resultados del proyecto de emprendimiento"
+        ]
+      }
+    ],
+    "Educación Religiosa": [
+      {
+        name: "Construye su identidad como persona humana, amada por Dios, digna, libre y trascendente",
+        capacidades: [
+          "Conoce a Dios y asume su identidad religiosa y espiritual como persona digna, libre y trascendente",
+          "Cultiva y valora las manifestaciones religiosas de su entorno argumentando su fe de manera comprensible y respetuosa"
+        ]
+      },
+      {
+        name: "Asume la experiencia del encuentro personal y comunitario con Dios en su proyecto de vida",
+        capacidades: [
+          "Transforma su entorno desde el encuentro personal y comunitario con Dios y desde la fe que profesa",
+          "Actúa coherentemente en razón de su fe según los principios de su conciencia moral en situaciones concretas de la vida"
+        ]
+      }
+    ]
+  }
+}
 
 const capacidadesPorCompetencia: Record<string, string[]> = {
   "Resuelve problemas de cantidad": [
@@ -407,12 +923,24 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
   const [grado, setGrado] = useState("")
   const [seccion, setSeccion] = useState("")
 
-  // Resetear grado y area al cambiar de nivel
+  // Resetear grado, area, competencias y capacidades al cambiar de nivel
   const handleNivelChange = (nuevoNivel: string) => {
     setNivel(nuevoNivel)
     setGrado("")
-    const areas = areasPorNivel[nuevoNivel] || []
-    setArea(areas[0] || "Matemática")
+    const areas = Object.keys(cnebEstructura[nuevoNivel] || {})
+    const primeraArea = areas[0] || "Matemática"
+    setArea(primeraArea)
+    setCompetenciasSeleccionadas([])
+    setCapacidadesSeleccionadas([])
+    setCompetenciaExpandida(null)
+  }
+
+  // Resetear competencias y capacidades al cambiar de área
+  const handleAreaChange = (nuevaArea: string) => {
+    setArea(nuevaArea)
+    setCompetenciasSeleccionadas([])
+    setCapacidadesSeleccionadas([])
+    setCompetenciaExpandida(null)
   }
 
   const ciclo = useMemo(() => {
@@ -660,11 +1188,16 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     contexto
   )
 
+  const competenciasDelArea = useMemo(() => {
+    return cnebEstructura[nivel]?.[area] || []
+  }, [nivel, area])
+
   return {
     nombreDocente, setNombreDocente,
     fecha, setFecha,
     nivel, setNivel, handleNivelChange,
-    area, setArea,
+    area, setArea, handleAreaChange,
+    competenciasDelArea,
     grado, setGrado,
     seccion, setSeccion,
     ciclo,
@@ -932,6 +1465,8 @@ function SessionSidebarSummary({
 }
 
 interface CompetenciasSectionProps {
+  readonly area: string
+  readonly competenciasDelArea: readonly CompetenciaCneb[]
   readonly showErrors: boolean
   readonly competenciasSeleccionadas: readonly string[]
   readonly competenciaExpandida: string | null
@@ -944,6 +1479,8 @@ interface CompetenciasSectionProps {
 }
 
 function CompetenciasSection({
+  area,
+  competenciasDelArea,
   showErrors,
   competenciasSeleccionadas,
   competenciaExpandida,
@@ -961,21 +1498,20 @@ function CompetenciasSection({
           <div className="bg-blue-100 p-1.5 rounded-md">
             <Target className="h-5 w-5 text-blue-600" />
           </div>
-          <h3 className="text-lg font-bold text-slate-800">2. Competencias y Capacidades</h3>
+          <h3 className="text-lg font-bold text-slate-800">2. Competencias y Capacidades ({area})</h3>
         </div>
       </div>
 
       <div className="space-y-4">
         <Label className="text-sm font-semibold text-slate-700">
-          Competencias del CNEB <span className="text-red-500">*</span>
+          Competencias CNEB del Área de <span className="text-blue-600 font-bold">{area}</span> <span className="text-red-500">*</span>
         </Label>
 
         <div className="grid grid-cols-1 gap-3">
-          {competenciasData.map((comp) => {
-            const Icon = comp.icon
+          {competenciasDelArea.map((comp) => {
             const isSelected = competenciasSeleccionadas.includes(comp.name)
             const isExpanded = competenciaExpandida === comp.name
-            const capacidades = capacidadesPorCompetencia[comp.name] || []
+            const capacidades = comp.capacidades
             return (
               <div key={comp.name}>
                 {/* Tarjeta de Competencia */}
@@ -998,10 +1534,10 @@ function CompetenciasSection({
                     }}
                   >
                     <div className={`p-2.5 rounded-lg mr-4 ${isSelected ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "bg-slate-100 text-slate-500"}`}>
-                      <Icon className="h-5 w-5" />
+                      <BookOpen className="h-5 w-5" />
                     </div>
                     <div className={`font-semibold text-sm ${isSelected ? "text-blue-900" : "text-slate-700"}`}>
-                        {comp.name}
+                      {comp.name}
                     </div>
                   </button>
 
@@ -1041,7 +1577,7 @@ function CompetenciasSection({
                 {isSelected && isExpanded && (
                   <div className="mt-2 ml-4 p-4 bg-slate-50 border border-slate-200 rounded-xl animate-in slide-in-from-top-2">
                     <p className="text-xs text-slate-600 font-semibold mb-3 flex items-center gap-1.5 uppercase tracking-wide">
-                      Selecciona las capacidades:
+                      Capacidades oficiales asociadas:
                     </p>
                     <div className="flex flex-col gap-2">
                       {capacidades.map((capacidad) => {
@@ -1085,7 +1621,7 @@ function CompetenciasSection({
           })}
         </div>
         {showErrors && competenciasSeleccionadas.length === 0 && (
-          <p className="text-xs text-red-500 font-medium">Selecciona al menos una competencia</p>
+          <p className="text-xs text-red-500 font-medium">Selecciona al menos una competencia de {area}</p>
         )}
       </div>
     </section>
@@ -1164,7 +1700,8 @@ export function SessionGenerator(props: SessionGeneratorProps) {
     nombreDocente, setNombreDocente,
     fecha, setFecha,
     nivel, setNivel, handleNivelChange,
-    area, setArea,
+    area, setArea, handleAreaChange,
+    competenciasDelArea,
     grado, setGrado,
     seccion, setSeccion,
     ciclo,
@@ -1198,6 +1735,8 @@ export function SessionGenerator(props: SessionGeneratorProps) {
     idiomaGeneracion,
     setIdiomaGeneracion
   } = useSessionGeneratorState(props)
+
+  const areasDisponibles = Object.keys(cnebEstructura[nivel] || {})
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 relative font-sans">
@@ -1305,12 +1844,12 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                       <Label htmlFor="area" className="text-sm font-semibold text-slate-700">
                         Área Curricular <span className="text-red-500">*</span>
                       </Label>
-                      <Select value={area} onValueChange={setArea}>
+                      <Select value={area} onValueChange={handleAreaChange}>
                         <SelectTrigger className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm">
                           <SelectValue placeholder="Selecciona Área..." />
                         </SelectTrigger>
                         <SelectContent className="bg-white border-slate-200 text-slate-900">
-                          {(areasPorNivel[nivel] || []).map((a) => (
+                          {areasDisponibles.map((a) => (
                             <SelectItem key={a} value={a}>
                               {a}
                             </SelectItem>
@@ -1361,6 +1900,8 @@ export function SessionGenerator(props: SessionGeneratorProps) {
 
                 {/* 2. COMPETENCIAS Y CAPACIDADES */}
                 <CompetenciasSection
+                  area={area}
+                  competenciasDelArea={competenciasDelArea}
                   showErrors={showErrors}
                   competenciasSeleccionadas={competenciasSeleccionadas}
                   competenciaExpandida={competenciaExpandida}
