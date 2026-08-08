@@ -987,6 +987,9 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
       const coreBase = webhookUrl.replace(/\/webhook.*$/, "").replace(/\/$/, "")
       const endpoint = `${coreBase}/recommend-curriculum`
 
+      console.log("[Copiloto RAG] webhookUrl:", webhookUrl)
+      console.log("[Copiloto RAG] endpoint:", endpoint)
+
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
