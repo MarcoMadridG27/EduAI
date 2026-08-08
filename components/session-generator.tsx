@@ -984,7 +984,8 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     setIsAnalyzingCopilot(true)
     try {
       const backendUrl = process.env.NEXT_PUBLIC_CORE_API_URL || "https://api.sesionmas.online"
-      const res = await fetch(`${backendUrl}/api/recommend-curriculum`, {
+      const endpoint = backendUrl.endsWith("/api") ? `${backendUrl}/recommend-curriculum` : `${backendUrl}/recommend-curriculum`
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -2086,28 +2087,13 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                   </div>
                 </section>
 
-                {/* 2. COMPETENCIAS Y CAPACIDADES */}
-                <CompetenciasSection
-                  area={area}
-                  competenciasDelArea={competenciasDelArea}
-                  showErrors={showErrors}
-                  competenciasSeleccionadas={competenciasSeleccionadas}
-                  competenciaExpandida={competenciaExpandida}
-                  capacidadesSeleccionadas={capacidadesSeleccionadas}
-                  toggleAccordion={toggleAccordion}
-                  addCompetencia={addCompetencia}
-                  removeCompetencia={removeCompetencia}
-                  addCapacidad={addCapacidad}
-                  removeCapacidad={removeCapacidad}
-                />
-
-                {/* 3. CONTENIDO DE LA SESIÓN CON COPILOTO RAG */}
+                {/* 2. TEMA Y CONTENIDO DE LA SESIÓN CON COPILOTO RAG */}
                 <section className="space-y-5 animate-in fade-in">
                   <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
                     <div className="bg-emerald-100 p-1.5 rounded-md">
                       <FileText className="h-5 w-5 text-emerald-600" />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-800">3. {t("theme")}</h3>
+                    <h3 className="text-lg font-bold text-slate-800">2. {t("theme")}</h3>
                   </div>
 
                   <div className="space-y-5">
@@ -2174,6 +2160,21 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                     </div>
                   </div>
                 </section>
+
+                {/* 3. COMPETENCIAS Y CAPACIDADES */}
+                <CompetenciasSection
+                  area={area}
+                  competenciasDelArea={competenciasDelArea}
+                  showErrors={showErrors}
+                  competenciasSeleccionadas={competenciasSeleccionadas}
+                  competenciaExpandida={competenciaExpandida}
+                  capacidadesSeleccionadas={capacidadesSeleccionadas}
+                  toggleAccordion={toggleAccordion}
+                  addCompetencia={addCompetencia}
+                  removeCompetencia={removeCompetencia}
+                  addCapacidad={addCapacidad}
+                  removeCapacidad={removeCapacidad}
+                />
 
                 {/* 4. ENFOQUES TRANSVERSALES */}
                 <section className="space-y-5 animate-in fade-in">
