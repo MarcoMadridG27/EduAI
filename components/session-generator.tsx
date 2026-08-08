@@ -981,7 +981,12 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     }
     setIsAnalyzingCopilot(true)
     try {
-      const endpoint = "https://api.sesionmas.online/core/recommend-curriculum"
+      const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL || ""
+      // Derivar la base del core desde NEXT_PUBLIC_WEBHOOK_URL
+      // ej: https://api.sesionmas.online/core/webhook -> https://api.sesionmas.online/core
+      const coreBase = webhookUrl.replace(/\/webhook.*$/, "").replace(/\/$/, "")
+      const endpoint = `${coreBase}/recommend-curriculum`
+
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -997,7 +1002,7 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
         const data: CopilotResponse = await res.json()
         setCopilotData(data)
       } else {
-        console.error("Error backend status:", res.status)
+        console.error("Error backend status:", res.status, "URL:", endpoint)
         setCopilotData(null)
       }
     } catch (e) {
