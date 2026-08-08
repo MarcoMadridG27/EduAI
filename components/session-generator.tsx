@@ -981,46 +981,27 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     }
     setIsAnalyzingCopilot(true)
     try {
-      const baseEnv = (process.env.NEXT_PUBLIC_CORE_API_URL || "https://api.sesionmas.online/core").replace(/\/+$/, "")
-      
-      // Probar URLs posibles del proxy Nginx
-      const candidateUrls = [
-        `${baseEnv}/recommend-curriculum`,
-        `https://api.sesionmas.online/api/core/recommend-curriculum`,
-        `https://api.sesionmas.online/core/recommend-curriculum`,
-        `https://api.sesionmas.online/recommend-curriculum`
-      ]
-
-      let successData: CopilotResponse | null = null
-      for (const url of candidateUrls) {
-        try {
-          const res = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              nivel,
-              grado,
-              area_seleccionada: area,
-              competencias_seleccionadas: competenciasSeleccionadas,
-              tema: temaInput
-            })
-          })
-          if (res.ok) {
-            successData = await res.json()
-            break
-          }
-        } catch (err) {
-          console.warn(`Falló fetch RAG a ${url}, intentando siguiente ruta...`)
-        }
-      }
-
-      if (successData) {
-        setCopilotData(successData)
+      const endpoint = "https://api.sesionmas.online/recommend-curriculum"
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nivel,
+          grado,
+          area_seleccionada: area,
+          competencias_seleccionadas: competenciasSeleccionadas,
+          tema: temaInput
+        })
+      })
+      if (res.ok) {
+        const data: CopilotResponse = await res.json()
+        setCopilotData(data)
       } else {
+        console.error("Error backend status:", res.status)
         setCopilotData(null)
       }
     } catch (e) {
-      console.warn("Copiloto RAG usando análisis local:", e)
+      console.error("Error conectando a backend RAG:", e)
       setCopilotData(null)
     } finally {
       setIsAnalyzingCopilot(false)
