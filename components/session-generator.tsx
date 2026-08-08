@@ -984,7 +984,7 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     setIsAnalyzingCopilot(true)
     try {
       const backendUrl = process.env.NEXT_PUBLIC_CORE_API_URL || "https://api.sesionmas.online"
-      const endpoint = backendUrl.endsWith("/api") ? `${backendUrl}/recommend-curriculum` : `${backendUrl}/recommend-curriculum`
+      const endpoint = `${backendUrl.replace(/\/+$/, "")}/api/core/recommend-curriculum`
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -2102,32 +2102,44 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                         <Label htmlFor="tema" className="text-sm font-semibold text-slate-700">
                           {t("temaLabel")} <span className="text-red-500">*</span>
                         </Label>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => analizarTemaCopiloto(tema)}
-                          className="text-xs text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 font-semibold h-7 px-2 flex items-center gap-1"
-                        >
-                          <Brain className="h-3.5 w-3.5" />
-                          Analizar con Copiloto RAG
-                        </Button>
+                        {nivel && area && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => analizarTemaCopiloto(tema)}
+                            className="text-xs text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 font-semibold h-7 px-2 flex items-center gap-1"
+                          >
+                            <Brain className="h-3.5 w-3.5" />
+                            Analizar con Copiloto RAG
+                          </Button>
+                        )}
                       </div>
-                      <Input
-                        id="tema"
-                        placeholder={t("temaPlaceholder")}
-                        value={tema}
-                        onChange={(e) => {
-                          const val = e.target.value
-                          setTema(val)
-                          if (val.trim().length >= 4) {
-                            analizarTemaCopiloto(val)
-                          } else {
-                            descartarSugerenciaCopiloto()
-                          }
-                        }}
-                        className={`h-11 bg-white border-${showErrors && !tema ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm`}
-                      />
+
+                      {(!nivel || !area) ? (
+                        <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/80 text-amber-800 text-xs font-semibold flex items-center gap-2">
+                          <BookOpen className="h-4 w-4 text-amber-600 shrink-0" />
+                          <span>Primero selecciona el <strong>Nivel Educativo</strong> y el <strong>Área Curricular</strong> arriba para ingresar el tema.</span>
+                        </div>
+                      ) : (
+                        <Input
+                          id="tema"
+                          placeholder={t("temaPlaceholder")}
+                          value={tema}
+                          disabled={!nivel || !area}
+                          onChange={(e) => {
+                            const val = e.target.value
+                            setTema(val)
+                            if (val.trim().length >= 4) {
+                              analizarTemaCopiloto(val)
+                            } else {
+                              descartarSugerenciaCopiloto()
+                            }
+                          }}
+                          className={`h-11 bg-white border-${showErrors && !tema ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm`}
+                        />
+                      )}
+                      
                       <p className="text-xs text-slate-500">
                         El tema o situación de aprendizaje. El Copiloto RAG analizará la alineación con el CNEB automáticamente.
                       </p>
