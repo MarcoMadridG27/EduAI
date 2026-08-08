@@ -981,24 +981,42 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     }
     setIsAnalyzingCopilot(true)
     try {
-      const base = (process.env.NEXT_PUBLIC_CORE_API_URL || "https://api.sesionmas.online").replace(/\/+$/, "")
-      const endpoint = base.includes("/api/core") ? `${base}/recommend-curriculum` : `${base}/api/core/recommend-curriculum`
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nivel,
-          grado,
-          area_seleccionada: area,
-          competencias_seleccionadas: competenciasSeleccionadas,
-          tema: temaInput
-        })
-      })
-      if (res.ok) {
-        const data: CopilotResponse = await res.json()
-        setCopilotData(data)
+      const baseEnv = (process.env.NEXT_PUBLIC_CORE_API_URL || "https://api.sesionmas.online/core").replace(/\/+$/, "")
+      
+      // Probar URLs posibles del proxy Nginx
+      const candidateUrls = [
+        `${baseEnv}/recommend-curriculum`,
+        `https://api.sesionmas.online/api/core/recommend-curriculum`,
+        `https://api.sesionmas.online/core/recommend-curriculum`,
+        `https://api.sesionmas.online/recommend-curriculum`
+      ]
+
+      let successData: CopilotResponse | null = null
+      for (const url of candidateUrls) {
+        try {
+          const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              nivel,
+              grado,
+              area_seleccionada: area,
+              competencias_seleccionadas: competenciasSeleccionadas,
+              tema: temaInput
+            })
+          })
+          if (res.ok) {
+            successData = await res.json()
+            break
+          }
+        } catch (err) {
+          console.warn(`Falló fetch RAG a ${url}, intentando siguiente ruta...`)
+        }
+      }
+
+      if (successData) {
+        setCopilotData(successData)
       } else {
-        // Fallback local defensivo
         setCopilotData(null)
       }
     } catch (e) {
