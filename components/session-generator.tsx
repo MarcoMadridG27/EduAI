@@ -958,7 +958,7 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
   const [competenciaTransversal, setCompetenciaTransversal] = useState("")
 
   const [contexto, setContexto] = useState("")
-  const [horasClase, setHorasClase] = useState<number>(1)
+  const [horasClase, setHorasClase] = useState<number | string>(1)
 
   const [materialesSeleccionados, setMaterialesSeleccionados] = useState<string[]>([])
   const [materialesNoEstructurados, setMaterialesNoEstructurados] = useState("")
@@ -1216,7 +1216,7 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
         competenciaTransversal,
         ciclo,
         contexto,
-        horasClase,
+        horasClase: Number(horasClase) || 1,
         materialesSeleccionados,
         materialesNoEstructurados,
         instrumentoEvaluacion,
@@ -1246,7 +1246,7 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
           competenciasSeleccionadas,
           capacidades: capacidadesSeleccionadas,
           contexto,
-          horasClase,
+          horasClase: Number(horasClase) || 1,
           enfoqueTransversal,
           competenciaTransversal,
           materialesDisponibles: materialesCombinados,
@@ -2238,12 +2238,14 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                     <div className="space-y-2">
                       <Label htmlFor="competenciaTransversal" className="text-sm font-semibold text-slate-700">{t("competenciaTransversalLabel")}</Label>
                       <Select value={competenciaTransversal} onValueChange={setCompetenciaTransversal}>
-                        <SelectTrigger className="h-11 bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm">
-                          <SelectValue placeholder="Selecciona..." />
+                        <SelectTrigger className="h-11 w-full bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm text-left [&>span]:line-clamp-1 [&>span]:truncate font-medium rounded-xl">
+                          <SelectValue placeholder="Selecciona..." className="truncate" />
                         </SelectTrigger>
-                        <SelectContent className="bg-white border-slate-200 text-slate-900">
+                        <SelectContent className="bg-white border-slate-200 text-slate-900 z-50 max-w-[90vw] md:max-w-md">
                           {competenciasTransversales.map((comp) => (
-                            <SelectItem key={comp} value={comp}>{comp}</SelectItem>
+                            <SelectItem key={comp} value={comp} className="py-2.5 text-xs whitespace-normal leading-snug">
+                              {comp}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -2282,7 +2284,7 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                       {showErrors && !contexto && <p className="text-xs text-red-500 font-medium">Selecciona el contexto social</p>}
                     </div>
 
-                    {/* Campo 2: Horas pedagógicas (3 cols en desktop) */}
+                    {/* Campo 2: Horas pedagógicas (3 cols en desktop, max 4) */}
                     <div className="space-y-2 lg:col-span-3">
                       <Label htmlFor="horas" className="text-sm font-semibold text-slate-700">
                         {t("horasLabel")} <span className="text-red-500">*</span>
@@ -2292,14 +2294,34 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                           id="horas"
                           type="number"
                           min="1"
-                          max="8"
+                          max="4"
                           value={horasClase}
-                          onChange={(e) => setHorasClase(Number.parseInt(e.target.value) || 1)}
+                          onChange={(e) => {
+                            const raw = e.target.value
+                            if (raw === "") {
+                              setHorasClase("")
+                              return
+                            }
+                            const val = Number.parseInt(raw, 10)
+                            if (!Number.isNaN(val)) {
+                              if (val > 4) setHorasClase(4)
+                              else if (val < 1) setHorasClase(1)
+                              else setHorasClase(val)
+                            }
+                          }}
+                          onBlur={() => {
+                            if (!horasClase || Number(horasClase) < 1) setHorasClase(1)
+                            if (Number(horasClase) > 4) setHorasClase(4)
+                          }}
                           className="h-11 w-full bg-white border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 text-center font-bold shadow-sm rounded-xl"
                         />
                         <div className="bg-indigo-50/80 border border-indigo-100 px-3 py-1.5 rounded-lg flex items-center justify-center gap-1.5 text-xs text-indigo-800 font-semibold">
                           <Clock className="h-3.5 w-3.5 text-indigo-600 shrink-0" />
-                          <span>{horasClase === 1 ? "1 hora (45 min)" : `${horasClase} horas (${horasClase * 45} min)`}</span>
+                          <span>
+                            {Number(horasClase) <= 1
+                              ? "1 hora (45 min)"
+                              : `${Number(horasClase)} horas (${Number(horasClase) * 45} min)`}
+                          </span>
                         </div>
                       </div>
                     </div>

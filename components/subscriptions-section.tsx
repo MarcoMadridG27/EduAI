@@ -23,13 +23,15 @@ interface SubscriptionsSectionProps {
   readonly onNavigateToGenerator?: () => void
   readonly onNavigateToRepo?: () => void
   readonly onBack?: () => void
+  readonly onLoginRequired?: () => void
 }
 
 export function SubscriptionsSection({
   user,
   onNavigateToGenerator,
   onNavigateToRepo,
-  onBack
+  onBack,
+  onLoginRequired
 }: SubscriptionsSectionProps) {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "quarterly" | "annual">("monthly")
   const [showCheckoutModal, setShowCheckoutModal] = useState(false)
@@ -45,8 +47,17 @@ export function SubscriptionsSection({
   const [paymentStatus, setPaymentStatus] = useState<"authorized" | "processed" | "waiting for gateway" | "recycling">("authorized")
 
   const handleRealCheckout = () => {
+    if (!user) {
+      toast.error("Debes iniciar sesión para suscribirte", {
+        description: "Inicia sesión con tu cuenta de Google para vincular tu suscripción."
+      })
+      if (onLoginRequired) {
+        onLoginRequired()
+      }
+      return
+    }
     const baseUrl = process.env.NEXT_PUBLIC_PAYMENTS_API_URL || "https://api.sesionmas.online/payments"
-    const checkoutUrl = `${baseUrl}/checkout/${billingCycle}`
+    const checkoutUrl = `${baseUrl}/checkout/${billingCycle}?email=${encodeURIComponent(user.email)}`
     
     toast.loading("Redirigiendo a la pasarela segura de Mercado Pago...")
     window.location.href = checkoutUrl
