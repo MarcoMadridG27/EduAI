@@ -839,7 +839,7 @@ Nota: La IA debe generar automáticamente:
 - Recursos y materiales estructurados`
 
   const sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
-  const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL || ""
+  const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL || "https://api.sesionmas.online/core/webhook"
   let wsUrl = webhookUrl
     .replace(/^https:\/\//, "wss://")
     .replace(/^http:\/\//, "ws://")
@@ -981,7 +981,7 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     }
     setIsAnalyzingCopilot(true)
     try {
-      const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL || ""
+      const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL || "https://api.sesionmas.online/core/webhook"
       // Derivar la base del core desde NEXT_PUBLIC_WEBHOOK_URL
       // ej: https://api.sesionmas.online/core/webhook -> https://api.sesionmas.online/core
       const coreBase = webhookUrl.replace(/\/webhook.*$/, "").replace(/\/$/, "")
