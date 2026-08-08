@@ -972,6 +972,62 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
   const [currentStep, setCurrentStep] = useState("")
   const [showErrors, setShowErrors] = useState(false)
 
+  // ESTADOS DEL COPILOTO CURRICULAR
+  const [copilotData, setCopilotData] = useState<CopilotResponse | null>(null)
+  const [isAnalyzingCopilot, setIsAnalyzingCopilot] = useState(false)
+
+  const analizarTemaCopiloto = async (temaInput: string) => {
+    if (!temaInput || temaInput.trim().length < 3) {
+      setCopilotData(null)
+      return
+    }
+    setIsAnalyzingCopilot(true)
+    try {
+      const backendUrl = process.env.NEXT_PUBLIC_CORE_API_URL || "https://api.sesionmas.online"
+      const res = await fetch(`${backendUrl}/api/recommend-curriculum`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nivel,
+          grado,
+          area_seleccionada: area,
+          competencias_seleccionadas: competenciasSeleccionadas,
+          tema: temaInput
+        })
+      })
+      if (res.ok) {
+        const data: CopilotResponse = await res.json()
+        setCopilotData(data)
+      } else {
+        // Fallback local defensivo
+        setCopilotData(null)
+      }
+    } catch (e) {
+      console.warn("Copiloto RAG usando análisis local:", e)
+      setCopilotData(null)
+    } finally {
+      setIsAnalyzingCopilot(false)
+    }
+  }
+
+  const aplicarSugerenciaCopiloto = (sug: SugerenciaCopiloto) => {
+    setArea(sug.area)
+    setCompetenciasSeleccionadas([sug.competencia])
+    setCapacidadesSeleccionadas(sug.capacidades || [])
+    setCompetenciaExpandida(sug.competencia)
+    setCopilotData({
+      coincide: true,
+      es_multiarea: false,
+      mensaje_evaluacion: `Se aplicó la sugerencia recomendada del área ${sug.area} con la competencia ${sug.competencia}.`,
+      recomendaciones: []
+    })
+    toast.success(`Recomendación aplicada: ${sug.area} - ${sug.competencia}`)
+  }
+
+  const descartarSugerenciaCopiloto = () => {
+    setCopilotData(null)
+  }
+
   useEffect(() => {
     if (!editingSession) return
     const {
@@ -1217,6 +1273,11 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     progress,
     currentStep,
     showErrors,
+    copilotData,
+    isAnalyzingCopilot,
+    analizarTemaCopiloto,
+    aplicarSugerenciaCopiloto,
+    descartarSugerenciaCopiloto,
     addCompetencia,
     removeCompetencia,
     addCapacidad,
@@ -1628,6 +1689,128 @@ function CompetenciasSection({
   )
 }
 
+interface SugerenciaCopiloto {
+  area: string
+  competencia: string
+  capacidades: string[]
+  enfoque_explicacion: string
+}
+
+interface CopilotResponse {
+  coincide: boolean
+  es_multiarea: boolean
+  mensaje_evaluacion: string
+  recomendaciones: SugerenciaCopiloto[]
+}
+
+interface CopilotCurricularCardProps {
+  readonly copilotData: CopilotResponse | null
+  readonly isAnalyzing: boolean
+  readonly onAplicarRecomendacion: (sugerencia: SugerenciaCopiloto) => void
+  readonly onDescartarRecomendacion: () => void
+}
+
+function CopilotCurricularCard({
+  copilotData,
+  isAnalyzing,
+  onAplicarRecomendacion,
+  onDescartarRecomendacion
+}: Readonly<CopilotCurricularCardProps>) {
+  if (isAnalyzing) {
+    return (
+      <div className="p-4 rounded-xl bg-indigo-50/70 border border-indigo-100 flex items-center gap-3 animate-pulse">
+        <Brain className="h-5 w-5 text-indigo-600 animate-spin" />
+        <span className="text-xs font-semibold text-indigo-800">
+          El Copiloto RAG está analizando el Currículo Nacional para este tema...
+        </span>
+      </div>
+    )
+  }
+
+  if (!copilotData) return null
+
+  // Caso A: Coincidencia perfecta
+  if (copilotData.coincide) {
+    return (
+      <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3 animate-in fade-in">
+        <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+        <div>
+          <h4 className="text-xs font-bold text-emerald-900 uppercase tracking-wider">Alineación Curricular Excelente</h4>
+          <p className="text-xs text-emerald-800 font-medium mt-0.5 leading-relaxed">
+            {copilotData.mensaje_evaluacion}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Caso B / C: Recomendación orientadora o Multi-área
+  return (
+    <div className="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/90 via-blue-50/50 to-white border border-indigo-200/80 shadow-sm space-y-4 animate-in slide-in-from-top-2">
+      <div className="flex items-start gap-3">
+        <div className="bg-indigo-600 p-2 rounded-xl text-white shadow-md shadow-indigo-500/20 shrink-0">
+          <Brain className="h-5 w-5" />
+        </div>
+        <div className="space-y-1">
+          <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+            Copiloto Curricular EduAI
+            <span className="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold">
+              RAG CNEB
+            </span>
+          </h4>
+          <p className="text-xs text-slate-700 font-medium leading-relaxed">
+            {copilotData.mensaje_evaluacion}
+          </p>
+        </div>
+      </div>
+
+      {/* Lista de Recomendaciones */}
+      <div className="space-y-3 pt-1">
+        {copilotData.recomendaciones.map((sug, idx) => (
+          <div key={idx} className="p-3.5 rounded-xl bg-white border border-indigo-100 shadow-sm space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-indigo-900 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">
+                Área: {sug.area}
+              </span>
+              <span className="text-[11px] font-semibold text-slate-500">
+                {sug.competencia}
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 italic">
+              "{sug.enfoque_explicacion}"
+            </p>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => onAplicarRecomendacion(sug)}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs h-8 px-3 rounded-lg shadow-sm"
+              >
+                Usar recomendación
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex justify-between items-center border-t border-indigo-100/60 pt-3">
+        <span className="text-[11px] text-slate-400">
+          El docente siempre conserva la decisión final de la planificación.
+        </span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={onDescartarRecomendacion}
+          className="text-xs text-slate-500 hover:text-slate-700 h-7 px-2 font-medium"
+        >
+          Mantener mi selección
+        </Button>
+      </div>
+    </div>
+  )
+}
+
 interface MaterialesSectionProps {
   readonly contextoBase: string
   readonly materialesSeleccionados: readonly string[]
@@ -1721,6 +1904,11 @@ export function SessionGenerator(props: SessionGeneratorProps) {
     progress,
     currentStep,
     showErrors,
+    copilotData,
+    isAnalyzingCopilot,
+    analizarTemaCopiloto,
+    aplicarSugerenciaCopiloto,
+    descartarSugerenciaCopiloto,
     addCompetencia,
     removeCompetencia,
     addCapacidad,
@@ -1913,7 +2101,7 @@ export function SessionGenerator(props: SessionGeneratorProps) {
                   removeCapacidad={removeCapacidad}
                 />
 
-                {/* 3. CONTENIDO DE LA SESIÓN */}
+                {/* 3. CONTENIDO DE LA SESIÓN CON COPILOTO RAG */}
                 <section className="space-y-5 animate-in fade-in">
                   <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
                     <div className="bg-emerald-100 p-1.5 rounded-md">
@@ -1924,20 +2112,48 @@ export function SessionGenerator(props: SessionGeneratorProps) {
 
                   <div className="space-y-5">
                     <div className="space-y-2">
-                      <Label htmlFor="tema" className="text-sm font-semibold text-slate-700">
-                        {t("temaLabel")} <span className="text-red-500">*</span>
-                      </Label>
+                      <div className="flex justify-between items-center">
+                        <Label htmlFor="tema" className="text-sm font-semibold text-slate-700">
+                          {t("temaLabel")} <span className="text-red-500">*</span>
+                        </Label>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => analizarTemaCopiloto(tema)}
+                          className="text-xs text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 font-semibold h-7 px-2 flex items-center gap-1"
+                        >
+                          <Brain className="h-3.5 w-3.5" />
+                          Analizar con Copiloto RAG
+                        </Button>
+                      </div>
                       <Input
                         id="tema"
                         placeholder={t("temaPlaceholder")}
                         value={tema}
-                        onChange={(e) => setTema(e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          setTema(val)
+                          if (val.trim().length >= 4) {
+                            analizarTemaCopiloto(val)
+                          } else {
+                            descartarSugerenciaCopiloto()
+                          }
+                        }}
                         className={`h-11 bg-white border-${showErrors && !tema ? 'red-300' : 'slate-300'} focus:border-indigo-500 focus:ring-indigo-500/20 text-slate-900 shadow-sm`}
                       />
                       <p className="text-xs text-slate-500">
-                        El contenido matemático que trabajarás. La IA lo relacionará con el contexto social.
+                        El tema o situación de aprendizaje. El Copiloto RAG analizará la alineación con el CNEB automáticamente.
                       </p>
                       {showErrors && !tema && <p className="text-xs text-red-500 font-medium">El tema es obligatorio</p>}
+
+                      {/* RENDERING TARJETA COPILOTO RAG */}
+                      <CopilotCurricularCard
+                        copilotData={copilotData}
+                        isAnalyzing={isAnalyzingCopilot}
+                        onAplicarRecomendacion={aplicarSugerenciaCopiloto}
+                        onDescartarRecomendacion={descartarSugerenciaCopiloto}
+                      />
                     </div>
 
                     <div className="space-y-2">
