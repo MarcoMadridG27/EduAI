@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useTransition } from "react";
+import React, { useState, useEffect } from "react";
 import { 
-  Building2, MapPin, School, GraduationCap, BookOpen, UserCheck, 
+  MapPin, School, GraduationCap, BookOpen, 
   Sparkles, CheckCircle2, ArrowRight, ArrowLeft, Search, Loader2,
-  Brain, ShieldCheck, Check, Star, Layers, Briefcase, Award
+  Brain, Check, Award
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,6 +78,14 @@ const FRECUENCIA_IA = [
   { id: "Todos los días", title: "Diario", desc: "Uso IA a diario para mi trabajo docente" },
 ];
 
+// Helper para construir URLs absolutas al backend en producción y desarrollo
+const getApiUrl = (endpoint: string) => {
+  const webhookUrl = process.env.NEXT_PUBLIC_WEBHOOK_URL || "https://api.sesionmas.online/core/webhook";
+  const base = webhookUrl.replace(/\/webhook.*$/, "").replace(/\/$/, "");
+  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : "/" + endpoint;
+  return `${base}${cleanEndpoint}`;
+};
+
 export function OnboardingWizard({ userEmail = "", userName = "Docente", onComplete, onSkip }: OnboardingWizardProps) {
   const [step, setStep] = useState(1);
 
@@ -116,10 +124,13 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
 
   const fetchDepartamentos = async () => {
     try {
-      const res = await fetch("/api/ubigeo/departamentos");
+      const url = getApiUrl("/api/ubigeo/departamentos");
+      const res = await fetch(url);
       if (!res.ok) return;
       const data = await res.json();
-      if (data.departamentos) setDepartamentos(data.departamentos);
+      if (data.departamentos && Array.isArray(data.departamentos)) {
+        setDepartamentos(data.departamentos);
+      }
     } catch (e) {
       console.error("Error cargando departamentos", e);
     }
@@ -133,7 +144,8 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
     setDistritos([]);
     if (!dept) return;
     try {
-      const res = await fetch(`/api/ubigeo/provincias?departamento=${encodeURIComponent(dept)}`);
+      const url = getApiUrl(`/api/ubigeo/provincias?departamento=${encodeURIComponent(dept)}`);
+      const res = await fetch(url);
       const data = await res.json();
       if (data.provincias) setProvincias(data.provincias);
     } catch (e) {
@@ -147,7 +159,8 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
     setDistritos([]);
     if (!prov) return;
     try {
-      const res = await fetch(`/api/ubigeo/distritos?departamento=${encodeURIComponent(selectedDept)}&provincia=${encodeURIComponent(prov)}`);
+      const url = getApiUrl(`/api/ubigeo/distritos?departamento=${encodeURIComponent(selectedDept)}&provincia=${encodeURIComponent(prov)}`);
+      const res = await fetch(url);
       const data = await res.json();
       if (data.distritos) setDistritos(data.distritos);
     } catch (e) {
@@ -175,7 +188,8 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
       if (selectedDist) params.append("distrito", selectedDist);
       params.append("limit", "15");
 
-      const res = await fetch(`/api/colegios/search?${params.toString()}`);
+      const url = getApiUrl(`/api/colegios/search?${params.toString()}`);
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         setSchoolResults(data.colegios || []);
@@ -236,7 +250,8 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
 
     // Guardar en backend
     try {
-      await fetch("/api/user/profile", {
+      const url = getApiUrl("/api/user/profile");
+      await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(profilePayload),
@@ -253,16 +268,14 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 sm:p-6 overflow-y-auto">
       <div className="w-full max-w-3xl bg-white border border-slate-200 rounded-[2rem] shadow-2xl text-slate-900 overflow-hidden my-auto transition-all duration-300">
         
-        {/* Banner Superior Limpio (Blanco con Gradient Suave) */}
+        {/* Banner Superior Limpio con Logo PNG de Educa+ */}
         <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-white p-6 border-b border-slate-200 relative">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-blue-600 border border-blue-400/40 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-                <Sparkles className="w-6 h-6 animate-pulse" />
-              </div>
+              <img src="/educa-logo.png" alt="Educa+" className="h-12 w-auto object-contain drop-shadow-sm" />
               <div>
                 <h2 className="text-xl font-black text-slate-900 tracking-tight">Bienvenido a Educa+, {userName.split(" ")[0]} 👋</h2>
-                <p className="text-xs font-medium text-slate-600">Personaliza tu asistente docente inteligente</p>
+                <p className="text-xs font-semibold text-slate-500">Personaliza tu experiencia docente</p>
               </div>
             </div>
 
@@ -293,17 +306,14 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
                   <MapPin className="w-5 h-5 text-blue-600" />
                   ¿En qué colegio y región enseñas?
                 </h3>
-                <p className="text-sm text-slate-500 mt-1">
-                  Busca tu colegio en el padrón oficial del MINEDU (106,705 colegios del Perú).
-                </p>
               </div>
 
-              {/* Desplegables de Ubigeo Limpios y Desplegables */}
+              {/* Desplegables de Ubigeo Limpios */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <Label className="text-xs font-bold text-slate-700 mb-1.5 block">Departamento</Label>
                   <select
-                    className="w-full h-11 px-3 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full h-11 px-3 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
                     value={selectedDept}
                     onChange={(e) => handleDeptChange(e.target.value)}
                   >
@@ -317,7 +327,7 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
                 <div>
                   <Label className="text-xs font-bold text-slate-700 mb-1.5 block">Provincia</Label>
                   <select
-                    className="w-full h-11 px-3 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-50"
+                    className="w-full h-11 px-3 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-50 cursor-pointer"
                     value={selectedProv}
                     onChange={(e) => handleProvChange(e.target.value)}
                     disabled={!selectedDept}
@@ -332,7 +342,7 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
                 <div>
                   <Label className="text-xs font-bold text-slate-700 mb-1.5 block">Distrito</Label>
                   <select
-                    className="w-full h-11 px-3 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-50"
+                    className="w-full h-11 px-3 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-50 cursor-pointer"
                     value={selectedDist}
                     onChange={(e) => setSelectedDist(e.target.value)}
                     disabled={!selectedProv}
@@ -427,9 +437,6 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
                   <GraduationCap className="w-5 h-5 text-blue-600" />
                   ¿A quiénes enseñas?
                 </h3>
-                <p className="text-sm text-slate-500 mt-1">
-                  Selecciona tu nivel educativo, grados y áreas curriculares.
-                </p>
               </div>
 
               {/* Nivel Educativo */}
@@ -517,9 +524,6 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
                   <Award className="w-5 h-5 text-blue-600" />
                   ¿Cuántos años llevas enseñando?
                 </h3>
-                <p className="text-sm text-slate-500 mt-1">
-                  Esto nos permite calibrar las sugerencias pedagógicas de Educa+.
-                </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -557,9 +561,6 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
                   <BookOpen className="w-5 h-5 text-blue-600" />
                   ¿Qué esperas lograr principalmente con Educa+?
                 </h3>
-                <p className="text-sm text-slate-500 mt-1">
-                  Priorizaremos las herramientas clave en tu panel principal.
-                </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -592,9 +593,6 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
                   <Brain className="w-5 h-5 text-blue-600" />
                   ¿Con qué frecuencia utilizas Inteligencia Artificial?
                 </h3>
-                <p className="text-sm text-slate-500 mt-1">
-                  Adaptaremos la interfaz para que tu trabajo sea 100% sencillo.
-                </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
