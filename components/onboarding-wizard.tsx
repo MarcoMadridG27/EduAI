@@ -9,8 +9,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 
 interface SchoolItem {
@@ -82,7 +80,6 @@ const FRECUENCIA_IA = [
 
 export function OnboardingWizard({ userEmail = "", userName = "Docente", onComplete, onSkip }: OnboardingWizardProps) {
   const [step, setStep] = useState(1);
-  const [isPending, startTransition] = useTransition();
 
   // Paso 1: Ubicación & Colegio
   const [departamentos, setDepartamentos] = useState<string[]>([]);
@@ -119,7 +116,7 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
 
   const fetchDepartamentos = async () => {
     try {
-      const res = await fetch("/core/api/ubigeo/departamentos");
+      const res = await fetch("/api/ubigeo/departamentos");
       if (!res.ok) return;
       const data = await res.json();
       if (data.departamentos) setDepartamentos(data.departamentos);
@@ -134,8 +131,9 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
     setSelectedDist("");
     setProvincias([]);
     setDistritos([]);
+    if (!dept) return;
     try {
-      const res = await fetch(`/core/api/ubigeo/provincias?departamento=${encodeURIComponent(dept)}`);
+      const res = await fetch(`/api/ubigeo/provincias?departamento=${encodeURIComponent(dept)}`);
       const data = await res.json();
       if (data.provincias) setProvincias(data.provincias);
     } catch (e) {
@@ -147,8 +145,9 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
     setSelectedProv(prov);
     setSelectedDist("");
     setDistritos([]);
+    if (!prov) return;
     try {
-      const res = await fetch(`/core/api/ubigeo/distritos?departamento=${encodeURIComponent(selectedDept)}&provincia=${encodeURIComponent(prov)}`);
+      const res = await fetch(`/api/ubigeo/distritos?departamento=${encodeURIComponent(selectedDept)}&provincia=${encodeURIComponent(prov)}`);
       const data = await res.json();
       if (data.distritos) setDistritos(data.distritos);
     } catch (e) {
@@ -176,7 +175,7 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
       if (selectedDist) params.append("distrito", selectedDist);
       params.append("limit", "15");
 
-      const res = await fetch(`/core/api/colegios/search?${params.toString()}`);
+      const res = await fetch(`/api/colegios/search?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
         setSchoolResults(data.colegios || []);
@@ -237,7 +236,7 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
 
     // Guardar en backend
     try {
-      await fetch("/core/api/user/profile", {
+      await fetch("/api/user/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(profilePayload),
@@ -246,120 +245,122 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
       console.error("Error guardando en backend", e);
     }
 
-    toast.success("¡Bienvenido a EduAI! Tu perfil ha sido configurado.");
+    toast.success("¡Bienvenido a Educa+! Tu perfil ha sido configurado.");
     onComplete(profilePayload);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto">
-      <div className="w-full max-w-3xl bg-slate-900/95 border border-indigo-500/30 rounded-3xl shadow-2xl shadow-indigo-950/50 text-slate-100 overflow-hidden my-auto transition-all duration-300">
+    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 sm:p-6 overflow-y-auto">
+      <div className="w-full max-w-3xl bg-white border border-slate-200 rounded-[2rem] shadow-2xl text-slate-900 overflow-hidden my-auto transition-all duration-300">
         
-        {/* Banner Superior con Progreso */}
-        <div className="bg-gradient-to-r from-indigo-900/60 via-purple-900/60 to-slate-900 p-6 border-b border-indigo-500/20 relative">
+        {/* Banner Superior Limpio (Blanco con Gradient Suave) */}
+        <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-white p-6 border-b border-slate-200 relative">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center text-indigo-300">
-                <Sparkles className="w-5 h-5 text-indigo-400 animate-pulse" />
+              <div className="w-11 h-11 rounded-2xl bg-blue-600 border border-blue-400/40 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+                <Sparkles className="w-6 h-6 animate-pulse" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white tracking-tight">Bienvenido a EduAI, {userName.split(" ")[0]} 👋</h2>
-                <p className="text-xs text-indigo-200/70">Personaliza tu asistente docente inteligente</p>
+                <h2 className="text-xl font-black text-slate-900 tracking-tight">Bienvenido a Educa+, {userName.split(" ")[0]} 👋</h2>
+                <p className="text-xs font-medium text-slate-600">Personaliza tu asistente docente inteligente</p>
               </div>
             </div>
 
             <div className="text-right">
-              <span className="text-xs font-semibold text-indigo-300 bg-indigo-950/80 border border-indigo-500/30 px-3 py-1 rounded-full">
+              <span className="text-xs font-bold text-blue-700 bg-blue-100/80 border border-blue-200 px-3.5 py-1.5 rounded-full">
                 Paso {step} de 5
               </span>
             </div>
           </div>
 
-          {/* Barra de progreso */}
-          <div className="w-full bg-slate-800/80 h-2 rounded-full overflow-hidden border border-slate-700/50">
+          {/* Barra de progreso limpia */}
+          <div className="w-full bg-slate-200/80 h-2.5 rounded-full overflow-hidden border border-slate-300/50">
             <div 
-              className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-full transition-all duration-500 ease-out"
+              className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 h-full transition-all duration-500 ease-out"
               style={{ width: `${(step / 5) * 100}%` }}
             />
           </div>
         </div>
 
         {/* Cuerpo Dinámico por Pasos */}
-        <div className="p-6 sm:p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+        <div className="p-6 sm:p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar bg-white">
           
           {/* PASO 1: Ubicación & Colegio */}
           {step === 1 && (
             <div className="space-y-6 animate-fadeIn">
               <div>
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-indigo-400" />
+                <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-blue-600" />
                   ¿En qué colegio y región enseñas?
                 </h3>
-                <p className="text-sm text-slate-400 mt-1">
-                  Busca tu institución educativa en el padrón oficial del MINEDU (106,705 colegios del Perú).
+                <p className="text-sm text-slate-500 mt-1">
+                  Busca tu colegio en el padrón oficial del MINEDU (106,705 colegios del Perú).
                 </p>
               </div>
 
-              {/* Cascadas Ubigeo */}
+              {/* Desplegables de Ubigeo Limpios y Desplegables */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <Label className="text-xs text-slate-300 mb-1.5 block">Departamento</Label>
-                  <Select value={selectedDept} onValueChange={handleDeptChange}>
-                    <SelectTrigger className="bg-slate-800/80 border-slate-700 text-slate-200">
-                      <SelectValue placeholder="Seleccionar..." />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-800 text-slate-200 max-h-60">
-                      {departamentos.map((d) => (
-                        <SelectItem key={d} value={d}>{d}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label className="text-xs font-bold text-slate-700 mb-1.5 block">Departamento</Label>
+                  <select
+                    className="w-full h-11 px-3 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    value={selectedDept}
+                    onChange={(e) => handleDeptChange(e.target.value)}
+                  >
+                    <option value="">:: Seleccionar ::</option>
+                    {departamentos.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
-                  <Label className="text-xs text-slate-300 mb-1.5 block">Provincia</Label>
-                  <Select value={selectedProv} onValueChange={handleProvChange} disabled={!selectedDept}>
-                    <SelectTrigger className="bg-slate-800/80 border-slate-700 text-slate-200">
-                      <SelectValue placeholder="Seleccionar..." />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-800 text-slate-200 max-h-60">
-                      {provincias.map((p) => (
-                        <SelectItem key={p} value={p}>{p}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label className="text-xs font-bold text-slate-700 mb-1.5 block">Provincia</Label>
+                  <select
+                    className="w-full h-11 px-3 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-50"
+                    value={selectedProv}
+                    onChange={(e) => handleProvChange(e.target.value)}
+                    disabled={!selectedDept}
+                  >
+                    <option value="">:: Seleccionar ::</option>
+                    {provincias.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
-                  <Label className="text-xs text-slate-300 mb-1.5 block">Distrito</Label>
-                  <Select value={selectedDist} onValueChange={(d) => setSelectedDist(d)} disabled={!selectedProv}>
-                    <SelectTrigger className="bg-slate-800/80 border-slate-700 text-slate-200">
-                      <SelectValue placeholder="Seleccionar..." />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-800 text-slate-200 max-h-60">
-                      {distritos.map((dist) => (
-                        <SelectItem key={dist} value={dist}>{dist}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label className="text-xs font-bold text-slate-700 mb-1.5 block">Distrito</Label>
+                  <select
+                    className="w-full h-11 px-3 bg-slate-50 border border-slate-300 text-slate-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-50"
+                    value={selectedDist}
+                    onChange={(e) => setSelectedDist(e.target.value)}
+                    disabled={!selectedProv}
+                  >
+                    <option value="">:: Seleccionar ::</option>
+                    {distritos.map((dist) => (
+                      <option key={dist} value={dist}>{dist}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
               {/* Búsqueda de Colegio Autocomplete */}
               <div className="space-y-3">
-                <Label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
+                <Label className="text-xs font-bold text-slate-700 flex items-center justify-between">
                   <span>Buscar Colegio por nombre o Código Modular</span>
                   {isSearchingSchools && (
-                    <span className="text-indigo-400 flex items-center gap-1 text-[11px]">
-                      <Loader2 className="w-3 h-3 animate-spin" /> Buscando en padrón...
+                    <span className="text-blue-600 flex items-center gap-1 text-[11px] font-semibold">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" /> Buscando colegios...
                     </span>
                   )}
                 </Label>
 
                 <div className="relative">
-                  <Search className="w-4 h-4 absolute left-3 top-3.5 text-slate-400" />
+                  <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
                   <Input
                     placeholder="Ej. Alfonso Ugarte o 0603654..."
-                    className="pl-9 bg-slate-800/90 border-indigo-500/30 text-white placeholder:text-slate-500 focus:border-indigo-400"
+                    className="pl-10 h-11 bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 rounded-xl text-sm font-medium"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -367,28 +368,28 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
 
                 {/* Colegio Seleccionado */}
                 {selectedSchool && (
-                  <div className="p-4 bg-indigo-950/40 border border-indigo-500/40 rounded-2xl flex items-start justify-between gap-3">
+                  <div className="p-4 bg-blue-50/80 border border-blue-300 rounded-2xl flex items-start justify-between gap-3 shadow-sm">
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-indigo-600/30 border border-indigo-400/30 flex items-center justify-center text-indigo-300 mt-0.5">
+                      <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 mt-0.5">
                         <School className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-white">{selectedSchool.nombre_ie}</h4>
-                        <div className="flex flex-wrap gap-2 text-xs text-slate-300 mt-1">
-                          <span className="bg-indigo-900/60 px-2 py-0.5 rounded text-indigo-200 border border-indigo-500/30">
+                        <h4 className="text-sm font-bold text-slate-900">{selectedSchool.nombre_ie}</h4>
+                        <div className="flex flex-wrap gap-2 text-xs text-slate-600 mt-1.5">
+                          <span className="bg-blue-200/80 px-2 py-0.5 rounded text-blue-900 font-semibold">
                             Cód: {selectedSchool.cod_mod}
                           </span>
-                          <span className="bg-slate-800 px-2 py-0.5 rounded text-slate-300">
+                          <span className="bg-slate-200/80 px-2 py-0.5 rounded text-slate-800">
                             {selectedSchool.nivel_modalidad}
                           </span>
-                          <span className="bg-slate-800 px-2 py-0.5 rounded text-slate-300">
+                          <span className="bg-slate-200/80 px-2 py-0.5 rounded text-slate-800">
                             {selectedSchool.gestion}
                           </span>
-                          <span>📍 {selectedSchool.distrito}, {selectedSchool.departamento}</span>
+                          <span className="font-medium">📍 {selectedSchool.distrito}, {selectedSchool.departamento}</span>
                         </div>
                       </div>
                     </div>
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                    <CheckCircle2 className="w-6 h-6 text-emerald-600 flex-shrink-0" />
                   </div>
                 )}
 
@@ -399,15 +400,15 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
                       <div
                         key={s.cod_mod}
                         onClick={() => handleSelectSchool(s)}
-                        className="p-3 bg-slate-800/60 hover:bg-indigo-900/40 border border-slate-700/60 hover:border-indigo-500/50 rounded-xl cursor-pointer transition-all duration-200 flex items-center justify-between group"
+                        className="p-3 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-400 rounded-xl cursor-pointer transition-all duration-200 flex items-center justify-between group"
                       >
                         <div>
-                          <p className="text-sm font-semibold text-slate-200 group-hover:text-white">{s.nombre_ie}</p>
-                          <p className="text-xs text-slate-400">
-                            Cod: <span className="text-indigo-300">{s.cod_mod}</span> | {s.nivel_modalidad} | {s.gestion} | {s.distrito}, {s.departamento}
+                          <p className="text-sm font-bold text-slate-800 group-hover:text-blue-900">{s.nombre_ie}</p>
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            Cod: <span className="font-semibold text-blue-700">{s.cod_mod}</span> | {s.nivel_modalidad} | {s.gestion} | {s.distrito}, {s.departamento}
                           </p>
                         </div>
-                        <Button size="sm" variant="ghost" className="text-indigo-400 hover:text-white">
+                        <Button size="sm" variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-semibold">
                           Seleccionar
                         </Button>
                       </div>
@@ -422,35 +423,35 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
           {step === 2 && (
             <div className="space-y-6 animate-fadeIn">
               <div>
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <GraduationCap className="w-5 h-5 text-indigo-400" />
+                <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                  <GraduationCap className="w-5 h-5 text-blue-600" />
                   ¿A quiénes enseñas?
                 </h3>
-                <p className="text-sm text-slate-400 mt-1">
-                  Selecciona tu nivel educativo, los grados y las áreas curriculares que tienes a tu cargo.
+                <p className="text-sm text-slate-500 mt-1">
+                  Selecciona tu nivel educativo, grados y áreas curriculares.
                 </p>
               </div>
 
               {/* Nivel Educativo */}
               <div className="space-y-2">
-                <Label className="text-xs font-semibold text-slate-300">Nivel Educativo (Selección Múltiple)</Label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <Label className="text-xs font-bold text-slate-700">Nivel Educativo (Selección Múltiple)</Label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                   {NIVELES.map((n) => {
                     const isSelected = selectedNiveles.includes(n.id);
                     return (
                       <div
                         key={n.id}
                         onClick={() => toggleArrayItem(selectedNiveles, setSelectedNiveles, n.id)}
-                        className={`p-3 rounded-xl border cursor-pointer transition-all duration-200 flex items-center gap-2.5 ${
+                        className={`p-3 rounded-2xl border cursor-pointer transition-all duration-200 flex items-center gap-3 ${
                           isSelected
-                            ? "bg-indigo-600/30 border-indigo-400 text-white shadow-lg shadow-indigo-950/50"
-                            : "bg-slate-800/50 border-slate-700/60 text-slate-300 hover:border-slate-500"
+                            ? "bg-blue-50 border-blue-600 text-blue-950 ring-2 ring-blue-500/20 shadow-sm"
+                            : "bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300"
                         }`}
                       >
-                        <span className="text-xl">{n.icon}</span>
+                        <span className="text-2xl">{n.icon}</span>
                         <div>
                           <p className="text-sm font-bold">{n.title}</p>
-                          <p className="text-[10px] text-slate-400 line-clamp-1">{n.desc}</p>
+                          <p className="text-[10px] text-slate-500 line-clamp-1">{n.desc}</p>
                         </div>
                       </div>
                     );
@@ -460,7 +461,7 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
 
               {/* Grados */}
               <div className="space-y-2">
-                <Label className="text-xs font-semibold text-slate-300">Grados que enseñas</Label>
+                <Label className="text-xs font-bold text-slate-700">Grados que enseñas</Label>
                 <div className="flex flex-wrap gap-2">
                   {GRADOS.map((g) => {
                     const isSelected = selectedGrados.includes(g);
@@ -469,10 +470,10 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
                         key={g}
                         type="button"
                         onClick={() => toggleArrayItem(selectedGrados, setSelectedGrados, g)}
-                        className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
+                        className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
                           isSelected
-                            ? "bg-purple-600 text-white border-purple-400 shadow-md"
-                            : "bg-slate-800 text-slate-300 border-slate-700 hover:border-slate-500"
+                            ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                            : "bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300"
                         }`}
                       >
                         {g} Grado
@@ -484,7 +485,7 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
 
               {/* Áreas Curriculares */}
               <div className="space-y-2">
-                <Label className="text-xs font-semibold text-slate-300">Áreas Curriculares CNEB</Label>
+                <Label className="text-xs font-bold text-slate-700">Áreas Curriculares CNEB</Label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {AREAS.map((a) => {
                     const isSelected = selectedAreas.includes(a.id);
@@ -492,10 +493,10 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
                       <div
                         key={a.id}
                         onClick={() => toggleArrayItem(selectedAreas, setSelectedAreas, a.id)}
-                        className={`p-2.5 rounded-xl border text-xs font-medium cursor-pointer transition-all flex items-center gap-2 ${
+                        className={`p-2.5 rounded-xl border text-xs font-bold cursor-pointer transition-all flex items-center gap-2 ${
                           isSelected
-                            ? "bg-indigo-600/30 border-indigo-400 text-white"
-                            : "bg-slate-800/40 border-slate-700/60 text-slate-300 hover:bg-slate-800"
+                            ? "bg-blue-50 border-blue-600 text-blue-900 shadow-sm"
+                            : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
                         }`}
                       >
                         <span>{a.icon}</span>
@@ -512,12 +513,12 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
           {step === 3 && (
             <div className="space-y-6 animate-fadeIn">
               <div>
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Award className="w-5 h-5 text-indigo-400" />
+                <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                  <Award className="w-5 h-5 text-blue-600" />
                   ¿Cuántos años llevas enseñando?
                 </h3>
-                <p className="text-sm text-slate-400 mt-1">
-                  Esto nos permite calibrar la profundidad pedagógica y las sugerencias didácticas de EduAI.
+                <p className="text-sm text-slate-500 mt-1">
+                  Esto nos permite calibrar las sugerencias pedagógicas de Educa+.
                 </p>
               </div>
 
@@ -528,19 +529,19 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
                     <div
                       key={exp.id}
                       onClick={() => setAnosExperiencia(exp.id)}
-                      className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 relative ${
+                      className={`p-4 rounded-2xl border cursor-pointer transition-all duration-200 ${
                         isSelected
-                          ? "bg-indigo-600/30 border-indigo-400 text-white ring-2 ring-indigo-500/50"
-                          : "bg-slate-800/50 border-slate-700/60 text-slate-300 hover:border-slate-500"
+                          ? "bg-blue-50 border-blue-600 text-blue-950 ring-2 ring-blue-500/20 shadow-sm"
+                          : "bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-base font-bold text-white">{exp.title}</span>
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-900/60 border border-indigo-500/30 text-indigo-300">
+                        <span className="text-base font-bold text-slate-900">{exp.title}</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200">
                           {exp.badge}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-400">{exp.desc}</p>
+                      <p className="text-xs text-slate-500">{exp.desc}</p>
                     </div>
                   );
                 })}
@@ -552,12 +553,12 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
           {step === 4 && (
             <div className="space-y-6 animate-fadeIn">
               <div>
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-indigo-400" />
-                  ¿Qué esperas lograr principalmente con EduAI?
+                <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-blue-600" />
+                  ¿Qué esperas lograr principalmente con Educa+?
                 </h3>
-                <p className="text-sm text-slate-400 mt-1">
-                  Priorizaremos las herramientas y módulos más relevantes en tu panel principal.
+                <p className="text-sm text-slate-500 mt-1">
+                  Priorizaremos las herramientas clave en tu panel principal.
                 </p>
               </div>
 
@@ -570,12 +571,12 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
                       onClick={() => toggleArrayItem(selectedObjetivos, setSelectedObjetivos, obj.id)}
                       className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex items-center gap-3 ${
                         isSelected
-                          ? "bg-purple-600/30 border-purple-400 text-white"
-                          : "bg-slate-800/50 border-slate-700/60 text-slate-300 hover:border-slate-500"
+                          ? "bg-blue-50 border-blue-600 text-blue-950 font-bold shadow-sm"
+                          : "bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300"
                       }`}
                     >
                       <span className="text-2xl">{obj.icon}</span>
-                      <span className="text-xs font-semibold">{obj.title}</span>
+                      <span className="text-xs font-semibold text-slate-800">{obj.title}</span>
                     </div>
                   );
                 })}
@@ -587,12 +588,12 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
           {step === 5 && (
             <div className="space-y-6 animate-fadeIn">
               <div>
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Brain className="w-5 h-5 text-indigo-400" />
+                <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                  <Brain className="w-5 h-5 text-blue-600" />
                   ¿Con qué frecuencia utilizas Inteligencia Artificial?
                 </h3>
-                <p className="text-sm text-slate-400 mt-1">
-                  Adaptaremos las explicaciones e interfaces para que tu experiencia sea totalmente fluida.
+                <p className="text-sm text-slate-500 mt-1">
+                  Adaptaremos la interfaz para que tu trabajo sea 100% sencillo.
                 </p>
               </div>
 
@@ -605,12 +606,12 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
                       onClick={() => setFrecuenciaIa(f.id)}
                       className={`p-4 rounded-2xl border cursor-pointer transition-all ${
                         isSelected
-                          ? "bg-indigo-600/30 border-indigo-400 text-white ring-2 ring-indigo-500/50"
-                          : "bg-slate-800/50 border-slate-700/60 text-slate-300 hover:border-slate-500"
+                          ? "bg-blue-50 border-blue-600 text-blue-950 ring-2 ring-blue-500/20 shadow-sm"
+                          : "bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300"
                       }`}
                     >
-                      <h4 className="text-sm font-bold text-white">{f.title}</h4>
-                      <p className="text-xs text-slate-400 mt-1">{f.desc}</p>
+                      <h4 className="text-sm font-bold text-slate-900">{f.title}</h4>
+                      <p className="text-xs text-slate-500 mt-1">{f.desc}</p>
                     </div>
                   );
                 })}
@@ -620,13 +621,13 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
 
         </div>
 
-        {/* Botones de Navegación del Onboarding */}
-        <div className="p-6 bg-slate-900 border-t border-slate-800 flex items-center justify-between">
+        {/* Botones de Navegación Limpios */}
+        <div className="p-6 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
           {step > 1 ? (
             <Button
               variant="outline"
               onClick={() => setStep(step - 1)}
-              className="bg-slate-800 border-slate-700 text-slate-300 hover:text-white"
+              className="bg-white border-slate-300 text-slate-700 hover:bg-slate-100 font-semibold"
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Atrás
             </Button>
@@ -634,7 +635,7 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
             <Button
               variant="ghost"
               onClick={onSkip}
-              className="text-slate-500 hover:text-slate-300 text-xs"
+              className="text-slate-400 hover:text-slate-600 text-xs font-medium"
             >
               Omitir por ahora
             </Button>
@@ -643,14 +644,14 @@ export function OnboardingWizard({ userEmail = "", userName = "Docente", onCompl
           {step < 5 ? (
             <Button
               onClick={() => setStep(step + 1)}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 font-semibold shadow-lg shadow-indigo-900/40"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-7 font-bold h-11 rounded-xl shadow-md shadow-blue-500/20"
             >
               Siguiente <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           ) : (
             <Button
               onClick={handleFinish}
-              className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold px-8 shadow-xl shadow-emerald-950/50"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 h-11 rounded-xl shadow-lg shadow-emerald-500/20"
             >
               <Check className="w-4 h-4 mr-2" /> Finalizar y Comenzar
             </Button>
