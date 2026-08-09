@@ -10,6 +10,8 @@ import { LandingPage } from "@/components/landing-page"
 import { PublicRepository } from "@/components/public-repository"
 import { SubscriptionsSection } from "@/components/subscriptions-section"
 import { OnboardingWizard } from "@/components/onboarding-wizard"
+import { Navbar } from "@/components/navbar"
+import { ProfileModal } from "@/components/profile-modal"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
 import { toast } from "sonner"
@@ -138,6 +140,7 @@ export default function Home() {
   const [guestMode, setGuestMode] = useState<boolean>(false)
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false)
   const [showOnboarding, setShowOnboarding] = useState<boolean>(false)
+  const [showProfileModal, setShowProfileModal] = useState<boolean>(false)
   const [currentSession, setCurrentSession] = useState<SessionData | null>(null)
   const [sessions, setSessions] = useState<SessionData[]>([])
   const [editingSession, setEditingSession] = useState<SessionData | null>(null)
@@ -291,6 +294,19 @@ export default function Home() {
 
   return (
     <>
+      <Navbar
+        user={user}
+        currentView={currentView}
+        onNavigateView={(view) => {
+          if (view === "subscriptions") setCurrentView("subscriptions")
+          else if (view === "generator") setCurrentView("generator")
+          else if (view === "repository") setCurrentView("repository")
+          else if (view === "dashboard") handleViewDashboard()
+        }}
+        onOpenProfile={() => setShowProfileModal(true)}
+        onLogout={handleLogout}
+      />
+
       {currentView === "repository" && (
         <PublicRepository
           user={user}
@@ -393,6 +409,17 @@ export default function Home() {
           userName={user.name}
           onComplete={() => setShowOnboarding(false)}
           onSkip={() => setShowOnboarding(false)}
+        />
+      )}
+
+      {showProfileModal && (
+        <ProfileModal
+          user={user}
+          onClose={() => setShowProfileModal(false)}
+          onEditProfile={() => {
+            setShowProfileModal(false);
+            setShowOnboarding(true);
+          }}
         />
       )}
     </>

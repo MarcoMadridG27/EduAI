@@ -72,7 +72,7 @@ export function SubscriptionsSection({
       if (onLoginRequired) {
         onLoginRequired()
       } else {
-        window.location.href = "/?view=generator"
+        window.location.href = "/auth"
       }
       return
     }
