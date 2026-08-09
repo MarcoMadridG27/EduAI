@@ -9,6 +9,7 @@ import { TeacherDashboard } from "@/components/teacher-dashboard"
 import { LandingPage } from "@/components/landing-page"
 import { PublicRepository } from "@/components/public-repository"
 import { SubscriptionsSection } from "@/components/subscriptions-section"
+import { OnboardingWizard } from "@/components/onboarding-wizard"
 import { Button } from "@/components/ui/button"
 import { X } from "lucide-react"
 import { toast } from "sonner"
@@ -136,6 +137,7 @@ export default function Home() {
   const [user, setUser] = useState<{ name: string; email: string } | null>(null)
   const [guestMode, setGuestMode] = useState<boolean>(false)
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false)
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(false)
   const [currentSession, setCurrentSession] = useState<SessionData | null>(null)
   const [sessions, setSessions] = useState<SessionData[]>([])
   const [editingSession, setEditingSession] = useState<SessionData | null>(null)
@@ -157,6 +159,11 @@ export default function Home() {
         const userData = JSON.parse(storedUser)
         setUser(userData)
         setGuestMode(false)
+
+        const teacherProfile = localStorage.getItem("eduai_teacher_profile")
+        if (!teacherProfile) {
+          setShowOnboarding(true)
+        }
 
         const sessionToEdit = localStorage.getItem("session_to_edit")
         if (sessionToEdit) {
@@ -378,6 +385,15 @@ export default function Home() {
             </div>
           </div>
         </div>
+      )}
+
+      {showOnboarding && user && (
+        <OnboardingWizard
+          userEmail={user.email}
+          userName={user.name}
+          onComplete={() => setShowOnboarding(false)}
+          onSkip={() => setShowOnboarding(false)}
+        />
       )}
     </>
   )

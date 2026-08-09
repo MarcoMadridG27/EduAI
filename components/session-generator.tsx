@@ -1055,6 +1055,41 @@ function useSessionGeneratorState({ user, onSessionGenerated, editingSession, gu
     setCopilotData(null)
   }
 
+  // Cargar automáticamente perfil de docente guardado del Onboarding
+  useEffect(() => {
+    if (editingSession) return
+    try {
+      const storedProfile = localStorage.getItem("eduai_teacher_profile")
+      if (storedProfile) {
+        const profile = JSON.parse(storedProfile)
+        if (profile.niveles && profile.niveles.length > 0) {
+          const nivelMap: Record<string, string> = {
+            "Inicial": "inicial",
+            "Primaria": "primaria",
+            "Secundaria": "secundaria"
+          }
+          const mappedNivel = nivelMap[profile.niveles[0]] || profile.niveles[0].toLowerCase()
+          if (["inicial", "primaria", "secundaria"].includes(mappedNivel)) {
+            setNivel(mappedNivel)
+          }
+        }
+        if (profile.areas && profile.areas.length > 0) {
+          setArea(profile.areas[0])
+        }
+        if (profile.grados && profile.grados.length > 0) {
+          const cleanGrado = profile.grados[0].replace("°", "").trim()
+          setGrado(cleanGrado)
+        }
+        if (profile.nombre_ie && profile.nombre_ie !== "Colegio No Especificado") {
+          const contextoStr = `I.E. ${profile.nombre_ie} (${profile.gestion || "Pública"}) - ${profile.distrito || ""}, ${profile.departamento || ""}`
+          setContexto((prev) => prev || contextoStr)
+        }
+      }
+    } catch (e) {
+      console.error("Error cargando perfil docente en generador", e)
+    }
+  }, [editingSession])
+
   useEffect(() => {
     if (!editingSession) return
     const {
