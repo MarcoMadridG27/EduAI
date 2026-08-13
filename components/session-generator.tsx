@@ -1368,29 +1368,18 @@ function SessionHeader({
   guestMode,
   onLoginRequired,
   onViewDashboard,
-  onLogout,
-  user
 }: Readonly<SessionHeaderProps>) {
   const { t } = useLanguage()
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div className="border-b" style={{ borderColor: "var(--border-subtle)", background: "var(--white)" }}>
       <div className="container mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          {guestMode ? (
-            <Link href="/" aria-label="Ir a la página principal">
-              <img src="/educa-logo.png" alt="Educa +" className="h-10 md:h-12 w-auto object-contain drop-shadow-sm" />
-            </Link>
-          ) : (
-            <img src="/educa-logo.png" alt="Educa +" className="h-10 md:h-12 w-auto object-contain drop-shadow-sm" />
-          )}
-          <div>
-            <h1 className="font-bold text-xl md:text-2xl text-slate-800 flex items-center gap-2">
-              {t("generatorTitle")}
-            </h1>
-            <div className="flex items-center gap-2">
-              <p className="text-xs md:text-sm text-slate-500 font-medium">{t("generatorSubtitle")}</p>
-              <span className="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full border border-indigo-100 font-semibold">Powered by IA</span>
-            </div>
+        <div>
+          <h1 className="font-bold text-xl md:text-2xl flex items-center gap-2" style={{ color: "var(--ink-900)" }}>
+            {t("generatorTitle")}
+          </h1>
+          <div className="flex items-center gap-2">
+            <p className="text-xs md:text-sm font-medium" style={{ color: "var(--ink-500)" }}>{t("generatorSubtitle")}</p>
+            <span className="text-[10px] px-2 py-0.5 rounded-full border font-semibold" style={{ background: "var(--violet-50)", color: "var(--violet-700)", borderColor: "var(--violet-300)" }}>Powered by IA</span>
           </div>
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
@@ -1404,40 +1393,14 @@ function SessionHeader({
                 onViewDashboard()
               }
             }}
-            className="bg-white border-slate-300 hover:bg-slate-50 text-slate-700 transition-all h-9 text-sm font-medium shadow-sm"
+            className="h-9 text-sm font-medium"
           >
-            <BarChart3 className="h-4 w-4 mr-2 text-slate-500" />
+            <BarChart3 className="h-4 w-4 mr-2" />
             <span className="hidden sm:inline">{t("dashboard")}</span>
           </Button>
-          {guestMode ? (
-            <Button
-              onClick={onLoginRequired}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-9 px-4 rounded-full text-sm shadow-sm transition-all hover:scale-105 active:scale-95"
-            >
-              {t("login")}
-            </Button>
-          ) : (
-            <>
-              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
-                <div className="bg-blue-100 p-1 rounded-full">
-                  <User className="h-3 w-3 text-blue-600" />
-                </div>
-                <span className="text-sm font-medium text-slate-700 truncate max-w-[100px] sm:max-w-[150px]">{user?.name}</span>
-              </div>
-              <Button
-                variant="ghost"
-                onClick={onLogout}
-                className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-2 sm:px-3 font-medium"
-                title={t("logout")}
-              >
-                <X className="h-4 w-4 sm:mr-1" />
-                <span className="hidden sm:inline">{t("exit")}</span>
-              </Button>
-            </>
-          )}
         </div>
       </div>
-    </header>
+    </div>
   )
 }
 

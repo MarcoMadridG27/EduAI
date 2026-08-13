@@ -1,4 +1,4 @@
-import { PublicSessionView } from "@/components/public-session-view"
+import { SessionViewPageClient } from "@/components/session-view-page-client"
 
 export const metadata = {
   title: 'Visor de Documentos - Educa +',
@@ -6,5 +6,5 @@ export const metadata = {
 }
 
 export default function SessionViewPage({ params }: Readonly<{ readonly params: Readonly<{ readonly id: string }> }>) {
-  return <PublicSessionView id={params.id} />
+  return <SessionViewPageClient id={params.id} />
 }

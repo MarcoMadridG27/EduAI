@@ -287,29 +287,25 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
           <div className="absolute bottom-20 left-20 w-64 h-64 bg-indigo-600 rounded-full blur-3xl opacity-10 animate-pulse delay-1000"></div>
         </div>
 
-        {/* Header */}
-        <header className="fixed top-0 left-0 right-0 w-full bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm z-40">
-          <div className="container mx-auto px-4 py-6 flex items-center justify-between">
+        {/* Toolbar */}
+        <div className="border-b" style={{ borderColor: "var(--border-subtle)", background: "var(--white)" }}>
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" onClick={onBack} className="bg-white border border-slate-200 shadow-sm hover:shadow-sm">
+              <Button variant="ghost" onClick={onBack}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 {t("back")}
               </Button>
-              <div className="flex items-center gap-3">
-                <img src="/educa-logo.png" alt="Educa +" className="h-10 md:h-12 w-auto object-contain drop-shadow-sm" />
-                <div>
-                  <h1 className="font-bold text-lg text-blue-800 font-bold">
-                    {t("resultsTitle")}
-                  </h1>
-                  <p className="text-sm text-slate-500">Powered by IA & CNEB</p>
-                </div>
+              <div>
+                <h1 className="font-bold text-lg" style={{ color: "var(--ink-900)" }}>
+                  {t("resultsTitle")}
+                </h1>
+                <p className="text-sm" style={{ color: "var(--ink-500)" }}>Powered by IA & CNEB</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Button
                 variant="outline"
                 onClick={onViewDashboard}
-                className="bg-white border border-slate-200 shadow-sm border-indigo-500/30 hover:shadow-sm bg-transparent"
               >
                 <BarChart3 className="h-4 w-4 mr-2" />
                 {t("dashboard")}
@@ -317,17 +313,16 @@ export function SessionResults(props: Readonly<SessionResultsProps>) {
               <Button
                 variant="outline"
                 onClick={() => { setIsEditing(!isEditing); setHasInteracted(true); }}
-                className={`bg-white border border-slate-200 shadow-sm border-emerald-500/30 hover:shadow-sm bg-transparent ${isEditing ? 'shadow-sm' : ''}`}
               >
                 <Edit3 className="h-4 w-4 mr-2" />
                 {isEditing ? "Vista Previa" : t("editSession")}
               </Button>
             </div>
           </div>
-        </header>
+        </div>
 
 
-        <div className="container mx-auto px-4 py-8 relative z-10 pt-28">
+        <div className="container mx-auto px-4 py-8 relative z-10">
           <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto" ref={contentRef}>
 
             {/* SIDEBAR */}

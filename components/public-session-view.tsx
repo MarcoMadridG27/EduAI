@@ -318,9 +318,9 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
     <>
       {showPdf && <PdfPreview session={s} onClose={() => setShowPdf(false)} />}
 
-      <div className="min-h-screen bg-[#F1F5F9] pb-20 pt-[80px]">
-        {/* Header flotante */}
-        <header className="fixed top-0 left-0 right-0 w-full bg-white border-b border-slate-200 py-3 px-6 lg:px-12 flex items-center justify-between z-40">
+      <div className="min-h-screen bg-[#F1F5F9] pb-20">
+        {/* Toolbar */}
+        <div className="w-full border-b py-3 px-6 lg:px-12 flex items-center justify-between" style={{ borderColor: "var(--border-subtle)", background: "var(--white)" }}>
           <div className="flex items-center gap-4">
             <Link href="/repositorio">
               <Button variant="ghost" size="sm" className="text-slate-500 hover:text-slate-800">
@@ -349,7 +349,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
               {lt.viewDownloadPdf}
             </Button>
           </div>
-        </header>
+        </div>
 
         <div className="max-w-5xl mx-auto px-4 mt-8 flex flex-col lg:flex-row gap-8">
 

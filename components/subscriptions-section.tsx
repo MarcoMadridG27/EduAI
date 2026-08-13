@@ -99,53 +99,20 @@ export function SubscriptionsSection({
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-blue-500 selection:text-white">
-      {/* Header Bar */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onBack ? onBack : () => window.history.back()}
-              className="text-slate-600 hover:text-slate-900 flex items-center gap-1.5 font-semibold"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Volver
-            </Button>
-            <div className="h-6 w-px bg-slate-200" />
-            <Link href="/" className="flex items-center group">
-              <img
-                src="/educa-logo.png"
-                alt="Educa +"
-                className="h-9 w-auto object-contain drop-shadow-sm group-hover:opacity-80 transition-opacity"
-              />
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {onNavigateToRepo && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onNavigateToRepo}
-                className="text-slate-600 hover:text-blue-600 hidden md:flex items-center gap-1.5 font-medium"
-              >
-                <BookOpen className="h-4 w-4" />
-                Repositorio
-              </Button>
-            )}
-            {onNavigateToGenerator && (
-              <Button
-                size="sm"
-                onClick={onNavigateToGenerator}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-sm"
-              >
-                Crear Sesión
-              </Button>
-            )}
-          </div>
+      {/* Toolbar */}
+      <div className="border-b" style={{ borderColor: "var(--border-subtle)", background: "var(--white)" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onBack ? onBack : () => window.history.back()}
+            className="flex items-center gap-1.5 font-semibold"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver
+          </Button>
         </div>
-      </header>
+      </div>
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">

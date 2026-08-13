@@ -1,4 +1,4 @@
-import { SubscriptionsSection } from "@/components/subscriptions-section"
+import { SuscripcionesPageClient } from "@/components/suscripciones-page-client"
 
 export const metadata = {
   title: 'Planes y Suscripciones - EduAI Pro',
@@ -6,5 +6,5 @@ export const metadata = {
 }
 
 export default function SuscripcionesPage() {
-  return <SubscriptionsSection />
+  return <SuscripcionesPageClient />
 }

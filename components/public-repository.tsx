@@ -203,14 +203,10 @@ export function PublicRepository({
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 pb-20 pt-[80px]">
-      {/* Header flotante */}
-      <header className="fixed top-0 left-0 right-0 w-full bg-white/90 backdrop-blur-lg py-3 px-6 lg:px-12 flex items-center justify-between z-50 border-b border-slate-200/60 shadow-sm">
-        <Link href="/" className="flex items-center gap-2">
-          <img src="/educa-logo.png" alt="Educa +" className="h-10 md:h-12 w-auto object-contain drop-shadow-sm" />
-          <span className="font-extrabold text-slate-700 text-lg tracking-tight hidden sm:inline">{lt.community}</span>
-        </Link>
-        <div className="flex-1 max-w-xl px-6 hidden md:block">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 pb-20">
+      {/* Search toolbar */}
+      <div className="w-full py-3 px-6 lg:px-12 border-b" style={{ borderColor: "var(--border-subtle)", background: "var(--white)" }}>
+        <div className="max-w-xl mx-auto">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
             <input
@@ -222,90 +218,7 @@ export function PublicRepository({
             />
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          {/* Suscripciones Button */}
-          <Link
-            href="/suscripciones"
-            className="text-slate-600 hover:text-blue-600 font-bold text-sm h-9 px-3 flex items-center gap-1.5 transition-colors"
-          >
-            <Sparkles className="h-4 w-4 text-blue-600" />
-            Suscripciones
-          </Link>
-
-          {/* Dashboard Button */}
-          <Button
-            variant="ghost"
-            onClick={() => {
-              if (guestMode && onLoginRequired) {
-                onLoginRequired()
-              } else if (guestMode) {
-                globalThis.location.href = "/auth"
-              } else if (onViewDashboard) {
-                onViewDashboard()
-              } else {
-                globalThis.location.href = "/?view=dashboard" // Clean route redirect
-              }
-            }}
-            className="text-slate-600 hover:text-slate-900 font-bold text-sm h-9 px-3"
-          >
-            {lt.myDashboard}
-          </Button>
-
-          {/* Crear Sesion Button */}
-          <Button
-            onClick={() => {
-              if (onNavigateToGenerator) {
-                onNavigateToGenerator()
-              } else {
-                globalThis.location.href = "/?view=generator" // Clean route redirect
-              }
-            }}
-            className="rounded-full bg-blue-600 text-white hover:bg-blue-700 font-bold px-4 text-xs sm:text-sm h-9 shadow-sm transition-all"
-          >
-            {lt.createSession}
-          </Button>
-
-          {/* User / Authentication Badge & Button */}
-          {guestMode ? (
-            <Button
-              onClick={() => {
-                if (onLoginRequired) {
-                  onLoginRequired()
-                } else {
-                  globalThis.location.href = "/auth"
-                }
-              }}
-              className="rounded-full bg-slate-900 text-white hover:bg-slate-800 font-bold px-4 text-xs sm:text-sm h-9 shadow-sm transition-all"
-            >
-              {lt.login}
-            </Button>
-          ) : (
-            <>
-              <div className="hidden sm:flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
-                <div className="bg-blue-100 p-1 rounded-full">
-                  <User className="h-3 w-3 text-blue-600" />
-                </div>
-                <span className="text-xs font-semibold text-slate-700 truncate max-w-[100px]">{user?.name}</span>
-              </div>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  if (onLogout) {
-                    onLogout()
-                  } else {
-                    localStorage.removeItem("user")
-                    localStorage.removeItem("access_token")
-                    globalThis.location.href = "/"
-                  }
-                }}
-                className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-2 font-bold text-sm"
-              >
-                {lt.logout}
-              </Button>
-            </>
-          )}
-        </div>
-      </header>
+      </div>
 
       {/* Hero Minimalista */}
       <div className="max-w-7xl mx-auto px-4 mt-8 mb-12">

@@ -281,29 +281,23 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
         <div className="absolute bottom-20 left-20 w-64 h-64 bg-indigo-400 rounded-full blur-[120px] opacity-20 animate-pulse delay-1000"></div>
       </div>
 
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 relative z-10 shadow-sm">
+      {/* Toolbar */}
+      <div className="relative z-10 border-b" style={{ borderColor: "var(--border-subtle)", background: "var(--white)" }}>
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={onBack} className="hover:bg-slate-100 text-slate-600 font-medium h-10 px-4">
+            <Button variant="ghost" onClick={onBack}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t("back")}
             </Button>
-            <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
-              <img src="/educa-logo.png" alt="Educa +" className="h-10 md:h-12 w-auto object-contain drop-shadow-sm" />
-              <div>
-                <h1 className="font-bold text-xl text-slate-800">
-                  Dashboard de {user.name.split(' ')[0]}
-                </h1>
-                <p className="text-xs text-slate-500 font-medium">{t("dashboardSubtitle")}</p>
-              </div>
+            <div className="pl-4" style={{ borderLeft: "1px solid var(--border-subtle)" }}>
+              <h1 className="font-bold text-xl" style={{ color: "var(--ink-900)" }}>
+                Dashboard de {user.name.split(' ')[0]}
+              </h1>
+              <p className="text-xs font-medium" style={{ color: "var(--ink-500)" }}>{t("dashboardSubtitle")}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-
-          </div>
         </div>
-      </header>
+      </div>
 
       <div className="container mx-auto px-4 py-8 relative z-10">
         <div className="max-w-7xl mx-auto space-y-8">
