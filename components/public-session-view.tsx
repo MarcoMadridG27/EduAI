@@ -318,18 +318,18 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
     <>
       {showPdf && <PdfPreview session={s} onClose={() => setShowPdf(false)} />}
 
-      <div className="min-h-screen bg-[#F1F5F9] pb-20">
+      <div className="min-h-screen bg-[var(--bg)] pb-20">
         {/* Toolbar */}
         <div className="w-full border-b py-3 px-6 lg:px-12 flex items-center justify-between" style={{ borderColor: "var(--border-subtle)", background: "var(--white)" }}>
           <div className="flex items-center gap-4">
             <Link href="/repositorio">
-              <Button variant="ghost" size="sm" className="text-slate-500 hover:text-slate-800">
+              <Button variant="ghost" size="sm" style={{ color: "var(--ink-700)" }}>
                 <ArrowLeft className="h-4 w-4 mr-2" /> {lt.back}
               </Button>
             </Link>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={handleCopyLink} className="border-slate-200 text-slate-600">
+            <Button variant="outline" onClick={handleCopyLink} style={{ borderColor: "var(--border-default)", color: "var(--ink-800)" }}>
               {copied ? <Check className="h-4 w-4 text-emerald-500 mr-2" /> : <LinkIcon className="h-4 w-4 mr-2" />}
               {lt.share}
             </Button>
@@ -344,7 +344,7 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
                 return
               }
               setShowPdf(true)
-            }} className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
+            }} className="shadow-sm" style={{ backgroundColor: "var(--blue-500)", color: "var(--white)" }}>
               <Download className="h-4 w-4 mr-2" />
               {lt.viewDownloadPdf}
             </Button>
@@ -355,14 +355,14 @@ export function PublicSessionView({ id }: Readonly<{ readonly id: string }>) {
 
           {/* Main Document Content */}
           <div className="flex-1">
-            <div className="bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200/60 rounded-xl p-8 md:p-12">
+            <div className="bg-white shadow-sm border rounded-xl p-8 md:p-12" style={{ borderColor: "var(--border-subtle)" }}>
 
               {/* Cabecera del Documento */}
-              <div className="border-b-2 border-slate-100 pb-8 mb-8 text-center">
-                <div className="inline-block bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold mb-4">
+              <div className="border-b pb-8 mb-8 text-center" style={{ borderColor: "var(--border-subtle)" }}>
+                <div className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4 border" style={{ background: "var(--blue-50)", color: "var(--blue-700)", borderColor: "var(--blue-100)" }}>
                   {lt.cycle} {s.ciclo || "—"} • {s.horasClase || 2} {lt.hours}
                 </div>
-                <h1 className="text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight leading-tight mb-6">
+                <h1 className="tracking-tight leading-tight mb-6" style={{ font: "var(--text-display-3)", color: "var(--ink-900)" }}>
                   {s.tema}
                 </h1>
 

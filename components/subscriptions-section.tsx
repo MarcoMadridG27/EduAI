@@ -98,7 +98,7 @@ export function SubscriptionsSection({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-blue-500 selection:text-white">
+    <div className="min-h-screen bg-[var(--bg)] text-slate-900 flex flex-col selection:bg-blue-500 selection:text-white">
       {/* Toolbar */}
       <div className="border-b" style={{ borderColor: "var(--border-subtle)", background: "var(--white)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center">
@@ -107,6 +107,7 @@ export function SubscriptionsSection({
             size="sm"
             onClick={onBack ? onBack : () => window.history.back()}
             className="flex items-center gap-1.5 font-semibold"
+            style={{ color: "var(--ink-700)" }}
           >
             <ArrowLeft className="h-4 w-4" />
             Volver
@@ -119,17 +120,17 @@ export function SubscriptionsSection({
         
         {/* Top Hero Banner */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 px-3.5 py-1 text-xs font-semibold rounded-full mb-4 border border-blue-200">
-            <Zap className="h-3.5 w-3.5 mr-1 text-blue-600 fill-blue-600" />
+          <Badge className="px-3.5 py-1 text-xs font-semibold rounded-full mb-4 border" style={{ background: "var(--blue-50)", color: "var(--blue-700)", borderColor: "var(--blue-100)" }}>
+            <Zap className="h-3.5 w-3.5 mr-1" style={{ color: "var(--blue-500)", fill: "var(--blue-500)" }} />
             Planes de Suscripción EduAI
           </Badge>
-          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
+          <h1 className="tracking-tight leading-tight mb-4" style={{ font: "var(--text-display-2)", color: "var(--ink-900)" }}>
             Diseñado para docentes que <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">
+            <span style={{ color: "var(--blue-500)" }}>
               transforman su enseñanza
             </span>
           </h1>
-          <p className="text-lg text-slate-600 leading-relaxed mb-8">
+          <p className="leading-relaxed mb-8" style={{ font: "var(--text-body-lg)", color: "var(--ink-500)" }}>
             Genera sesiones de aprendizaje adaptadas al CNEB en segundos, descarga fichas de trabajo y ahorra horas de planificación semanal.
           </p>
 

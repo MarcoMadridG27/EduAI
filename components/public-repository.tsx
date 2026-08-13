@@ -203,16 +203,17 @@ export function PublicRepository({
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 pb-20">
+    <div className="min-h-screen bg-[var(--bg)] text-slate-900 pb-20">
       {/* Search toolbar */}
       <div className="w-full py-3 px-6 lg:px-12 border-b" style={{ borderColor: "var(--border-subtle)", background: "var(--white)" }}>
         <div className="max-w-xl mx-auto">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "var(--ink-500)" }} />
             <input
               type="text"
               placeholder={lt.searchPlaceholder}
-              className="w-full pl-10 pr-4 py-2 bg-slate-100 rounded-full text-slate-800 text-sm border-transparent focus:bg-white focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all outline-none"
+              className="w-full pl-10 pr-4 py-2 rounded-full text-sm border focus:ring-2 focus:ring-blue-100 transition-all outline-none"
+              style={{ background: "var(--bg-subtle)", color: "var(--ink-900)", borderColor: "var(--border-subtle)" }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -222,15 +223,15 @@ export function PublicRepository({
 
       {/* Hero Minimalista */}
       <div className="max-w-7xl mx-auto px-4 mt-8 mb-12">
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl p-8 md:p-12 border border-blue-100/50 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+        <div className="rounded-3xl p-8 md:p-12 border flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden" style={{ background: "var(--white)", borderColor: "var(--border-subtle)", boxShadow: "var(--shadow-sm)" }}>
           <div className="absolute right-0 top-0 opacity-10 pointer-events-none">
-            <BookOpen className="w-96 h-96 text-blue-600 -translate-y-20 translate-x-20" />
+            <BookOpen className="w-96 h-96 -translate-y-20 translate-x-20" style={{ color: "var(--blue-500)" }} />
           </div>
           <div className="z-10 max-w-2xl">
-            <h1 className="text-3xl md:text-5xl font-black text-slate-800 mb-4 tracking-tight">
-              {lt.heroTitle} <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">{lt.heroTitleHighlight}</span>
+            <h1 className="mb-4 tracking-tight" style={{ font: "var(--text-display-2)", color: "var(--ink-900)" }}>
+              {lt.heroTitle} <br /><span style={{ color: "var(--blue-500)" }}>{lt.heroTitleHighlight}</span>
             </h1>
-            <p className="text-lg text-slate-600 mb-6 leading-relaxed">
+            <p className="mb-6 leading-relaxed" style={{ font: "var(--text-body-lg)", color: "var(--ink-500)" }}>
               {lt.heroSubtitle}
             </p>
             <div className="flex gap-4 md:hidden">

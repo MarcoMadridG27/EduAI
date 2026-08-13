@@ -285,15 +285,15 @@ export function TeacherDashboard({ user, sessions, onBack, onOpenSession }: Read
       <div className="relative z-10 border-b" style={{ borderColor: "var(--border-subtle)", background: "var(--white)" }}>
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={onBack}>
+            <Button variant="ghost" onClick={onBack} style={{ color: "var(--ink-700)" }}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t("back")}
             </Button>
             <div className="pl-4" style={{ borderLeft: "1px solid var(--border-subtle)" }}>
-              <h1 className="font-bold text-xl" style={{ color: "var(--ink-900)" }}>
+              <h1 style={{ font: "var(--text-h1)", color: "var(--ink-900)" }}>
                 Dashboard de {user.name.split(' ')[0]}
               </h1>
-              <p className="text-xs font-medium" style={{ color: "var(--ink-500)" }}>{t("dashboardSubtitle")}</p>
+              <p style={{ font: "var(--text-body-sm)", color: "var(--ink-500)" }}>{t("dashboardSubtitle")}</p>
             </div>
           </div>
         </div>

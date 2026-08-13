@@ -1374,11 +1374,11 @@ function SessionHeader({
     <div className="border-b" style={{ borderColor: "var(--border-subtle)", background: "var(--white)" }}>
       <div className="container mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
-          <h1 className="font-bold text-xl md:text-2xl flex items-center gap-2" style={{ color: "var(--ink-900)" }}>
+          <h1 className="flex items-center gap-2" style={{ font: "var(--text-h1)", color: "var(--ink-900)" }}>
             {t("generatorTitle")}
           </h1>
-          <div className="flex items-center gap-2">
-            <p className="text-xs md:text-sm font-medium" style={{ color: "var(--ink-500)" }}>{t("generatorSubtitle")}</p>
+          <div className="flex items-center gap-2 mt-0.5">
+            <p style={{ font: "var(--text-body-sm)", color: "var(--ink-500)" }}>{t("generatorSubtitle")}</p>
             <span className="text-[10px] px-2 py-0.5 rounded-full border font-semibold" style={{ background: "var(--violet-50)", color: "var(--violet-700)", borderColor: "var(--violet-300)" }}>Powered by IA</span>
           </div>
         </div>
@@ -1394,8 +1394,9 @@ function SessionHeader({
               }
             }}
             className="h-9 text-sm font-medium"
+            style={{ borderColor: "var(--border-default)", color: "var(--ink-800)" }}
           >
-            <BarChart3 className="h-4 w-4 mr-2" />
+            <BarChart3 className="h-4 w-4 mr-2" style={{ color: "var(--blue-500)" }} />
             <span className="hidden sm:inline">{t("dashboard")}</span>
           </Button>
         </div>
