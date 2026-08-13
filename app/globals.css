@@ -52,6 +52,64 @@
   --sidebar-accent-foreground: oklch(0.95 0.01 240);
   --sidebar-border: oklch(0.15 0.03 240);
   --sidebar-ring: oklch(0.65 0.25 300);
+
+  /* --- claude_design system tokens (project dc04cd96-d9aa-4225-a33b-3702e408258e) ---
+     Namespaced/prefixed where a name would otherwise collide with the shadcn
+     theme above (--radius-*, --ring, --font-sans) and change those globally. */
+  --white: #FFFFFF;
+  --bg: #FAFAF8;
+  --bg-subtle: #F3F2ED;
+  --bg-inverse: #0B1220;
+  --ink-900: #0B1220;
+  --ink-800: #151E2E;
+  --ink-700: #2B3444;
+  --ink-500: #5B6472;
+  --ink-300: #9AA3AF;
+  --ink-200: #D6D9DE;
+  --border-subtle: #EAE8E1;
+  --border-default: #DEDBD1;
+  --border-strong: #C9C5B9;
+  --blue-50: #EEF2FF;
+  --blue-100: #DCE4FF;
+  --blue-300: #8FA6F5;
+  --blue-500: #3B63E0;
+  --blue-600: #2F52C7;
+  --blue-700: #2543A6;
+  --emerald-50: #ECFBF4;
+  --emerald-300: #7FDBB4;
+  --emerald-500: #1FA971;
+  --emerald-700: #157F55;
+  --violet-50: #F3EFFE;
+  --violet-300: #BCA6F7;
+  --violet-500: #7C5CE0;
+  --violet-700: #5C3FB8;
+  --amber-500: #D9A441;
+  --rose-500: #D2554A;
+  --ds-ring: var(--blue-300);
+
+  --font-serif: var(--font-newsreader), Georgia, 'Times New Roman', serif;
+  --text-display-1: 600 clamp(2.75rem, 5vw, 4.5rem) / 1.04 var(--font-serif);
+  --text-display-2: 600 clamp(2.25rem, 3.6vw, 3.25rem) / 1.08 var(--font-serif);
+  --text-body-lg: 400 1.125rem / 1.65 var(--font-sans);
+  --text-body: 400 1rem / 1.6 var(--font-sans);
+  --text-body-sm: 400 0.875rem / 1.55 var(--font-sans);
+
+  --ds-radius-sm: 12px;
+  --ds-radius-md: 16px;
+  --ds-radius-lg: 20px;
+  --ds-radius-xl: 24px;
+  --ds-radius-pill: 999px;
+  --container-max: 1160px;
+
+  --shadow-xs: 0 1px 2px rgba(11, 18, 32, 0.04);
+  --shadow-sm: 0 2px 8px rgba(11, 18, 32, 0.06);
+  --shadow-md: 0 8px 24px rgba(11, 18, 32, 0.08);
+  --shadow-lg: 0 20px 48px rgba(11, 18, 32, 0.12);
+  --ds-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ds-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ds-duration-fast: 150ms;
+  --ds-duration-base: 220ms;
+  --ds-duration-slow: 400ms;
 }
 
 

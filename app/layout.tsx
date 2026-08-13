@@ -2,12 +2,19 @@ import type React from "react"
 import type { Metadata } from "next"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
+import { Newsreader } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import { Toaster } from "sonner"
 import { LanguageProvider } from "@/lib/LanguageContext"
 // @ts-ignore: Allow importing global css without type declarations
 import "./globals.css"
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  variable: "--font-newsreader",
+  weight: ["500", "600"],
+})
 
 export const metadata: Metadata = {
   title: "Educa +",
@@ -27,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
+      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${newsreader.variable} antialiased`}>
         <LanguageProvider>
           <Suspense fallback={null}>{children}</Suspense>
           <Toaster position="top-center" richColors />

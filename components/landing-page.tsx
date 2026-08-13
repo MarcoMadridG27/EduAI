@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { BookOpen, Layers, Users, Sparkles, BrainCircuit, Lightbulb, ChevronRight, ChevronLeft, Target, PlayCircle, Loader } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useLanguage } from "@/lib/LanguageContext"
-import { LanguageSelector } from "@/components/language-selector"
+import { Navbar } from "@/components/navbar"
+import { LandingHero } from "@/components/landing-hero"
 import { toast } from "sonner"
 
 interface LandingPageProps {
@@ -266,198 +267,12 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground pb-20 pt-12 overflow-x-hidden">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 w-full bg-background/80 backdrop-blur-md px-6 lg:px-12 h-16 flex items-center justify-between z-50 border-b border-border">
-        <div className="flex items-center">
-          <Link href="/" aria-label="Ir a la página principal">
-            <img src="/educa-logo.png" alt="Educa +" className="h-10 md:h-12 w-auto object-contain drop-shadow-sm" />
-          </Link>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Link
-            href="/suscripciones"
-            className="text-slate-700 hover:text-blue-600 font-bold text-sm h-9 px-3 flex items-center gap-1.5 transition-colors"
-          >
-            <Sparkles className="h-4 w-4 text-blue-600" />
-            Suscripciones
-          </Link>
-          <LanguageSelector />
-          <Button onClick={onLogin} className="rounded-full font-bold h-9 px-6 shadow-md transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#5590af', color: 'var(--papaya-whip)' }}>
-            {t("login")}
-          </Button>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="px-4 lg:px-8 pb-12 pt-6">
-        <motion.div 
-          initial={{ opacity: 0, y: 70, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 1, type: "spring" }}
-          className="relative w-full min-h-[600px] lg:h-[80vh] rounded-[3rem] overflow-hidden flex items-center shadow-2xl border border-border bg-card animate-fade-in"
-          style={{
-            backgroundImage: "url('/blu.jpg')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-        >
-          {/* High-tech Gradient Glow Blobs */}
-          <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-tr from-cyan-400 to-emerald-400 opacity-20 rounded-full blur-[80px] pointer-events-none z-0"></div>
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-gradient-to-tr from-indigo-400 to-purple-400 opacity-25 rounded-full blur-[100px] pointer-events-none z-0"></div>
-          <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10 opacity-30"></div>
-          
-          <div className="relative z-10 w-full max-w-[1300px] mx-auto px-6 py-12 md:px-12 grid lg:grid-cols-12 gap-12 items-center">
-            
-            {/* Left Column - Main Info */}
-            <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
-              
-              {/* Eyebrow Pill */}
-              <div className="inline-flex items-center gap-2 bg-[#003049]/5 backdrop-blur-md px-4 py-1.5 rounded-full text-[#003049] text-xs font-black uppercase tracking-wider mb-6 border border-[#003049]/10">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-500 animate-pulse" />
-                {t("planificationTitle")}
-              </div>
-
-              {/* Premium Typographic Logo Title */}
-              <motion.h1 
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, type: "spring", bounce: 0.5 }}
-                className="text-5xl md:text-7xl lg:text-[6.5rem] font-black tracking-tight leading-none mb-6 select-none"
-              >
-                <span className="text-[#003049] lowercase">educa</span>
-                <span className="relative inline-block ml-1 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-500 to-indigo-600 drop-shadow-[0_2px_10px_rgba(6,182,212,0.3)] font-bold scale-110 translate-y-[-0.03em] select-none">
-                  +
-                </span>
-              </motion.h1>
-              
-              <p className="text-base md:text-xl text-[#003049]/80 font-medium mb-10 max-w-xl leading-relaxed">
-                {t("heroSubtitle")}
-              </p>
-
-              {/* Premium CTA Buttons */}
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
-                className="flex flex-col sm:flex-row gap-4 relative z-20 w-full sm:w-auto"
-              >
-                <Button
-                  onClick={onEnterGeneratorPreview}
-                  className="rounded-full font-bold px-8 py-6 text-lg min-w-[220px] shadow-lg bg-[#5590af] text-white hover:bg-[#3d6e88] hover:shadow-xl transition-all hover:scale-105 active:scale-95 border border-[#5590af]/20 flex items-center justify-center gap-2 animate-pulse-slow"
-                >
-                  {t("startNow")}
-                  <ChevronRight className="w-5 h-5 animate-pulse" />
-                </Button>
-                <Button 
-                  onClick={onEnterRepositoryPreview} 
-                  className="rounded-full font-bold px-8 py-6 text-lg min-w-[220px] shadow-lg bg-white/80 hover:bg-white text-[#003049] border border-slate-200 backdrop-blur-sm hover:shadow-xl transition-all hover:scale-105 active:scale-95"
-                >
-                  {t("exploreRepo")}
-                </Button>
-              </motion.div>
-            </div>
-
-            {/* Right Column - Tech Wireframe Interactive Mockup */}
-            <div className="lg:col-span-5 relative w-full flex items-center justify-center">
-
-              
-              {/* AI Generation Blueprint Mockup Container */}
-              <div className="relative w-full max-w-[420px] aspect-[4/5] bg-slate-950/85 backdrop-blur-md rounded-[3rem] p-6 shadow-2xl border border-slate-800/80 overflow-hidden group">
-                
-                {/* Glowing neon blueprint grid lines */}
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(30,41,59,0.4)_1px,transparent_1px),linear-gradient(to_bottom,rgba(30,41,59,0.4)_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] opacity-40 z-0"></div>
-                
-                {/* Glowing neon blurs inside mockup */}
-                <div className="absolute top-1/4 left-1/4 w-36 h-36 bg-cyan-500/10 rounded-full blur-[50px] pointer-events-none z-0 animate-pulse"></div>
-                <div className="absolute bottom-1/4 right-1/4 w-36 h-36 bg-indigo-500/10 rounded-full blur-[50px] pointer-events-none z-0"></div>
-                
-                {/* IDE-like Header */}
-                <div className="relative z-10 flex items-center justify-between pb-4 border-b border-slate-800/80 mb-5">
-                  <div className="flex gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
-                  </div>
-                  <div className="text-[9px] font-mono text-slate-500 tracking-wider">CREADOR_SESIONES.JSON</div>
-                </div>
-
-                {/* Layered Document Cards */}
-                <div className="relative z-10 space-y-4">
-                  
-                  {/* Card 1: Header info */}
-                  <div className="bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm rounded-2xl p-4 shadow-md transition-all duration-300 group-hover:-translate-y-0.5">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-[9px] font-black text-cyan-400 tracking-wider">{lt.bpPlan}</span>
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="text-[11px] text-slate-300 font-bold">{lt.bpTema} <span className="text-slate-400 font-normal">{lt.bpTemaVal}</span></div>
-                      <div className="text-[11px] text-slate-300 font-bold">{lt.bpGrado} <span className="text-slate-400 font-normal">{lt.bpGradoVal}</span></div>
-                    </div>
-                  </div>
-
-                  {/* Card 2: Flow Circular wireframe representing raw structured thoughts! */}
-                  <div className="bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm rounded-2xl p-4 shadow-md transition-all duration-300 group-hover:-translate-y-1">
-                    <div className="flex justify-between items-center mb-2.5">
-                      <span className="text-[9px] font-black text-emerald-400 tracking-wider">{lt.bpPropositos}</span>
-                      <span className="text-[9px] font-mono text-slate-500 font-semibold uppercase">{lt.bpAnalizando}</span>
-                    </div>
-                    
-                    {/* Render text with Flow Circular font, acting as a wireframe layout */}
-                    <div className="space-y-2 font-flow text-[10px] text-slate-600/80 leading-relaxed select-none tracking-widest">
-                      {lt.bpComp}
-                      {lt.bpCap}
-                      {lt.bpCrit}
-                    </div>
-                  </div>
-
-                  {/* Card 3: Methodology generation active view */}
-                  <div className="bg-[#003049]/35 border border-[#5590af]/20 rounded-2xl p-4 shadow-md relative overflow-hidden transition-all duration-300 group-hover:-translate-y-1.5">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/5 to-transparent pointer-events-none"></div>
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-[9px] font-black text-indigo-400 tracking-wider">{lt.bpSecuencia}</span>
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-400 animate-spin" style={{ animationDuration: '6s' }} />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex gap-2 items-start">
-                        <span className="bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wide">{lt.bpInicio}</span>
-                        <p className="text-[10px] text-slate-300 leading-snug">
-                          {lt.bpInicioVal}
-                        </p>
-                      </div>
-                      
-                      {/* Flow Circular representing raw content being formatted under the hood */}
-                      <div className="space-y-1.5 pl-11">
-                        <div className="font-flow text-[10px] text-slate-600/80 leading-relaxed select-none tracking-widest">
-                          {lt.bpDesarrollo}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Micro Input Prompt Bar at the bottom of panel */}
-                <div className="absolute bottom-4 left-4 right-4 bg-slate-900/90 border border-slate-800 backdrop-blur-md py-2.5 px-3 rounded-2xl flex items-center justify-between shadow-xl">
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    <BrainCircuit className="w-4 h-4 text-cyan-400 shrink-0" />
-                    <span className="text-[10px] font-black text-slate-400 truncate">{lt.bpPrompt}</span>
-                  </div>
-                  <span className="text-[8px] font-mono bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded-full font-black uppercase shrink-0 animate-pulse">
-                    {lt.bpGenerando}
-                  </span>
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-        </motion.div>
-      </section>
+    <div className="min-h-screen bg-[var(--bg)] text-foreground font-sans selection:bg-primary selection:text-primary-foreground pb-20 overflow-x-hidden">
+      <Navbar variant="landing" onLogin={onLogin} />
+      <LandingHero
+        onEnterGeneratorPreview={onEnterGeneratorPreview}
+        onEnterRepositoryPreview={onEnterRepositoryPreview}
+      />
 
       {/* Demo Demonstration Section */}
       <section className="px-4 lg:px-8 py-16">
@@ -520,7 +335,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
 
             <div className="flex justify-center pt-8 border-t border-border">
               <div className="flex flex-col items-center text-center">
-                <div className="w-14 h-14 rounded-full p-4 shrink-0" style={{ backgroundColor: 'var(--brick-red)', color: 'var(--papaya-whip)' }}>
+                <div className="w-14 h-14 rounded-full p-4 shrink-0 flex items-center justify-center" style={{ backgroundColor: 'var(--emerald-50)', color: 'var(--emerald-700)', border: '1px solid var(--emerald-300)' }}>
                   <Target className="w-6 h-6" />
                 </div>
                 <span className="text-xl font-black text-foreground mt-3">✓ CNEB</span>
@@ -542,7 +357,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
               whileHover={{ scale: 1.03, x: -10 }}
               className="bg-card border border-border rounded-[2rem] p-6 flex items-center gap-6 shadow-md cursor-pointer transition-all"
             >
-              <div className="p-4 rounded-2xl shrink-0" style={{ backgroundColor: 'var(--brick-red)', color: 'var(--papaya-whip)' }}>
+              <div className="p-4 rounded-2xl shrink-0" style={{ backgroundColor: 'var(--blue-50)', color: 'var(--blue-600)' }}>
                 <BrainCircuit className="w-8 h-8" />
               </div>
               <div>
@@ -612,10 +427,10 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                 {lt.newAsistant}
               </div>
-              <h2 className="text-4xl md:text-5xl font-black text-[#003049] tracking-tight leading-none">
+              <h2 className="text-4xl md:text-5xl font-black tracking-tight leading-none" style={{ color: "var(--ink-900)" }}>
                 {t("whatsAppTitle")}
               </h2>
-              <p className="text-[#003049]/80 text-sm md:text-base font-medium leading-relaxed max-w-xl">
+              <p className="text-sm md:text-base font-medium leading-relaxed max-w-xl" style={{ color: "var(--ink-500)" }}>
                 {t("whatsAppDesc")}
               </p>
 
@@ -626,7 +441,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                     <Sparkles className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-[#003049]">{lt.cnebAligned}</h4>
+                    <h4 className="font-bold text-sm" style={{ color: "var(--ink-900)" }}>{lt.cnebAligned}</h4>
                     <p className="text-xs text-muted-foreground mt-0.5">{lt.cnebAlignedDesc}</p>
                   </div>
                 </div>
@@ -636,7 +451,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                     <BookOpen className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-[#003049]">{lt.noRegister}</h4>
+                    <h4 className="font-bold text-sm" style={{ color: "var(--ink-900)" }}>{lt.noRegister}</h4>
                     <p className="text-xs text-muted-foreground mt-0.5">{lt.noRegisterDesc}</p>
                   </div>
                 </div>
@@ -772,7 +587,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                   
                   <div className="p-5 flex-1 relative z-10 flex flex-col justify-between">
                     <div>
-                      <div className="inline-block backdrop-blur-md px-3 py-1 rounded-full text-foreground text-[10px] font-bold tracking-wide mb-3 border border-border shadow-sm" style={i === 0 ? { backgroundColor: 'var(--papaya-whip)', color: 'var(--deep-space-blue)' } : undefined}>
+                      <div className="inline-block backdrop-blur-md px-3 py-1 rounded-full text-foreground text-[10px] font-bold tracking-wide mb-3 border border-border shadow-sm" style={i === 0 ? { backgroundColor: 'var(--blue-50)', color: 'var(--blue-700)' } : undefined}>
                         {session.session_data?.grado || "General"}
                       </div>
                       <h4 className="text-xl font-bold mb-1 text-foreground leading-tight group-hover:text-primary transition-colors">
@@ -783,7 +598,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                       </p>
                     </div>
                     
-                    <div className="flex items-center gap-1 text-xs font-bold" style={{ color: 'var(--brick-red)' }}>
+                    <div className="flex items-center gap-1 text-xs font-bold" style={{ color: 'var(--emerald-500)' }}>
                       ✓ Publicado
                     </div>
                   </div>
@@ -793,7 +608,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
           )}
 
           <div className="mt-8 flex justify-start relative z-10">
-            <Button onClick={onEnterRepositoryPreview} className="rounded-full font-bold px-8 py-2 text-sm shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#5590af', color: 'var(--papaya-whip)' }}>
+            <Button onClick={onEnterRepositoryPreview} className="rounded-full font-bold px-8 py-2 text-sm shadow-lg transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: 'var(--blue-500)', color: 'var(--white)' }}>
               {t("exploreRepo")}
             </Button>
           </div>
@@ -827,7 +642,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
             </div>
             
             <div className="relative z-10">
-              <Button onClick={onEnterGeneratorPreview} className="rounded-full font-bold px-6 py-2 text-sm shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: '#5590af', color: 'var(--papaya-whip)' }}>
+              <Button onClick={onEnterGeneratorPreview} className="rounded-full font-bold px-6 py-2 text-sm shadow-lg transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: 'var(--blue-500)', color: 'var(--white)' }}>
                 {t("newSession")}
               </Button>
             </div>
@@ -921,25 +736,25 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
            <p className="text-sm text-muted-foreground mb-6">{t("formInstructions")}</p>
 
            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-8 text-xs text-muted-foreground max-w-2xl border-t border-border/60 pt-6">
-             <a href="/legal/aviso_legal.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[#5590af] transition-colors hover:underline">
+             <a href="/legal/aviso_legal.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--blue-500)] transition-colors hover:underline">
                Aviso Legal
              </a>
-             <a href="/legal/politica_privacidad.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[#5590af] transition-colors hover:underline">
+             <a href="/legal/politica_privacidad.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--blue-500)] transition-colors hover:underline">
                Política de Privacidad
              </a>
-             <a href="/legal/politica_cookies.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[#5590af] transition-colors hover:underline">
+             <a href="/legal/politica_cookies.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--blue-500)] transition-colors hover:underline">
                Política de Cookies
              </a>
-             <a href="/legal/politica_proteccion_datos.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[#5590af] transition-colors hover:underline">
+             <a href="/legal/politica_proteccion_datos.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--blue-500)] transition-colors hover:underline">
                Protección de Datos
              </a>
-             <a href="/legal/politica_seguridad_encriptacion.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[#5590af] transition-colors hover:underline">
+             <a href="/legal/politica_seguridad_encriptacion.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--blue-500)] transition-colors hover:underline">
                Seguridad y Encriptación
              </a>
-             <a href="/legal/terminos_y_condiciones.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[#5590af] transition-colors hover:underline">
+             <a href="/legal/terminos_y_condiciones.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--blue-500)] transition-colors hover:underline">
                Términos y Condiciones
              </a>
-             <Link href="/libro-de-reclamaciones" className="hover:text-[#5590af] transition-colors hover:underline font-bold text-amber-600 flex items-center gap-1">
+             <Link href="/libro-de-reclamaciones" className="hover:text-[var(--blue-500)] transition-colors hover:underline font-bold text-amber-600 flex items-center gap-1">
                📖 Libro de Reclamaciones
              </Link>
            </div>

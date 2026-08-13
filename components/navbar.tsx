@@ -3,11 +3,22 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { 
-  Sparkles, BookOpen, Crown, User, LogOut, UserCheck, 
-  Menu, X, ChevronDown, Layers, ShieldCheck, Home
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Sparkles,
+  BookOpen,
+  Crown,
+  User,
+  LogOut,
+  Menu,
+  X,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LanguageSelector } from "@/components/language-selector";
+import { useLanguage } from "@/lib/LanguageContext";
+
+const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 
 interface NavbarProps {
   user?: { name: string; email: string } | null;
@@ -15,11 +26,24 @@ interface NavbarProps {
   onLogout?: () => void;
   currentView?: string;
   onNavigateView?: (view: string) => void;
+  /** landing-only: routes to /auth (or whatever the caller wants) for the bare marketing CTA */
+  onLogin?: () => void;
+  /** "landing" = bare marketing header, "app" = full product chrome. Defaults to "app". */
+  variant?: "landing" | "app";
 }
 
-export function Navbar({ user, onOpenProfile, onLogout, currentView, onNavigateView }: NavbarProps) {
+export function Navbar({
+  user,
+  onOpenProfile,
+  onLogout,
+  currentView,
+  onNavigateView,
+  onLogin,
+  variant = "app",
+}: NavbarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
@@ -31,215 +55,306 @@ export function Navbar({ user, onOpenProfile, onLogout, currentView, onNavigateV
     setMobileMenuOpen(false);
     if (onNavigateView) {
       onNavigateView(viewName);
-    } else {
-      if (viewName === "repository") {
-        router.push("/repositorio");
-      } else if (viewName === "generator") {
-        router.push("/?view=generator");
-      } else if (viewName === "subscriptions") {
-        router.push("/suscripciones");
-      }
+    } else if (viewName === "repository") {
+      router.push("/repositorio");
+    } else if (viewName === "generator") {
+      router.push("/?view=generator");
+    } else if (viewName === "subscriptions") {
+      router.push("/suscripciones");
     }
   };
 
+  const navItems = [
+    { key: "repository", label: "Repositorio Público", icon: BookOpen, active: isRepoActive, primary: false },
+    { key: "generator", label: "Generar Sesión", icon: Sparkles, active: isGeneratorActive, primary: true },
+    { key: "subscriptions", label: "Planes & Suscripciones", icon: Crown, active: isSubscriptionsActive, primary: false },
+  ] as const;
+
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        
-        {/* LOGO PNG EDUCA+ */}
-        <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2 group">
-            <img
-              src="/educa-logo.png"
-              alt="Educa +"
-              className="h-10 w-auto object-contain drop-shadow-sm group-hover:opacity-85 transition-opacity"
-            />
+    <header
+      className="sticky top-0 z-40 border-b backdrop-blur-md"
+      style={{ background: "color-mix(in srgb, var(--white) 92%, transparent)", borderColor: "var(--border-subtle)" }}
+    >
+      <div className="max-w-[var(--container-max)] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex items-center gap-6 min-w-0">
+          <Link href="/" className="flex items-center gap-2 shrink-0" aria-label="Educa +">
+            <img src="/educa-logo.png" alt="Educa +" className="h-9 w-auto object-contain" />
           </Link>
 
-          {/* Navegación Desktop */}
-          <nav className="hidden md:flex items-center gap-1.5 ml-4">
-            <button
-              onClick={() => handleGoToView("repository")}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
-                isRepoActive
-                  ? "bg-blue-50 text-blue-700 border border-blue-200 shadow-xs"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-              }`}
-            >
-              <BookOpen className="w-4 h-4" />
-              <span>Repositorio Público</span>
-            </button>
-
-            <button
-              onClick={() => handleGoToView("generator")}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
-                isGeneratorActive
-                  ? "bg-blue-600 text-white shadow-sm shadow-blue-500/20"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-              }`}
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Generar Sesión</span>
-            </button>
-
-            <button
-              onClick={() => handleGoToView("subscriptions")}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
-                isSubscriptionsActive
-                  ? "bg-amber-50 text-amber-800 border border-amber-200"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-              }`}
-            >
-              <Crown className="w-4 h-4 text-amber-500" />
-              <span>Planes & Suscripciones</span>
-            </button>
-          </nav>
-        </div>
-
-        {/* Acciones de Usuario (Derecha) */}
-        <div className="hidden md:flex items-center gap-3">
-          {user ? (
-            <div className="relative">
-              <button
-                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-2 p-1.5 pr-3 rounded-full bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all text-left"
-              >
-                <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">
-                  {user.name ? user.name.charAt(0).toUpperCase() : "D"}
-                </div>
-                <div className="max-w-[120px] truncate">
-                  <p className="text-xs font-bold text-slate-800 leading-tight truncate">{user.name.split(" ")[0]}</p>
-                </div>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-              </button>
-
-              {/* Dropdown del Menú de Usuario */}
-              {userDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 text-slate-800 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="px-4 py-2 border-b border-slate-100">
-                    <p className="text-xs font-bold text-slate-900 truncate">{user.name}</p>
-                    <p className="text-[11px] text-slate-500 truncate">{user.email}</p>
-                  </div>
-
+          {variant === "app" && (
+            <nav className="hidden md:flex items-center gap-1 p-1 rounded-[var(--ds-radius-pill)]" style={{ background: "var(--bg-subtle)" }}>
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                return (
                   <button
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      if (onOpenProfile) onOpenProfile();
+                    key={item.key}
+                    onClick={() => handleGoToView(item.key)}
+                    className="relative px-3.5 py-1.5 rounded-[var(--ds-radius-pill)] text-[13px] font-semibold flex items-center gap-1.5 transition-colors"
+                    style={{
+                      color: item.active
+                        ? item.primary
+                          ? "var(--white)"
+                          : "var(--ink-900)"
+                        : "var(--ink-500)",
                     }}
-                    className="w-full px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2 text-left"
                   >
-                    <User className="w-4 h-4 text-blue-600" />
-                    <span>Mi Perfil Docente</span>
+                    {item.active && (
+                      <motion.span
+                        layoutId="nav-pill-active"
+                        transition={{ duration: 0.22, ease: EASE_OUT }}
+                        className="absolute inset-0 rounded-[var(--ds-radius-pill)]"
+                        style={{
+                          background: item.primary ? "var(--blue-500)" : "var(--white)",
+                          boxShadow: item.primary ? "none" : "var(--shadow-xs)",
+                        }}
+                      />
+                    )}
+                    <Icon className="relative w-3.5 h-3.5" />
+                    <span className="relative">{item.label}</span>
                   </button>
-
-                  <button
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      handleGoToView("subscriptions");
-                    }}
-                    className="w-full px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-800 flex items-center gap-2 text-left"
-                  >
-                    <Crown className="w-4 h-4 text-amber-500" />
-                    <span>Mi Suscripción</span>
-                  </button>
-
-                  <div className="border-t border-slate-100 my-1" />
-
-                  <button
-                    onClick={() => {
-                      setUserDropdownOpen(false);
-                      if (onLogout) onLogout();
-                    }}
-                    className="w-full px-4 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 text-left"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Cerrar Sesión</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <Button
-              onClick={() => router.push("/auth")}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs h-9 px-4 rounded-xl shadow-sm"
-            >
-              Iniciar Sesión
-            </Button>
+                );
+              })}
+            </nav>
           )}
         </div>
 
-        {/* Botón menú Mobile */}
+        {/* Right side */}
+        {variant === "landing" ? (
+          <div className="hidden md:flex items-center gap-4">
+            <Link
+              href="/suscripciones"
+              className="flex items-center gap-1.5 text-[13px] font-semibold transition-colors"
+              style={{ color: "var(--ink-700)" }}
+            >
+              <Sparkles className="h-3.5 w-3.5" style={{ color: "var(--blue-500)" }} />
+              Suscripciones
+            </Link>
+            <LanguageSelector />
+            <Button
+              onClick={onLogin ?? (() => router.push("/auth"))}
+              className="rounded-[var(--ds-radius-pill)] font-semibold h-9 px-5 text-[13px]"
+              style={{ backgroundColor: "var(--blue-500)", color: "var(--white)" }}
+            >
+              {t("login")}
+            </Button>
+          </div>
+        ) : (
+          <div className="hidden md:flex items-center gap-3">
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserDropdownOpen((v) => !v)}
+                  className="flex items-center gap-2 p-1 pr-2.5 rounded-[var(--ds-radius-pill)] border transition-colors"
+                  style={{ borderColor: "var(--border-subtle)" }}
+                >
+                  <div
+                    className="w-7 h-7 rounded-full font-bold text-[11px] flex items-center justify-center"
+                    style={{ backgroundColor: "var(--ink-900)", color: "var(--white)" }}
+                  >
+                    {user.name ? user.name.charAt(0).toUpperCase() : "D"}
+                  </div>
+                  <span className="text-[13px] font-semibold" style={{ color: "var(--ink-800)" }}>
+                    {user.name.split(" ")[0]}
+                  </span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 transition-transform duration-150 ${userDropdownOpen ? "rotate-180" : ""}`}
+                    style={{ color: "var(--ink-300)" }}
+                  />
+                </button>
+
+                <AnimatePresence>
+                  {userDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                      transition={{ duration: 0.15, ease: EASE_OUT }}
+                      className="absolute right-0 mt-2 w-56 rounded-[var(--ds-radius-md)] py-2 z-50 origin-top-right"
+                      style={{
+                        background: "var(--white)",
+                        border: "1px solid var(--border-subtle)",
+                        boxShadow: "var(--shadow-md)",
+                      }}
+                    >
+                      <div className="px-4 py-2 border-b" style={{ borderColor: "var(--border-subtle)" }}>
+                        <p className="text-[13px] font-semibold truncate" style={{ color: "var(--ink-900)" }}>
+                          {user.name}
+                        </p>
+                        <p className="text-[11px] truncate" style={{ color: "var(--ink-500)" }}>
+                          {user.email}
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          setUserDropdownOpen(false);
+                          onOpenProfile?.();
+                        }}
+                        className="w-full px-4 py-2.5 text-[13px] font-medium flex items-center gap-2 text-left transition-colors"
+                        style={{ color: "var(--ink-700)" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-subtle)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <User className="w-4 h-4" style={{ color: "var(--blue-500)" }} />
+                        Mi Perfil Docente
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setUserDropdownOpen(false);
+                          handleGoToView("subscriptions");
+                        }}
+                        className="w-full px-4 py-2.5 text-[13px] font-medium flex items-center gap-2 text-left transition-colors"
+                        style={{ color: "var(--ink-700)" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-subtle)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <Crown className="w-4 h-4" style={{ color: "var(--amber-500)" }} />
+                        Mi Suscripción
+                      </button>
+
+                      <div className="border-t my-1" style={{ borderColor: "var(--border-subtle)" }} />
+
+                      <button
+                        onClick={() => {
+                          setUserDropdownOpen(false);
+                          onLogout?.();
+                        }}
+                        className="w-full px-4 py-2.5 text-[13px] font-medium flex items-center gap-2 text-left transition-colors"
+                        style={{ color: "var(--rose-500)" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-subtle)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Cerrar Sesión
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              // guest-mode: no `user`, but we're past the landing route
+              <Button
+                onClick={() => router.push("/auth")}
+                className="rounded-[var(--ds-radius-pill)] font-semibold h-9 px-5 text-[13px]"
+                style={{ backgroundColor: "var(--blue-500)", color: "var(--white)" }}
+              >
+                Iniciar Sesión
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Mobile toggle */}
         <div className="md:hidden flex items-center">
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+            onClick={() => setMobileMenuOpen((v) => !v)}
+            className="p-2 rounded-[var(--ds-radius-sm)]"
+            style={{ color: "var(--ink-700)" }}
+            aria-label="Menú"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
-
       </div>
 
-      {/* Menú Desplegable Mobile */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-2">
-          <button
-            onClick={() => handleGoToView("repository")}
-            className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 flex items-center gap-2"
+      {/* Mobile sheet — same items for both variants (landing just omits the pill group) */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.22, ease: EASE_OUT }}
+            className="md:hidden overflow-hidden"
+            style={{ background: "var(--white)", borderTop: "1px solid var(--border-subtle)" }}
           >
-            <BookOpen className="w-4 h-4 text-blue-600" /> Repositorio Público
-          </button>
+            <div className="px-4 pt-2 pb-4 space-y-1">
+              {variant === "app" &&
+                navItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.key}
+                      onClick={() => handleGoToView(item.key)}
+                      className="w-full text-left px-3 py-2.5 rounded-[var(--ds-radius-sm)] text-[13px] font-semibold flex items-center gap-2"
+                      style={{
+                        color: item.active ? "var(--blue-600)" : "var(--ink-700)",
+                        background: item.active ? "var(--blue-50)" : "transparent",
+                      }}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {item.label}
+                    </button>
+                  );
+                })}
 
-          <button
-            onClick={() => handleGoToView("generator")}
-            className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 flex items-center gap-2"
-          >
-            <Sparkles className="w-4 h-4 text-indigo-600" /> Generar Sesión
-          </button>
+              {variant === "landing" && (
+                <Link
+                  href="/suscripciones"
+                  className="w-full px-3 py-2.5 rounded-[var(--ds-radius-sm)] text-[13px] font-semibold flex items-center gap-2"
+                  style={{ color: "var(--ink-700)" }}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Sparkles className="w-4 h-4" style={{ color: "var(--blue-500)" }} />
+                  Suscripciones
+                </Link>
+              )}
 
-          <button
-            onClick={() => handleGoToView("subscriptions")}
-            className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 flex items-center gap-2"
-          >
-            <Crown className="w-4 h-4 text-amber-500" /> Planes & Suscripciones
-          </button>
+              <div className="border-t my-2" style={{ borderColor: "var(--border-subtle)" }} />
 
-          {user ? (
-            <>
-              <div className="border-t border-slate-100 pt-2" />
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  if (onOpenProfile) onOpenProfile();
-                }}
-                className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-blue-700 bg-blue-50 flex items-center gap-2"
-              >
-                <User className="w-4 h-4" /> Mi Perfil Docente ({user.name.split(" ")[0]})
-              </button>
+              {variant === "landing" && (
+                <div className="px-3 py-1">
+                  <LanguageSelector />
+                </div>
+              )}
 
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  if (onLogout) onLogout();
-                }}
-                className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 flex items-center gap-2"
-              >
-                <LogOut className="w-4 h-4" /> Cerrar Sesión
-              </button>
-            </>
-          ) : (
-            <Button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                router.push("/auth");
-              }}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs h-10 rounded-xl"
-            >
-              Iniciar Sesión
-            </Button>
-          )}
-        </div>
-      )}
+              {user ? (
+                <>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onOpenProfile?.();
+                    }}
+                    className="w-full text-left px-3 py-2.5 rounded-[var(--ds-radius-sm)] text-[13px] font-semibold flex items-center gap-2"
+                    style={{ color: "var(--blue-700)", background: "var(--blue-50)" }}
+                  >
+                    <User className="w-4 h-4" />
+                    Mi Perfil Docente ({user.name.split(" ")[0]})
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onLogout?.();
+                    }}
+                    className="w-full text-left px-3 py-2.5 rounded-[var(--ds-radius-sm)] text-[13px] font-semibold flex items-center gap-2"
+                    style={{ color: "var(--rose-500)" }}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Cerrar Sesión
+                  </button>
+                </>
+              ) : (
+                <Button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    if (variant === "landing" && onLogin) {
+                      onLogin();
+                    } else {
+                      router.push("/auth");
+                    }
+                  }}
+                  className="w-full rounded-[var(--ds-radius-sm)] font-semibold h-10 text-[13px]"
+                  style={{ backgroundColor: "var(--blue-500)", color: "var(--white)" }}
+                >
+                  Iniciar Sesión
+                </Button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
