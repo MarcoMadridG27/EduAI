@@ -284,16 +284,16 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
           className="max-w-5xl mx-auto"
         >
           <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-black text-foreground mb-4">{t("interactiveDemo")}</h2>
-            <p className="text-lg text-muted-foreground">{t("interactiveDemoDesc")}</p>
+            <h2 className="mb-4" style={{ font: "var(--text-display-2)", color: "var(--ink-900)" }}>{t("interactiveDemo")}</h2>
+            <p className="text-lg" style={{ color: "var(--ink-500)" }}>{t("interactiveDemoDesc")}</p>
           </div>
-          <div 
-            className="w-full relative overflow-hidden rounded-[2rem] shadow-2xl border border-border bg-card sl-embed"
-            style={{ paddingBottom: "calc(49.22% + 25px)", height: 0 }}
+          <div
+            className="w-full relative overflow-hidden rounded-[var(--ds-radius-xl)] border sl-embed"
+            style={{ paddingBottom: "calc(49.22% + 25px)", height: 0, borderColor: "var(--border-subtle)", boxShadow: "var(--shadow-lg)" }}
           >
-            <iframe 
-              loading="lazy" 
-              className="absolute top-0 left-0 w-full h-full border-0 rounded-[2rem] shadow-xl sl-demo"
+            <iframe
+              loading="lazy"
+              className="absolute top-0 left-0 w-full h-full border-0 rounded-[var(--ds-radius-xl)] sl-demo"
               src="https://app.storylane.io/demo/l7mjkcatobdt?embed=inline" 
               name="sl-embed" 
               allow="fullscreen" 
@@ -325,21 +325,21 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
             className="flex flex-col gap-8"
           >
             <div>
-              <h2 className="text-4xl md:text-5xl font-black text-foreground leading-[1.1] tracking-tight mb-6">
+              <h2 className="mb-6" style={{ font: "var(--text-display-2)", color: "var(--ink-900)", letterSpacing: "-0.01em" }}>
                 {t("whyChooseTitle")}
               </h2>
-              <p className="text-lg text-muted-foreground font-medium leading-relaxed">
+              <p className="text-lg font-medium leading-relaxed" style={{ color: "var(--ink-500)" }}>
                 {t("whyChooseSubtitle")}
               </p>
             </div>
 
-            <div className="flex justify-center pt-8 border-t border-border">
+            <div className="flex justify-center pt-8 border-t" style={{ borderColor: "var(--border-subtle)" }}>
               <div className="flex flex-col items-center text-center">
                 <div className="w-14 h-14 rounded-full p-4 shrink-0 flex items-center justify-center" style={{ backgroundColor: 'var(--emerald-50)', color: 'var(--emerald-700)', border: '1px solid var(--emerald-300)' }}>
                   <Target className="w-6 h-6" />
                 </div>
-                <span className="text-xl font-black text-foreground mt-3">✓ CNEB</span>
-                <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider leading-tight mt-1">Currículo<br/>Nacional</span>
+                <span className="text-xl font-black mt-3" style={{ color: "var(--ink-900)" }}>✓ CNEB</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider leading-tight mt-1" style={{ color: "var(--ink-500)" }}>Currículo<br/>Nacional</span>
               </div>
             </div>
           </motion.div>
@@ -352,54 +352,55 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
             className="flex flex-col gap-4"
           >
             {/* Card 1 */}
-            <motion.div 
+            <motion.div
               variants={springRight}
-              whileHover={{ scale: 1.03, x: -10 }}
-              className="bg-card border border-border rounded-[2rem] p-6 flex items-center gap-6 shadow-md cursor-pointer transition-all"
+              whileHover={{ x: -4 }}
+              className="border p-6 flex items-center gap-6 cursor-pointer transition-shadow hover:shadow-[var(--shadow-md)]"
+              style={{ background: "var(--white)", borderColor: "var(--border-subtle)", borderRadius: "var(--ds-radius-xl)", boxShadow: "var(--shadow-sm)" }}
             >
-              <div className="p-4 rounded-2xl shrink-0" style={{ backgroundColor: 'var(--blue-50)', color: 'var(--blue-600)' }}>
+              <div className="p-4 rounded-[var(--ds-radius-md)] shrink-0" style={{ backgroundColor: 'var(--blue-50)', color: 'var(--blue-600)' }}>
                 <BrainCircuit className="w-8 h-8" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground mb-1">{t("smartGenTitle")}</h3>
-                <p className="text-muted-foreground text-xs leading-relaxed font-medium">{t("smartGenDesc")}</p>
+                <h3 className="text-lg font-bold mb-1" style={{ color: "var(--ink-900)" }}>{t("smartGenTitle")}</h3>
+                <p className="text-xs leading-relaxed font-medium" style={{ color: "var(--ink-500)" }}>{t("smartGenDesc")}</p>
               </div>
             </motion.div>
 
             {/* Card 2 */}
-            <motion.div 
+            <motion.div
               variants={springRight}
-              whileHover={{ scale: 1.03, x: -10 }}
-              className="bg-card border border-border rounded-[2rem] p-6 flex items-center gap-6 shadow-md cursor-pointer transition-all"
+              whileHover={{ x: -4 }}
+              className="border p-6 flex items-center gap-6 cursor-pointer transition-shadow hover:shadow-[var(--shadow-md)]"
+              style={{ background: "var(--white)", borderColor: "var(--border-subtle)", borderRadius: "var(--ds-radius-xl)", boxShadow: "var(--shadow-sm)" }}
             >
-              <div className="bg-secondary/10 p-4 rounded-2xl shrink-0">
-                <Lightbulb className="w-8 h-8 text-secondary" />
+              <div className="p-4 rounded-[var(--ds-radius-md)] shrink-0" style={{ backgroundColor: 'var(--violet-50)', color: 'var(--violet-700)' }}>
+                <Lightbulb className="w-8 h-8" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-foreground mb-1">{t("contextualTitle")}</h3>
-                <p className="text-muted-foreground text-xs leading-relaxed font-medium">{t("contextualDesc")}</p>
+                <h3 className="text-lg font-bold mb-1" style={{ color: "var(--ink-900)" }}>{t("contextualTitle")}</h3>
+                <p className="text-xs leading-relaxed font-medium" style={{ color: "var(--ink-500)" }}>{t("contextualDesc")}</p>
               </div>
             </motion.div>
 
             {/* Card 3 */}
-            <motion.div 
+            <motion.div
               variants={springRight}
-              whileHover={{ scale: 1.03, x: -10 }}
-              className="bg-card border border-border rounded-[2rem] p-6 flex items-center gap-6 shadow-md cursor-pointer transition-all relative overflow-hidden"
+              whileHover={{ x: -4 }}
+              className="border p-6 flex items-center gap-6 cursor-pointer transition-shadow hover:shadow-[var(--shadow-md)] relative overflow-hidden"
+              style={{ background: "var(--white)", borderColor: "var(--border-subtle)", borderRadius: "var(--ds-radius-xl)", boxShadow: "var(--shadow-sm)" }}
             >
-              <div className="bg-accent/10 p-4 rounded-2xl shrink-0 z-10 relative">
-                <Users className="w-8 h-8 text-accent" />
+              <div className="p-4 rounded-[var(--ds-radius-md)] shrink-0 z-10 relative" style={{ backgroundColor: 'color-mix(in srgb, var(--amber-500) 15%, white)', color: '#B8842E' }}>
+                <Users className="w-8 h-8" />
               </div>
               <div className="z-10 relative">
-                <h3 className="text-lg font-bold text-foreground mb-1">{t("repoTitle")}</h3>
-                <p className="text-muted-foreground text-xs leading-relaxed font-medium">{t("repoDesc")}</p>
+                <h3 className="text-lg font-bold mb-1" style={{ color: "var(--ink-900)" }}>{t("repoTitle")}</h3>
+                <p className="text-xs leading-relaxed font-medium" style={{ color: "var(--ink-500)" }}>{t("repoDesc")}</p>
               </div>
-              <motion.img 
-                animate={{ y: [0, -5, 0] }}
-                transition={{ repeat: Infinity, duration: 3 }}
-                src="/pinguinos/pinguino_pensando.png" 
-                className="absolute right-0 bottom-0 w-24 h-24 opacity-20 translate-x-4 translate-y-4 object-contain"
-                alt="Pinguino"
+              <img
+                src="/pinguinos/pinguino_pensando.png"
+                className="absolute right-0 bottom-0 w-24 h-24 opacity-15 translate-x-4 translate-y-4 object-contain pointer-events-none"
+                alt=""
               />
             </motion.div>
           </motion.div>
@@ -414,20 +415,17 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={scaleIn}
-          className="relative rounded-[3rem] bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-background border border-emerald-500/20 p-8 lg:p-16 overflow-hidden shadow-2xl"
+          className="relative p-8 lg:p-16 overflow-hidden"
+          style={{ background: "var(--white)", border: "1px solid var(--border-subtle)", borderRadius: "var(--ds-radius-xl)", boxShadow: "var(--shadow-lg)" }}
         >
-          {/* Neon Glow Blobs */}
-          <div className="absolute -top-12 -right-12 w-64 h-64 bg-emerald-400/20 rounded-full blur-[80px] pointer-events-none" />
-          <div className="absolute -bottom-12 -left-12 w-80 h-80 bg-teal-400/10 rounded-full blur-[100px] pointer-events-none" />
-
           <div className="grid lg:grid-cols-12 gap-12 items-center relative z-10">
             {/* Left side: Info & Copy/Chat triggers */}
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-1.5 rounded-full text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-wider mb-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-[var(--ds-radius-pill)] text-xs font-black uppercase tracking-wider mb-2" style={{ background: "var(--emerald-50)", color: "var(--emerald-700)", border: "1px solid var(--emerald-300)" }}>
+                <span className="w-2 h-2 rounded-full" style={{ background: "var(--emerald-500)" }} />
                 {lt.newAsistant}
               </div>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight leading-none" style={{ color: "var(--ink-900)" }}>
+              <h2 style={{ font: "var(--text-display-2)", color: "var(--ink-900)" }}>
                 {t("whatsAppTitle")}
               </h2>
               <p className="text-sm md:text-base font-medium leading-relaxed max-w-xl" style={{ color: "var(--ink-500)" }}>
@@ -436,23 +434,23 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
 
               {/* Bot Info Cards */}
               <div className="grid sm:grid-cols-2 gap-4 pt-2 text-left">
-                <div className="bg-card/50 border border-border/60 p-4 rounded-2xl flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 shrink-0">
+                <div className="p-4 rounded-[var(--ds-radius-md)] flex items-start gap-3" style={{ background: "var(--bg-subtle)", border: "1px solid var(--border-subtle)" }}>
+                  <div className="p-2 rounded-[var(--ds-radius-sm)] shrink-0" style={{ background: "var(--emerald-50)", color: "var(--emerald-700)" }}>
                     <Sparkles className="w-5 h-5" />
                   </div>
                   <div>
                     <h4 className="font-bold text-sm" style={{ color: "var(--ink-900)" }}>{lt.cnebAligned}</h4>
-                    <p className="text-xs text-muted-foreground mt-0.5">{lt.cnebAlignedDesc}</p>
+                    <p className="text-xs mt-0.5" style={{ color: "var(--ink-500)" }}>{lt.cnebAlignedDesc}</p>
                   </div>
                 </div>
 
-                <div className="bg-card/50 border border-border/60 p-4 rounded-2xl flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 shrink-0">
+                <div className="p-4 rounded-[var(--ds-radius-md)] flex items-start gap-3" style={{ background: "var(--bg-subtle)", border: "1px solid var(--border-subtle)" }}>
+                  <div className="p-2 rounded-[var(--ds-radius-sm)] shrink-0" style={{ background: "var(--emerald-50)", color: "var(--emerald-700)" }}>
                     <BookOpen className="w-5 h-5" />
                   </div>
                   <div>
                     <h4 className="font-bold text-sm" style={{ color: "var(--ink-900)" }}>{lt.noRegister}</h4>
-                    <p className="text-xs text-muted-foreground mt-0.5">{lt.noRegisterDesc}</p>
+                    <p className="text-xs mt-0.5" style={{ color: "var(--ink-500)" }}>{lt.noRegisterDesc}</p>
                   </div>
                 </div>
               </div>
@@ -521,21 +519,22 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
           variants={scaleIn}
-          className="bg-muted/50 border border-border rounded-[3rem] p-8 lg:p-12 max-w-[1400px] mx-auto relative overflow-hidden"
+          className="p-8 lg:p-12 max-w-[1400px] mx-auto relative overflow-hidden"
+          style={{ background: "var(--bg-subtle)", border: "1px solid var(--border-subtle)", borderRadius: "var(--ds-radius-xl)" }}
         >
           <div className="flex flex-col md:flex-row justify-between items-end mb-10 relative z-10">
             <div className="max-w-xl">
-              <h2 className="text-2xl font-black text-foreground mb-2">{t("exploreRepo")}</h2>
-              <p className="text-muted-foreground text-sm font-medium">{t("repoDesc")}</p>
+              <h2 className="mb-2" style={{ font: "var(--text-h1)", color: "var(--ink-900)" }}>{t("exploreRepo")}</h2>
+              <p className="text-sm font-medium" style={{ color: "var(--ink-500)" }}>{t("repoDesc")}</p>
             </div>
-            
+
             <div className="flex items-center gap-6 mt-6 md:mt-0">
               <div className="flex gap-2">
-                <button className="w-8 h-8 rounded-full border border-border bg-card flex items-center justify-center hover:bg-muted transition-colors shadow-sm">
-                  <ChevronLeft className="w-4 h-4 text-foreground" />
+                <button className="w-8 h-8 rounded-full flex items-center justify-center transition-colors" style={{ border: "1px solid var(--border-subtle)", background: "var(--white)" }}>
+                  <ChevronLeft className="w-4 h-4" style={{ color: "var(--ink-700)" }} />
                 </button>
-                <button className="w-8 h-8 rounded-full border border-border bg-card flex items-center justify-center hover:bg-muted transition-colors shadow-sm">
-                  <ChevronRight className="w-4 h-4 text-foreground" />
+                <button className="w-8 h-8 rounded-full flex items-center justify-center transition-colors" style={{ border: "1px solid var(--border-subtle)", background: "var(--white)" }}>
+                  <ChevronRight className="w-4 h-4" style={{ color: "var(--ink-700)" }} />
                 </button>
               </div>
             </div>
@@ -613,12 +612,10 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
             </Button>
           </div>
 
-          <motion.img 
-            animate={{ x: [0, 20, 0] }}
-            transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+          <img
             src="/pinguinos/pinguino_chill.png"
-            className="absolute -bottom-16 -right-10 w-64 h-64 opacity-20 z-0 pointer-events-none object-contain"
-            alt="Pinguino"
+            className="absolute -bottom-16 -right-10 w-64 h-64 opacity-15 z-0 pointer-events-none object-contain"
+            alt=""
           />
         </motion.div>
       </section>
@@ -626,48 +623,46 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
       {/* Tools Grid Section */}
       <section className="px-4 lg:px-8 py-10 max-w-[1400px] mx-auto">
         <div className="grid md:grid-cols-2 gap-6">
-          <motion.div 
+          <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={springLeft}
-            whileHover={{ scale: 0.98 }}
-            className="bg-primary/5 border border-primary/20 rounded-[2rem] p-10 flex flex-col justify-between h-[450px] relative overflow-hidden group cursor-pointer shadow-md"
+            className="p-10 flex flex-col justify-between h-[450px] relative overflow-hidden group cursor-pointer"
+            style={{ background: "var(--blue-50)", border: "1px solid var(--blue-100)", borderRadius: "var(--ds-radius-xl)" }}
           >
             <div className="relative z-10">
-              <h2 className="text-3xl font-bold text-foreground mb-4">{lt.teacherTools}</h2>
-              <p className="text-muted-foreground font-medium text-sm max-w-xs leading-relaxed">
+              <h2 className="mb-4" style={{ font: "var(--text-display-2)", color: "var(--ink-900)" }}>{lt.teacherTools}</h2>
+              <p className="font-medium text-sm max-w-xs leading-relaxed" style={{ color: "var(--ink-500)" }}>
                 {lt.teacherToolsDesc}
               </p>
             </div>
-            
+
             <div className="relative z-10">
-              <Button onClick={onEnterGeneratorPreview} className="rounded-full font-bold px-6 py-2 text-sm shadow-lg transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: 'var(--blue-500)', color: 'var(--white)' }}>
+              <Button onClick={onEnterGeneratorPreview} className="rounded-[var(--ds-radius-pill)] font-bold px-6 py-2 text-sm transition-transform group-hover:scale-105" style={{ backgroundColor: 'var(--blue-500)', color: 'var(--white)', boxShadow: 'var(--shadow-sm)' }}>
                 {t("newSession")}
               </Button>
             </div>
 
-            <motion.img 
-              animate={{ rotate: [-5, 5, -5] }}
-              transition={{ repeat: Infinity, duration: 5 }}
+            <img
               src="/pinguinos/pinguino_mostrando.png"
-              className="absolute right-0 bottom-0 w-64 h-64 translate-x-12 translate-y-12 group-hover:scale-110 transition-transform duration-500 drop-shadow-xl object-contain"
-              alt="Mascota"
+              className="absolute right-0 bottom-0 w-64 h-64 translate-x-12 translate-y-12 group-hover:scale-105 group-hover:-rotate-2 transition-transform duration-300 object-contain"
+              alt=""
             />
           </motion.div>
 
           <div className="grid sm:grid-cols-2 gap-6">
-             <motion.div 
+             <motion.div
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={springUp}
-                whileHover={{ scale: 1.03 }}
-                className="bg-card border border-border rounded-[2rem] p-8 flex flex-col justify-between h-[450px] relative group cursor-pointer shadow-md"
+                className="p-8 flex flex-col justify-between h-[450px] relative group cursor-pointer transition-shadow hover:shadow-[var(--shadow-md)]"
+                style={{ background: "var(--white)", border: "1px solid var(--border-subtle)", borderRadius: "var(--ds-radius-xl)", boxShadow: "var(--shadow-sm)" }}
              >
                 <div className="absolute top-4 left-4 z-10">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-primary" />
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "var(--blue-50)" }}>
+                    <Sparkles className="w-6 h-6" style={{ color: "var(--blue-600)" }} />
                   </div>
                 </div>
 
@@ -675,27 +670,27 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                   <img
                     src="/innovacion.jpg"
                     alt={lt.pedagogicInnovation}
-                    className="w-52 h-52 object-contain drop-shadow-lg"
+                    className="w-52 h-52 object-contain"
                   />
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2 leading-tight">{lt.pedagogicInnovation}</h3>
-                  <p className="text-xs text-muted-foreground font-medium leading-relaxed">{lt.pedagogicInnovationDesc}</p>
+                  <h3 className="text-xl font-bold mb-2 leading-tight" style={{ color: "var(--ink-900)" }}>{lt.pedagogicInnovation}</h3>
+                  <p className="text-xs font-medium leading-relaxed" style={{ color: "var(--ink-500)" }}>{lt.pedagogicInnovationDesc}</p>
                 </div>
              </motion.div>
 
-             <motion.div 
+             <motion.div
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={springUp}
-                whileHover={{ scale: 1.03 }}
-                className="bg-card border border-border rounded-[2rem] p-8 flex flex-col justify-between h-[450px] relative group cursor-pointer shadow-md"
+                className="p-8 flex flex-col justify-between h-[450px] relative group cursor-pointer transition-shadow hover:shadow-[var(--shadow-md)]"
+                style={{ background: "var(--white)", border: "1px solid var(--border-subtle)", borderRadius: "var(--ds-radius-xl)", boxShadow: "var(--shadow-sm)" }}
              >
                 <div className="absolute top-4 left-4 z-10">
-                  <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center">
-                    <BookOpen className="w-6 h-6 text-secondary" />
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "var(--emerald-50)" }}>
+                    <BookOpen className="w-6 h-6" style={{ color: "var(--emerald-700)" }} />
                   </div>
                 </div>
 
@@ -703,13 +698,13 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                   <img
                     src="/sesion_ap_doc.png"
                     alt={lt.officialDownload}
-                    className="w-52 h-52 object-contain drop-shadow-lg"
+                    className="w-52 h-52 object-contain"
                   />
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2 leading-tight">{lt.officialDownload}</h3>
-                  <p className="text-xs text-muted-foreground font-medium leading-relaxed">{lt.officialDownloadDesc}</p>
+                  <h3 className="text-xl font-bold mb-2 leading-tight" style={{ color: "var(--ink-900)" }}>{lt.officialDownload}</h3>
+                  <p className="text-xs font-medium leading-relaxed" style={{ color: "var(--ink-500)" }}>{lt.officialDownloadDesc}</p>
                 </div>
              </motion.div>
           </div>
@@ -725,17 +720,15 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
           transition={{ type: "spring", bounce: 0.5 }}
           className="flex flex-col items-center"
         >
-           <motion.img 
-             animate={{ y: [0, -15, 0] }}
-             transition={{ repeat: Infinity, duration: 2.5 }}
+           <img
              src="/pinguinos/pinguino_like.png"
-             className="w-24 h-24 mb-4 drop-shadow-xl object-contain"
-             alt="Like"
+             className="w-24 h-24 mb-4 object-contain"
+             alt=""
            />
-           <h2 className="text-2xl font-bold text-foreground mb-2 tracking-tight">{t("planificationDesc")}</h2>
-           <p className="text-sm text-muted-foreground mb-6">{t("formInstructions")}</p>
+           <h2 className="mb-2" style={{ font: "var(--text-display-3)", color: "var(--ink-900)" }}>{t("planificationDesc")}</h2>
+           <p className="text-sm mb-6" style={{ color: "var(--ink-500)" }}>{t("formInstructions")}</p>
 
-           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-8 text-xs text-muted-foreground max-w-2xl border-t border-border/60 pt-6">
+           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-8 text-xs max-w-2xl border-t pt-6" style={{ color: "var(--ink-500)", borderColor: "var(--border-subtle)" }}>
              <a href="/legal/aviso_legal.txt" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--blue-500)] transition-colors hover:underline">
                Aviso Legal
              </a>

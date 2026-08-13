@@ -33,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className={newsreader.variable}>
+    <html lang="es" className={`${GeistSans.variable} ${GeistMono.variable} ${newsreader.variable}`}>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${newsreader.variable} antialiased`}>
         <LanguageProvider>
           <Suspense fallback={null}>{children}</Suspense>
