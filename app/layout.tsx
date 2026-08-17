@@ -14,6 +14,8 @@ const newsreader = Newsreader({
   subsets: ["latin"],
   variable: "--font-newsreader",
   weight: ["500", "600"],
+  display: "swap",
+  adjustFontFallback: false,
 })
 
 export const metadata: Metadata = {

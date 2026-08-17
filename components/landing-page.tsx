@@ -284,7 +284,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
           className="max-w-5xl mx-auto"
         >
           <div className="text-center mb-8">
-            <h2 className="mb-4" style={{ font: "var(--text-display-2)", color: "var(--ink-900)" }}>{t("interactiveDemo")}</h2>
+            <h2 className="mb-4 text-display-2 font-serif" style={{ color: "var(--ink-900)" }}>{t("interactiveDemo")}</h2>
             <p className="text-lg" style={{ color: "var(--ink-500)" }}>{t("interactiveDemoDesc")}</p>
           </div>
           <div
@@ -325,7 +325,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
             className="flex flex-col gap-8"
           >
             <div>
-              <h2 className="mb-6" style={{ font: "var(--text-display-2)", color: "var(--ink-900)", letterSpacing: "-0.01em" }}>
+              <h2 className="mb-6 text-display-2 font-serif" style={{ color: "var(--ink-900)", letterSpacing: "-0.01em" }}>
                 {t("whyChooseTitle")}
               </h2>
               <p className="text-lg font-medium leading-relaxed" style={{ color: "var(--ink-500)" }}>
@@ -425,7 +425,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
                 <span className="w-2 h-2 rounded-full" style={{ background: "var(--emerald-500)" }} />
                 {lt.newAsistant}
               </div>
-              <h2 style={{ font: "var(--text-display-2)", color: "var(--ink-900)" }}>
+              <h2 className="text-display-2 font-serif" style={{ color: "var(--ink-900)" }}>
                 {t("whatsAppTitle")}
               </h2>
               <p className="text-sm md:text-base font-medium leading-relaxed max-w-xl" style={{ color: "var(--ink-500)" }}>
@@ -524,7 +524,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
         >
           <div className="flex flex-col md:flex-row justify-between items-end mb-10 relative z-10">
             <div className="max-w-xl">
-              <h2 className="mb-2" style={{ font: "var(--text-h1)", color: "var(--ink-900)" }}>{t("exploreRepo")}</h2>
+              <h2 className="mb-2 text-ds-h1 font-sans" style={{ color: "var(--ink-900)" }}>{t("exploreRepo")}</h2>
               <p className="text-sm font-medium" style={{ color: "var(--ink-500)" }}>{t("repoDesc")}</p>
             </div>
 
@@ -632,7 +632,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
             style={{ background: "var(--blue-50)", border: "1px solid var(--blue-100)", borderRadius: "var(--ds-radius-xl)" }}
           >
             <div className="relative z-10">
-              <h2 className="mb-4" style={{ font: "var(--text-display-2)", color: "var(--ink-900)" }}>{lt.teacherTools}</h2>
+              <h2 className="mb-4 text-display-2 font-serif" style={{ color: "var(--ink-900)" }}>{lt.teacherTools}</h2>
               <p className="font-medium text-sm max-w-xs leading-relaxed" style={{ color: "var(--ink-500)" }}>
                 {lt.teacherToolsDesc}
               </p>
@@ -725,7 +725,7 @@ export function LandingPage({ onEnterGeneratorPreview, onEnterRepositoryPreview,
              className="w-24 h-24 mb-4 object-contain"
              alt=""
            />
-           <h2 className="mb-2" style={{ font: "var(--text-display-3)", color: "var(--ink-900)" }}>{t("planificationDesc")}</h2>
+           <h2 className="mb-2 text-display-3 font-serif" style={{ color: "var(--ink-900)" }}>{t("planificationDesc")}</h2>
            <p className="text-sm mb-6" style={{ color: "var(--ink-500)" }}>{t("formInstructions")}</p>
 
            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-8 text-xs max-w-2xl border-t pt-6" style={{ color: "var(--ink-500)", borderColor: "var(--border-subtle)" }}>

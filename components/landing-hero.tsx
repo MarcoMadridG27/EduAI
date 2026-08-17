@@ -234,13 +234,13 @@ export function LandingHero({ onEnterGeneratorPreview, onEnterRepositoryPreview 
             Alineado al CNEB
           </div>
 
-          <h1 className="mb-6" style={{ font: "var(--text-display-1)", color: "var(--ink-900)", letterSpacing: "-0.01em" }}>
+          <h1 className="mb-6 text-display-1 font-serif" style={{ color: "var(--ink-900)", letterSpacing: "-0.01em" }}>
             Planifica tu clase
             <br />
             mientras la IA <span style={{ color: "var(--blue-500)" }}>la escribe</span>.
           </h1>
 
-          <p className="max-w-xl mb-9" style={{ font: "var(--text-body-lg)", color: "var(--ink-500)" }}>
+          <p className="max-w-xl mb-9 text-lg font-normal leading-relaxed" style={{ color: "var(--ink-500)" }}>
             {t("heroSubtitle")}
           </p>
 
